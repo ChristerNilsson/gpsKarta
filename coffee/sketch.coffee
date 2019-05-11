@@ -1,7 +1,7 @@
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 
-DISTANCES = [1,2,3,4,5,6,7,8,9,10,20,30,40,50,60,70,80,90,100,200,300,400,500,600,700,800,900,1000,2000,3000,4000,5000]
+# DISTANCES = [1,2,3,4,5,6,7,8,9,10,20,30,40,50,60,70,80,90,100,200,300,400,500,600,700,800,900,1000,2000,3000,4000,5000]
 
 spara = (lat,lon, x,y) -> {lat,lon, x,y}
 
@@ -151,15 +151,15 @@ makeCorners = ->
 
 	gps = new GPS nw,ne,se,sw,WIDTH,HEIGHT
 
-sayDistance = (a,b) ->
+sayDistance = (a,b) -> # anropa say om någon gräns passeras 1,2,3,4,5,6,8,9,10,20,30,...
 	# if a border is crossed, play a sound
-	for distance in DISTANCES
-		count = 0
-		if a<distance then count += 1
-		if b<distance then count += 1
-		if count==1
-			if distance >= 10 then distance = 'distans ' + distance
-			say distance, round(distance)//100
+	sa = round(a).toString()
+	sb = round(b).toString()
+	if sa.length==sb.length and sa[0]==sb[0] then return
+	distance = if a >= 10 then 'distans ' + sa[0] else sa[0]
+	for i in range sa.length-1
+		distance += '0'
+	say distance
 
 sayBearing = (a,b) -> # a is newer
 	# if a border is crossed, play a sound
@@ -227,10 +227,9 @@ initSpeaker = ->
 	speaker.voice = voices[5]	
 	speaker.voiceURI = "native"
 	speaker.volume = 1
-	speaker.rate = 1
+	speaker.rate = 0.8
 	speaker.pitch = 0.8
 	speaker.text = 'Välkommen!'
-	#speaker.lang = 'en-US'
 	speaker.lang = 'sv-SE'
 
 setup = ->
