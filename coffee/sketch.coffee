@@ -103,9 +103,9 @@ messages = []
 currentControl = "1"
 timeout = null
 
-sendMail = (txt) ->
-	output = encodeURI "mailto:#{MAIL}?&subject=gpsKarta&body=" + txt
-	window.open output,'_blank'
+sendMail = (body) ->
+	mail.href = "mailto:#{MAIL}?Subject=gpsKarta&body=" + body
+	mail.click()
 
 say = (m) ->
 	speechSynthesis.cancel()
@@ -367,4 +367,4 @@ myMousePressed = (mx,my) ->
 		xdraw()
 
 # only for debug on laptop
-#mousePressed = -> myMousePressed mouseX,mouseY
+# mousePressed = -> myMousePressed mouseX,mouseY

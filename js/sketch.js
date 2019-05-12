@@ -134,10 +134,9 @@ currentControl = "1";
 
 timeout = null;
 
-sendMail = function sendMail(txt) {
-  var output;
-  output = encodeURI('mailto:' + MAIL + '?&subject=gpsKarta&body=' + txt);
-  return window.open(output, '_blank');
+sendMail = function sendMail(body) {
+  mail.href = 'mailto:' + MAIL + '?Subject=gpsKarta&body=' + body;
+  return mail.click();
 };
 
 say = function say(m) {
@@ -509,5 +508,5 @@ myMousePressed = function myMousePressed(mx, my) {
 };
 
 // only for debug on laptop
-//mousePressed = -> myMousePressed mouseX,mouseY
+// mousePressed = -> myMousePressed mouseX,mouseY
 //# sourceMappingURL=sketch.js.map
