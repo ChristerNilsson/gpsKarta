@@ -33,6 +33,8 @@ var A,
     hortal,
     img,
     initSpeaker,
+    lastBearing,
+    lastDistance,
     locationUpdate,
     locationUpdateFail,
     makeCorners,
@@ -201,6 +203,10 @@ currentControl = "1";
 
 timeout = null;
 
+lastBearing = '';
+
+lastDistance = '';
+
 // sendMail '1 A 59.123456 18.123456 2019-05-12 12:34:56'
 sendMail = function sendMail(subject, body) {
   mail.href = 'mailto:' + MAIL + '?Subject=' + subject + '&body=' + body;
@@ -291,7 +297,11 @@ sayDistance = function sayDistance(a, b) {
   // if a border is crossed, play a sound
   if (a <= LIMIT) {
     if (Math.round(a) !== Math.round(b)) {
-      say(Math.round(a));
+      distance = Math.round(a).toString();
+      if (distance !== lastDistance) {
+        say(distance);
+        lastDistance = distance;
+      }
       return;
     }
   }
@@ -301,13 +311,16 @@ sayDistance = function sayDistance(a, b) {
     return;
   }
   distance = a >= LIMIT ? 'distans ' + sa : sa;
-  return say(distance);
+  if (distance !== lastDistance) {
+    say(distance);
+    return lastDistance = distance;
+  }
 };
 
 // eventuellt kräva tio sekunder sedan föregående bäring sades
 sayBearing = function sayBearing(a, b) {
   // a is newer
-  var c, d, tr;
+  var bearing, c, d, lastbearing, tr;
   // if a border is crossed, tell the new bearing
   a = Math.round(a / 10);
   b = Math.round(b / 10);
@@ -319,8 +332,11 @@ sayBearing = function sayBearing(a, b) {
     tr = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split(' ');
     c = tr[Math.floor(a / 10)];
     d = tr[modulo(a, 10)];
-    print('bäring ' + c + ' ' + d);
-    return say('bäring ' + c + ' ' + d);
+    bearing = 'bäring ' + c + ' ' + d;
+    if (bearing !== lastBearing) {
+      say(bearing);
+      return lastbearing = bearing;
+    }
   }
 };
 

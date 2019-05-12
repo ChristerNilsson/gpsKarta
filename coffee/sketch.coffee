@@ -108,6 +108,9 @@ messages = []
 currentControl = "1"
 timeout = null
 
+lastBearing = ''
+lastDistance = ''
+
 # sendMail '1 A 59.123456 18.123456 2019-05-12 12:34:56'
 sendMail = (subject,body) ->
 	mail.href = "mailto:#{MAIL}?Subject=#{subject}&body=#{body}"
@@ -176,13 +179,18 @@ sayDistance = (a,b) -> # anropa say om någon gräns passeras 1,2,3,4,5,6,8,9,10
 	# if a border is crossed, play a sound
 	if a <= LIMIT
 		if Math.round(a) != Math.round(b)
-			say Math.round a
+			distance = (Math.round a).toString()
+			if distance != lastDistance 
+				say distance 
+				lastDistance = distance
 			return
 	sa = coarse a
 	sb = coarse b
 	if sa == sb then return
 	distance = if a >= LIMIT then 'distans ' + sa else sa
-	say distance
+	if distance != lastDistance 
+		say distance
+		lastDistance = distance 
 
 # eventuellt kräva tio sekunder sedan föregående bäring sades
 sayBearing = (a,b) -> # a is newer
@@ -194,8 +202,10 @@ sayBearing = (a,b) -> # a is newer
 		tr = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
 		c = tr[a//10]
 		d = tr[a%%10]
-		print 'bäring ' + c + ' ' + d
-		say 'bäring ' + c + ' ' + d
+		bearing = 'bäring ' + c + ' ' + d
+		if bearing != lastBearing
+			say bearing
+			lastbearing = bearing
 
 showSpeed = (sp) -> buttons[0].prompt = myround sp, 1
 
