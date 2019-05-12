@@ -370,4 +370,4 @@ myMousePressed = (mx,my) ->
 		xdraw()
 
 # only for debug on laptop
-mousePressed = -> myMousePressed mouseX,mouseY
+#mousePressed = -> myMousePressed mouseX,mouseY
