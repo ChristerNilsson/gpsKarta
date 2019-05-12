@@ -48,3 +48,12 @@ Genom att klicka på en kontroll kan man se bäring och avstånd till kontrollen
 ## Intern info
 
 * playSound måste göra ett minimum för att hinna med 10 Hz.
+
+## Förslag
+
+* Låt localStorage lagras i molnet vid wifikontakt (typ Google Photo)
+* Då man går in på en annan enhet kopieras localStorage ner till den enheten (typ Google Photo)
+* Fördelar: man kommer åt data insamlade på en annan enhet utan att behöva någon server.
+* localStorage lagras per domän, per inloggad
+* Konflikt om två olika enheter ändrar localStorage samtidigt.
+* Alternativ: lagra i Google Sheets?

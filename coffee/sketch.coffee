@@ -1,6 +1,8 @@
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 
+MAIL = 'janchrister.nilsson@gmail.com'
+
 # DISTANCES = [1,2,3,4,5,6,7,8,9,10,20,30,40,50,60,70,80,90,100,200,300,400,500,600,700,800,900,1000,2000,3000,4000,5000]
 
 spara = (lat,lon, x,y) -> {lat,lon, x,y}
@@ -100,6 +102,10 @@ messages = []
 [trgLat,trgLon] = [0,0]
 currentControl = "1"
 timeout = null
+
+sendMail = (txt) ->
+	output = encodeURI "mailto:#{MAIL}?&subject=gpsKarta&body=" + txt
+	window.open output,'_blank'
 
 say = (m) ->
 	speechSynthesis.cancel()
@@ -272,7 +278,9 @@ setup = ->
 
 	buttons.push new Button 'R',x2,y, -> cx += 0.33*width/SCALE
 	buttons.push new Button '-',x1,y2, -> if SCALE > 0.5 then SCALE /= 1.5
-	buttons.push new Button 'D',x,y2, -> cy += 0.33*height/SCALE
+	buttons.push new Button 'D',x,y2, -> 
+		cy += 0.33*height/SCALE
+		sendMail '1 A 59.123456 18.123456 2019-05-12 12:34:56'
 	buttons.push new Button '+',x2,y2, ->	SCALE *= 1.5
 
 	position = [WIDTH/2,HEIGHT/2]
@@ -359,4 +367,4 @@ myMousePressed = (mx,my) ->
 		xdraw()
 
 # only for debug on laptop
-# mousePressed = -> myMousePressed mouseX,mouseY
+#mousePressed = -> myMousePressed mouseX,mouseY
