@@ -168,6 +168,7 @@ sayDistance = (a,b) -> # anropa say om någon gräns passeras 1,2,3,4,5,6,8,9,10
 	sa = round(a).toString()
 	sb = round(b).toString()
 	if a <= LIMIT
+		if sa==sb then return
 		say sa
 		return
 	if sa.length==sb.length and sa[0]==sb[0] then return

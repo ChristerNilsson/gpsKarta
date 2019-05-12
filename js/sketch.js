@@ -275,6 +275,9 @@ sayDistance = function sayDistance(a, b) {
   sa = round(a).toString();
   sb = round(b).toString();
   if (a <= LIMIT) {
+    if (sa === sb) {
+      return;
+    }
     say(sa);
     return;
   }
