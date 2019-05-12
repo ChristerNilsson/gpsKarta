@@ -221,7 +221,7 @@ myround = function myround(x) {
   var dec = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 6;
 
   x *= Math.pow(10, dec);
-  x = round(x);
+  x = Math.round(x);
   return x / Math.pow(10, dec);
 };
 
@@ -271,17 +271,17 @@ makeCorners = function makeCorners() {
 
 coarse = function coarse(x) {
   var n, s;
-  n = round(x).toString().length;
+  n = Math.round(x).toString().length;
   return s = myround(x, 1 - n);
 };
 
-assert('4000', coarse(3917));
+assert(4000, coarse(3917));
 
-assert('400', coarse(421));
+assert(400, coarse(421));
 
-assert('40', coarse(36));
+assert(40, coarse(36));
 
-assert('5', coarse(5.3));
+assert(5, coarse(5.3));
 
 sayDistance = function sayDistance(a, b) {
   // anropa say om någon gräns passeras 1,2,3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,30,...
@@ -308,8 +308,8 @@ sayBearing = function sayBearing(a, b) {
   // a is newer
   var c, d, tr;
   // if a border is crossed, tell the new bearing
-  a = round(a / 10);
-  b = round(b / 10);
+  a = Math.round(a / 10);
+  b = Math.round(b / 10);
   if (a !== b) {
     // 0..35
     if (a === 0) {
@@ -333,8 +333,8 @@ soundIndicator = function soundIndicator(p) {
   c = LatLon(trgLat, trgLon); // target
   dista = a.distanceTo(c);
   distb = b.distanceTo(c);
-  distance = round((dista - distb) / DIST);
-  buttons[5].prompt = round(dista);
+  distance = Math.round((dista - distb) / DIST);
+  buttons[5].prompt = Math.round(dista);
   sayDistance(dista, distb);
   bearinga = a.bearingTo(c);
   bearingb = b.bearingTo(c);

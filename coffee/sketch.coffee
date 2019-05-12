@@ -122,7 +122,7 @@ preload = -> img = loadImage FILENAME
 
 myround = (x,dec=6) ->
 	x *= 10**dec
-	x = round x
+	x = Math.round x
 	x/10**dec
 
 show = (prompt,p) -> print prompt,"http://maps.google.com/maps?q=#{p.lat},#{p.lon}"	
@@ -164,12 +164,12 @@ makeCorners = ->
 	gps = new GPS nw,ne,se,sw,WIDTH,HEIGHT
 
 coarse = (x) ->
-	n = round(x).toString().length
+	n = Math.round(x).toString().length
 	s = myround x,1-n
-assert '4000', coarse 3917	
-assert '400', coarse 421	
-assert '40', coarse 36
-assert '5', coarse 5.3
+assert 4000, coarse 3917	
+assert 400, coarse 421	
+assert 40, coarse 36
+assert 5, coarse 5.3
 
 sayDistance = (a,b) -> # anropa say om någon gräns passeras 1,2,3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,30,...
 	# if a border is crossed, play a sound
@@ -188,8 +188,8 @@ sayDistance = (a,b) -> # anropa say om någon gräns passeras 1,2,3,4,5,6,8,9,10
 # eventuellt kräva tio sekunder sedan föregående bäring sades
 sayBearing = (a,b) -> # a is newer
 	# if a border is crossed, tell the new bearing
-	a = round a/10
-	b = round b/10
+	a = Math.round a/10
+	b = Math.round b/10
 	if a != b # 0..35
 		if a == 0 then a = 36
 		tr = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
@@ -207,8 +207,8 @@ soundIndicator = (p) ->
 
 	dista = a.distanceTo c
 	distb = b.distanceTo c
-	distance = round((dista - distb)/DIST)
-	buttons[5].prompt = round dista
+	distance = Math.round (dista - distb)/DIST
+	buttons[5].prompt = Math.round dista
 
 	sayDistance dista,distb
 	bearinga = a.bearingTo c
