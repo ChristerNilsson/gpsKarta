@@ -134,6 +134,7 @@ currentControl = "1";
 
 timeout = null;
 
+// sendMail '1 A 59.123456 18.123456 2019-05-12 12:34:56'
 sendMail = function sendMail(body) {
   mail.href = 'mailto:' + MAIL + '?Subject=gpsKarta&body=' + body;
   return mail.click();
@@ -369,8 +370,7 @@ setup = function setup() {
     }
   }));
   buttons.push(new Button('D', x, y2, function () {
-    cy += 0.33 * height / SCALE;
-    return sendMail('1 A 59.123456 18.123456 2019-05-12 12:34:56');
+    return cy += 0.33 * height / SCALE;
   }));
   buttons.push(new Button('+', x2, y2, function () {
     return SCALE *= 1.5;

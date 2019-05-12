@@ -103,6 +103,7 @@ messages = []
 currentControl = "1"
 timeout = null
 
+# sendMail '1 A 59.123456 18.123456 2019-05-12 12:34:56'
 sendMail = (body) ->
 	mail.href = "mailto:#{MAIL}?Subject=gpsKarta&body=" + body
 	mail.click()
@@ -278,9 +279,7 @@ setup = ->
 
 	buttons.push new Button 'R',x2,y, -> cx += 0.33*width/SCALE
 	buttons.push new Button '-',x1,y2, -> if SCALE > 0.5 then SCALE /= 1.5
-	buttons.push new Button 'D',x,y2, -> 
-		cy += 0.33*height/SCALE
-		sendMail '1 A 59.123456 18.123456 2019-05-12 12:34:56'
+	buttons.push new Button 'D',x,y2, -> cy += 0.33*height/SCALE
 	buttons.push new Button '+',x2,y2, ->	SCALE *= 1.5
 
 	position = [WIDTH/2,HEIGHT/2]
