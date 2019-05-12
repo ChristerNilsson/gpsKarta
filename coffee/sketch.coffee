@@ -282,6 +282,10 @@ setup = ->
 	buttons.push new Button 'D',x,y2, -> cy += 0.33*height/SCALE
 	buttons.push new Button '+',x2,y2, ->	SCALE *= 1.5
 
+	buttons.push new Button 'T',(x+x2)/2,(y+y2)/2, ->
+		d = new Date()
+		sendMail "#{currentControl} #{gpsLat} #{gpsLon} #{d.toISOString()}"
+
 	position = [WIDTH/2,HEIGHT/2]
 
 	navigator.geolocation.watchPosition locationUpdate, locationUpdateFail,
@@ -366,4 +370,4 @@ myMousePressed = (mx,my) ->
 		xdraw()
 
 # only for debug on laptop
-# mousePressed = -> myMousePressed mouseX,mouseY
+mousePressed = -> myMousePressed mouseX,mouseY
