@@ -163,18 +163,26 @@ makeCorners = ->
 
 	gps = new GPS nw,ne,se,sw,WIDTH,HEIGHT
 
-sayDistance = (a,b) -> # anropa say om någon gräns passeras 1,2,3,4,5,6,8,9,10,20,30,...
+coarse = (x) ->
+	n = round(x).toString().length
+	s = myround x,1-n
+assert '4000', coarse 3917	
+assert '400', coarse 421	
+assert '40', coarse 36
+assert '5', coarse 5.3
+
+sayDistance = (a,b) -> # anropa say om någon gräns passeras 1,2,3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,30,...
 	# if a border is crossed, play a sound
-	sa = round(a).toString()
-	sb = round(b).toString()
+	sa = coarse a
+	sb = coarse b
+	if sa==sb then return
 	if a <= LIMIT
-		if sa==sb then return
 		say sa
 		return
-	if sa.length==sb.length and sa[0]==sb[0] then return
-	distance = if a >= 10 then 'distans ' + sa[0] else sa[0]
-	for i in range sa.length-1
-		distance += '0'
+	#if sa.length==sb.length and sa[0]==sb[0] then return
+	distance = if a >= LIMIT then 'distans ' + sa else sa
+	#for i in range sa.length-1
+	#	distance += '0'
 	say distance
 
 # eventuellt kräva tio sekunder sedan föregående bäring sades

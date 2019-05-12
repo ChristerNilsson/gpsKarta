@@ -18,6 +18,7 @@ var A,
     TRACKED,
     WIDTH,
     buttons,
+    coarse,
     controls,
     corner,
     currentControl,
@@ -268,28 +269,37 @@ makeCorners = function makeCorners() {
   return gps = new GPS(nw, ne, se, sw, WIDTH, HEIGHT);
 };
 
+coarse = function coarse(x) {
+  var n, s;
+  n = round(x).toString().length;
+  return s = myround(x, 1 - n);
+};
+
+assert('4000', coarse(3917));
+
+assert('400', coarse(421));
+
+assert('40', coarse(36));
+
+assert('5', coarse(5.3));
+
 sayDistance = function sayDistance(a, b) {
-  // anropa say om någon gräns passeras 1,2,3,4,5,6,8,9,10,20,30,...
-  var distance, i, j, len, ref, sa, sb;
+  // anropa say om någon gräns passeras 1,2,3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,30,...
+  var distance, sa, sb;
   // if a border is crossed, play a sound
-  sa = round(a).toString();
-  sb = round(b).toString();
+  sa = coarse(a);
+  sb = coarse(b);
+  if (sa === sb) {
+    return;
+  }
   if (a <= LIMIT) {
-    if (sa === sb) {
-      return;
-    }
     say(sa);
     return;
   }
-  if (sa.length === sb.length && sa[0] === sb[0]) {
-    return;
-  }
-  distance = a >= 10 ? 'distans ' + sa[0] : sa[0];
-  ref = range(sa.length - 1);
-  for (j = 0, len = ref.length; j < len; j++) {
-    i = ref[j];
-    distance += '0';
-  }
+  //if sa.length==sb.length and sa[0]==sb[0] then return
+  distance = a >= LIMIT ? 'distans ' + sa : sa;
+  //for i in range sa.length-1
+  //	distance += '0'
   return say(distance);
 };
 
