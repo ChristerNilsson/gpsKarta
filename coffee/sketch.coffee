@@ -1,17 +1,22 @@
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
+LIMIT = 20 # meter. Under this, no bearing. Also distance voice every meter.
 
 MAIL = 'janchrister.nilsson@gmail.com'
-
-# DISTANCES = [1,2,3,4,5,6,7,8,9,10,20,30,40,50,60,70,80,90,100,200,300,400,500,600,700,800,900,1000,2000,3000,4000,5000]
 
 spara = (lat,lon, x,y) -> {lat,lon, x,y}
 
 # 2019-SommarN
-A = spara 59.300716, 18.125680, 197,278 # Lilla halvön
-B = spara 59.299235, 18.169492, 4306,367 # Kranglans väg/Östervägen
-C = spara 59.285443, 18.124585, 236,3082 # Ishockeyrink Mitten
-D = spara 59.287806, 18.170784, 4525,2454 # Mittenhus t v
+
+A = spara 59.2987921, 18.1284073, 472, 617 #  5 kontroll
+B = spara 59.2985405, 18.1699098,4361, 503 # 10
+C = spara 59.2851374, 18.1336592,1090,3104 # 31
+D = spara 59.2844998, 18.1666946,4181,3069 # 17
+
+# A = spara 59.300716, 18.125680,  197, 278 # Lilla halvön
+# B = spara 59.299235, 18.169492, 4306, 367 # Kranglans väg/Östervägen
+# C = spara 59.285443, 18.124585,  236,3082 # Ishockeyrink Mitten
+# D = spara 59.287806, 18.170784, 4525,2454 # Mittenhus t v
 
 FILENAME = '2019-SommarN.jpg' 
 
@@ -104,8 +109,8 @@ currentControl = "1"
 timeout = null
 
 # sendMail '1 A 59.123456 18.123456 2019-05-12 12:34:56'
-sendMail = (body) ->
-	mail.href = "mailto:#{MAIL}?Subject=gpsKarta&body=" + body
+sendMail = (subject,body) ->
+	mail.href = "mailto:#{MAIL}?Subject=#{subject}&body=#{body}"
 	mail.click()
 
 say = (m) ->
@@ -162,21 +167,26 @@ sayDistance = (a,b) -> # anropa say om någon gräns passeras 1,2,3,4,5,6,8,9,10
 	# if a border is crossed, play a sound
 	sa = round(a).toString()
 	sb = round(b).toString()
+	if a <= LIMIT
+		say sa
+		return
 	if sa.length==sb.length and sa[0]==sb[0] then return
 	distance = if a >= 10 then 'distans ' + sa[0] else sa[0]
 	for i in range sa.length-1
 		distance += '0'
 	say distance
 
+# eventuellt kräva tio sekunder sedan föregående bäring sades
 sayBearing = (a,b) -> # a is newer
-	# if a border is crossed, play a sound
-	a = round(a) // 10
-	b = round(b) // 10
+	# if a border is crossed, tell the new bearing
+	a = round a/10
+	b = round b/10
 	if a != b # 0..35
 		if a == 0 then a = 36
-		s = a.toString()  
-		if s.length == 1 then s = '0' + s
-		say 'bäring ' + s[0] + ' ' + s[1]
+		tr = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
+		c = tr[a//10]
+		d = tr[a%%10]
+		say 'bäring ' + c + ' ' + d
 
 showSpeed = (sp) -> buttons[0].prompt = myround sp, 1
 
@@ -194,7 +204,7 @@ soundIndicator = (p) ->
 	sayDistance dista,distb
 	bearinga = a.bearingTo c
 	bearingb = b.bearingTo c
-	if dista >= 10 then sayBearing bearinga,bearingb
+	if dista >= LIMIT then sayBearing bearinga,bearingb
 
 	showSpeed abs dista-distb
 
@@ -284,7 +294,7 @@ setup = ->
 
 	buttons.push new Button 'T',(x+x2)/2,(y+y2)/2, ->
 		d = new Date()
-		sendMail "#{currentControl} #{gpsLat} #{gpsLon} #{d.toISOString()}"
+		sendMail currentControl, "#{currentControl} #{gpsLat} #{gpsLon} #{d.toISOString()}"
 
 	position = [WIDTH/2,HEIGHT/2]
 
