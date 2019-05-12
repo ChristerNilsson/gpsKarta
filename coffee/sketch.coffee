@@ -174,12 +174,13 @@ assert '5', coarse 4.6
 
 sayDistance = (a,b) -> # anropa say om någon gräns passeras 1,2,3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,30,...
 	# if a border is crossed, play a sound
+	if a <= LIMIT
+		if Math.round(a) != Math.round(b)
+			say Math.round a
+			return
 	sa = coarse a
 	sb = coarse b
-	if sa==sb then return
-	if a <= LIMIT
-		say sa
-		return
+	if sa == sb then return
 	distance = if a >= LIMIT then 'distans ' + sa else sa
 	say distance
 
