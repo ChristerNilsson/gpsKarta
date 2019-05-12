@@ -165,11 +165,12 @@ makeCorners = ->
 
 coarse = (x) ->
 	n = Math.round(x).toString().length
-	s = myround x,1-n
-assert 4000, coarse 3917	
-assert 400, coarse 421	
-assert 40, coarse 36
-assert 5, coarse 5.3
+	myround(x,1-n).toString()
+assert '4000', coarse 3917.5	
+assert '400', coarse 421.2	
+assert '40', coarse 36.8
+assert '5', coarse 5.4
+assert '5', coarse 4.6
 
 sayDistance = (a,b) -> # anropa say om någon gräns passeras 1,2,3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,30,...
 	# if a border is crossed, play a sound
@@ -179,10 +180,7 @@ sayDistance = (a,b) -> # anropa say om någon gräns passeras 1,2,3,4,5,6,8,9,10
 	if a <= LIMIT
 		say sa
 		return
-	#if sa.length==sb.length and sa[0]==sb[0] then return
 	distance = if a >= LIMIT then 'distans ' + sa else sa
-	#for i in range sa.length-1
-	#	distance += '0'
 	say distance
 
 # eventuellt kräva tio sekunder sedan föregående bäring sades
@@ -195,6 +193,7 @@ sayBearing = (a,b) -> # a is newer
 		tr = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
 		c = tr[a//10]
 		d = tr[a%%10]
+		print 'bäring ' + c + ' ' + d
 		say 'bäring ' + c + ' ' + d
 
 showSpeed = (sp) -> buttons[0].prompt = myround sp, 1

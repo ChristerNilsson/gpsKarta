@@ -270,18 +270,20 @@ makeCorners = function makeCorners() {
 };
 
 coarse = function coarse(x) {
-  var n, s;
+  var n;
   n = Math.round(x).toString().length;
-  return s = myround(x, 1 - n);
+  return myround(x, 1 - n).toString();
 };
 
-assert(4000, coarse(3917));
+assert('4000', coarse(3917.5));
 
-assert(400, coarse(421));
+assert('400', coarse(421.2));
 
-assert(40, coarse(36));
+assert('40', coarse(36.8));
 
-assert(5, coarse(5.3));
+assert('5', coarse(5.4));
+
+assert('5', coarse(4.6));
 
 sayDistance = function sayDistance(a, b) {
   // anropa say om någon gräns passeras 1,2,3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,30,...
@@ -296,10 +298,7 @@ sayDistance = function sayDistance(a, b) {
     say(sa);
     return;
   }
-  //if sa.length==sb.length and sa[0]==sb[0] then return
   distance = a >= LIMIT ? 'distans ' + sa : sa;
-  //for i in range sa.length-1
-  //	distance += '0'
   return say(distance);
 };
 
@@ -318,6 +317,7 @@ sayBearing = function sayBearing(a, b) {
     tr = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split(' ');
     c = tr[Math.floor(a / 10)];
     d = tr[modulo(a, 10)];
+    print('bäring ' + c + ' ' + d);
     return say('bäring ' + c + ' ' + d);
   }
 };
