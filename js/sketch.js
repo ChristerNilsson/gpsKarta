@@ -769,6 +769,9 @@ menu4 = function menu4() {
 update = function update(littera) {
   var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
 
+  var d;
+  d = new Date();
+  sendMail(currentControl, currentControl + ' ' + littera + ' ' + gpsLat + ' ' + gpsLon + ' ' + d.toISOString());
   controls[currentControl][index] = littera;
   return dialogues.clear();
 };

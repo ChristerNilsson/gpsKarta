@@ -498,6 +498,8 @@ menu4 = -> # Take
 	dialogue.buttons[4].info 'UVWXYZ', true, -> menu9()
 
 update = (littera,index=2) ->
+	d = new Date()
+	sendMail currentControl, "#{currentControl} #{littera} #{gpsLat} #{gpsLon} #{d.toISOString()}"
 	controls[currentControl][index] = littera
 	dialogues.clear()
 
