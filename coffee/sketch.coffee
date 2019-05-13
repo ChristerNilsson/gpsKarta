@@ -241,15 +241,16 @@ soundIndicator = (p) ->
 	dista = a.distanceTo c
 	distb = b.distanceTo c
 	distance = Math.round (dista - distb)/DIST
-	messages[2] = Math.round dista
 
 	sayDistance dista,distb
 	bearinga = a.bearingTo c
 	bearingb = b.bearingTo c
 	if dista >= LIMIT then sayBearing bearinga,bearingb
 
-	messages[3] = DIST * distance # abs dista-distb
-	if abs(messages[3]) > 10 then messages[3] = ''
+	if abs(DIST * distance) < 10 
+		messages[3] = "#{DIST * distance} m/s" # abs dista-distb
+	else
+		messages[3] = ''
 
 	if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = p.coords.latitude
@@ -380,7 +381,8 @@ drawControl = ->
 
 	bearing = latLon1.bearingTo latLon2
 	messages[0] = currentControl
-	messages[1] = int bearing
+	messages[1] = "#{int bearing}º"
+	messages[2] = "#{Math.round(latLon1.distanceTo latLon2)} m"
 
 	control = controls[currentControl]
 	x = control[0]
