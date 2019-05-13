@@ -43,7 +43,6 @@ var A,
     makeCorners,
     makeTargets,
     menu1,
-    menu10,
     menu2,
     menu3,
     menu4,
@@ -662,7 +661,7 @@ menu1 = function menu1() {
     return xdraw();
   });
   dialogue.buttons[3].info('Speaker', true, function () {
-    return menu10();
+    return initSpeaker(5);
   });
   return dialogue.buttons[4].info('Take', true, function () {
     return menu4();
@@ -713,7 +712,7 @@ menu3 = function menu3() {
   lst = lst.sort(function (a, b) {
     return a[2] - b[2];
   });
-  dialogue = new Dialogue(3, 0, 0, int(0.15 * h));
+  dialogue = new Dialogue(3, 0, 0, int(0.25 * h));
   return dialogue.list(lst, 8, false, function (arr) {
     if (arr.length > 0) {
       setTarget(arr[0]);
@@ -879,45 +878,23 @@ menu9 = function menu9() {
   });
 };
 
-menu10 = function menu10() {
-  // speaker
-  var dialogue, r1, r2;
-  dialogue = new Dialogue(10, int(4 * w), int(2 * h), int(0.15 * h));
-  r1 = 0.27 * height;
-  r2 = 0.08 * height;
-  dialogue.clock(' ', 10, r1, r2, false);
-  dialogue.buttons[0].info('0', true, function () {
-    return initSpeaker(0);
-  });
-  dialogue.buttons[1].info('1', true, function () {
-    return initSpeaker(1);
-  });
-  dialogue.buttons[2].info('2', true, function () {
-    return initSpeaker(2);
-  });
-  dialogue.buttons[3].info('3', true, function () {
-    return initSpeaker(3);
-  });
-  dialogue.buttons[4].info('4', true, function () {
-    return initSpeaker(4);
-  });
-  dialogue.buttons[5].info('5', true, function () {
-    return initSpeaker(5);
-  });
-  dialogue.buttons[6].info('6', true, function () {
-    return initSpeaker(6);
-  });
-  dialogue.buttons[7].info('7', true, function () {
-    return initSpeaker(7);
-  });
-  dialogue.buttons[8].info('8', true, function () {
-    return initSpeaker(8);
-  });
-  return dialogue.buttons[9].info('9', true, function () {
-    return initSpeaker(9);
-  });
-};
+// menu10 = -> # speaker
+// 	dialogue = new Dialogue 10,int(4*w),int(2*h),int(0.15*h) 
 
+// 	r1 = 0.27 * height 
+// 	r2 = 0.08 * height
+// 	dialogue.clock ' ',10,r1,r2,false
+
+// 	dialogue.buttons[0].info '0', true, -> initSpeaker 0
+// 	dialogue.buttons[1].info '1', true, -> initSpeaker 1
+// 	dialogue.buttons[2].info '2', true, -> initSpeaker 2
+// 	dialogue.buttons[3].info '3', true, -> initSpeaker 3
+// 	dialogue.buttons[4].info '4', true, -> initSpeaker 4
+// 	dialogue.buttons[5].info '5', true, -> initSpeaker 5
+// 	dialogue.buttons[6].info '6', true, -> initSpeaker 6
+// 	dialogue.buttons[7].info '7', true, -> initSpeaker 7
+// 	dialogue.buttons[8].info '8', true, -> initSpeaker 8
+// 	dialogue.buttons[9].info '9', true, -> initSpeaker 9
 display = function display() {
   return xdraw();
 };

@@ -432,7 +432,7 @@ menu1 = -> # Main Menu
 		[cx,cy] = position
 		dialogues.clear()	
 		xdraw()	
-	dialogue.buttons[3].info 'Speaker', true, -> menu10() 
+	dialogue.buttons[3].info 'Speaker', true, -> initSpeaker 5
 	dialogue.buttons[4].info 'Take', true, -> menu4()
 
 menu2 = -> # Pan Zoom
@@ -457,7 +457,7 @@ menu3 = -> # Target
 	targets = makeTargets()
 	lst = targets.slice()
 	lst = lst.sort (a,b) -> a[2] - b[2]
-	dialogue = new Dialogue 3, 0,0, int(0.15*h)
+	dialogue = new Dialogue 3, 0,0, int(0.25*h)
 	dialogue.list lst, 8, false, (arr) ->
 		if arr.length > 0 then setTarget arr[0]
 		dialogues.clear()		
@@ -547,23 +547,23 @@ menu9 = -> # UVWXYZ
 	dialogue.buttons[4].info 'Y', true, -> update 'Y'
 	dialogue.buttons[5].info 'Z', true, -> update 'Z'
 
-menu10 = -> # speaker
-	dialogue = new Dialogue 10,int(4*w),int(2*h),int(0.15*h) 
+# menu10 = -> # speaker
+# 	dialogue = new Dialogue 10,int(4*w),int(2*h),int(0.15*h) 
 
-	r1 = 0.27 * height 
-	r2 = 0.08 * height
-	dialogue.clock ' ',10,r1,r2,false
+# 	r1 = 0.27 * height 
+# 	r2 = 0.08 * height
+# 	dialogue.clock ' ',10,r1,r2,false
 
-	dialogue.buttons[0].info '0', true, -> initSpeaker 0
-	dialogue.buttons[1].info '1', true, -> initSpeaker 1
-	dialogue.buttons[2].info '2', true, -> initSpeaker 2
-	dialogue.buttons[3].info '3', true, -> initSpeaker 3
-	dialogue.buttons[4].info '4', true, -> initSpeaker 4
-	dialogue.buttons[5].info '5', true, -> initSpeaker 5
-	dialogue.buttons[6].info '6', true, -> initSpeaker 6
-	dialogue.buttons[7].info '7', true, -> initSpeaker 7
-	dialogue.buttons[8].info '8', true, -> initSpeaker 8
-	dialogue.buttons[9].info '9', true, -> initSpeaker 9
+# 	dialogue.buttons[0].info '0', true, -> initSpeaker 0
+# 	dialogue.buttons[1].info '1', true, -> initSpeaker 1
+# 	dialogue.buttons[2].info '2', true, -> initSpeaker 2
+# 	dialogue.buttons[3].info '3', true, -> initSpeaker 3
+# 	dialogue.buttons[4].info '4', true, -> initSpeaker 4
+# 	dialogue.buttons[5].info '5', true, -> initSpeaker 5
+# 	dialogue.buttons[6].info '6', true, -> initSpeaker 6
+# 	dialogue.buttons[7].info '7', true, -> initSpeaker 7
+# 	dialogue.buttons[8].info '8', true, -> initSpeaker 8
+# 	dialogue.buttons[9].info '9', true, -> initSpeaker 9
 
 display = -> xdraw()
 

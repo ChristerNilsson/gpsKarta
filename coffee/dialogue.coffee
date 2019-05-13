@@ -3,7 +3,7 @@ dialogues = []
 class Dialogue 
 
 	constructor : (@number,@x,@y,@textSize) -> 
-		@col = '#ff08'
+		@col = '#ff0b'
 		@buttons = []
 		dialogues.push @
 

@@ -17,7 +17,7 @@ Dialogue = function () {
     this.x = x1;
     this.y = y1;
     this.textSize = textSize1;
-    this.col = '#ff08';
+    this.col = '#ff0b';
     this.buttons = [];
     dialogues.push(this);
   }
