@@ -289,9 +289,10 @@ initSpeaker = (index) ->
 	speaker.volume = 1
 	speaker.rate = 0.8
 	speaker.pitch = 0.8
-	speaker.text = 'Välkommen!'
+	speaker.text = ''
 	speaker.lang = 'sv-SE'
 	dialogues.clear()
+	say "speaker #{index}"
 
 setup = ->
 
@@ -317,33 +318,6 @@ setup = ->
 	x2 = width-100
 	y1 = 100
 	y2 = height-100
-
-	# buttons.push new Button 'S',x1,y1, -> # Store Bike Position
-	# 	initSpeaker()
-	# 	soundUp = loadSound 'soundUp.wav'
-	# 	soundDown = loadSound 'soundDown.wav'
-	# 	soundUp.setVolume 0.1
-	# 	soundDown.setVolume 0.1
-	# 	controls['bike'] = position
-	# 	buttons[2].prompt = 'bike'
-	# 	clearInterval timeout
-	# 	timeout = setInterval playSound, DELAY
-	# 	soundQueue = 0
-
-	# buttons.push new Button 'U',x,y1, -> cy -= 0.33*height/SCALE 
-	# buttons.push new Button '',x2,y1, -> setTarget 'bike'
-
-	# buttons.push new Button 'L',x1,y, -> cx -= 0.33*width/SCALE
-	# buttons.push new Button '', x,y, ->	[cx,cy] = position
-
-	# buttons.push new Button 'R',x2,y, -> cx += 0.33*width/SCALE
-	# buttons.push new Button '-',x1,y2, -> if SCALE > 0.5 then SCALE /= 1.5
-	# buttons.push new Button 'D',x,y2, -> cy += 0.33*height/SCALE
-	# buttons.push new Button '+',x2,y2, ->	SCALE *= 1.5
-
-	# buttons.push new Button 'T',(x+x2)/2,(y+y2)/2, ->
-	# 	d = new Date()
-	# 	sendMail currentControl, "#{currentControl} #{gpsLat} #{gpsLon} #{d.toISOString()}"
 
 	initControls()
 
@@ -418,22 +392,6 @@ setTarget = (key) ->
 	x = control[0]
 	y = control[1]
 	[trgLat,trgLon] = gps.bmp2gps x,y	
-
-#myMousePressed = (mx,my) ->
-	# for button in buttons
-	# 	if button.contains mx,my
-	# 		button.click()
-	# 		xdraw()
-	# 		return
-	# arr = ([dist(cx-width/SCALE/2 + mx/SCALE, cy-height/SCALE/2+my/SCALE, control[0], control[1]), key] for key,control of controls)
-	# closestControl = _.min arr, (item) -> item[0]
-	# [d,key] = closestControl
-	# if d < 85
-	# 	setTarget key
-	# 	xdraw()
-
-# only for debug on laptop
-#mousePressed = -> myMousePressed mouseX,mouseY
 
 ##########################
 
@@ -601,10 +559,6 @@ myMousePressed = (mx,my) ->
 	if not released then return false
 	released = false 
 
-	# if speaker == null 
-	# 	initSpeaker()
-	# 	return false
-
 	if dialogues.length == 1 and dialogues[0].number == 0 then dialogues.pop() # dölj indikatorer
 
 	dialogue = _.last dialogues
@@ -616,4 +570,4 @@ myMousePressed = (mx,my) ->
 	display()
 	false 
 
-# mousePressed = -> myMousePressed mouseX,mouseY
+mousePressed = -> myMousePressed mouseX,mouseY
