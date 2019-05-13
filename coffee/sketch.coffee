@@ -271,10 +271,10 @@ playSound = ->
 	if soundQueue==0 then xdraw()
 
 locationUpdate = (p) ->
-	messages[5] = gpsCount
-	messages[6] = myRound p.coords.latitude
-	messages[7] = myRound p.coords.longitude
 	gpsCount++
+	messages[5] = gpsCount
+	messages[6] = myround p.coords.latitude
+	messages[7] = myround p.coords.longitude
 	soundIndicator p
 
 	position = gps.gps2bmp gpsLat,gpsLon
@@ -574,4 +574,4 @@ myMousePressed = (mx,my) ->
 	display()
 	false 
 
-#mousePressed = -> myMousePressed mouseX,mouseY
+mousePressed = -> myMousePressed mouseX,mouseY

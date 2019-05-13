@@ -53,6 +53,7 @@ var A,
     menu8,
     menu9,
     messages,
+    mousePressed,
     mouseReleased,
     myMousePressed,
     myround,
@@ -464,10 +465,10 @@ playSound = function playSound() {
 };
 
 locationUpdate = function locationUpdate(p) {
-  messages[5] = gpsCount;
-  messages[6] = myRound(p.coords.latitude);
-  messages[7] = myRound(p.coords.longitude);
   gpsCount++;
+  messages[5] = gpsCount;
+  messages[6] = myround(p.coords.latitude);
+  messages[7] = myround(p.coords.longitude);
   soundIndicator(p);
   position = gps.gps2bmp(gpsLat, gpsLon);
   track.push(position);
@@ -940,5 +941,7 @@ myMousePressed = function myMousePressed(mx, my) {
   return false;
 };
 
-//mousePressed = -> myMousePressed mouseX,mouseY
+mousePressed = function mousePressed() {
+  return myMousePressed(mouseX, mouseY);
+};
 //# sourceMappingURL=sketch.js.map
