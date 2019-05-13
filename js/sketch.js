@@ -17,52 +17,70 @@ var A,
     SCALE,
     TRACKED,
     WIDTH,
-    buttons,
+    assert,
     coarse,
     controls,
     corner,
     currentControl,
     cx,
     cy,
-    drawButtons,
+    display,
     drawControl,
     drawTrack,
     gps,
     gpsLat,
     gpsLon,
+    h,
     hortal,
     img,
+    initControls,
     initSpeaker,
     lastBearing,
     lastDistance,
     locationUpdate,
     locationUpdateFail,
     makeCorners,
+    makeTargets,
+    menu1,
+    menu10,
+    menu2,
+    menu3,
+    menu4,
+    menu5,
+    menu6,
+    menu7,
+    menu8,
+    menu9,
     messages,
+    mousePressed,
+    mouseReleased,
     myMousePressed,
     myround,
     playSound,
     position,
     preload,
+    released,
     say,
     sayBearing,
     sayDistance,
     sendMail,
     setTarget,
     setup,
-    show,
-    showSpeed,
+    showDialogue,
     soundDown,
     soundIndicator,
     soundQueue,
     soundUp,
     spara,
     speaker,
+    targets,
     timeout,
     track,
     trgLat,
     trgLon,
+    update,
     vercal,
+    w,
     xdraw,
     modulo = function modulo(a, b) {
   return (+a % (b = +b) + b) % b;
@@ -81,13 +99,13 @@ spara = function spara(lat, lon, x, y) {
 };
 
 // 2019-SommarN
-A = spara(59.2987921, 18.1284073, 472, 617); //  5 kontroll
+A = spara(59.2987921, 18.1284073, 472, 617); // kontroll  5
 
-B = spara(59.2985405, 18.1699098, 4361, 503); // 10
+B = spara(59.2985405, 18.1699098, 4361, 503); // kontroll 10
 
-C = spara(59.2851374, 18.1336592, 1090, 3104); // 31
+C = spara(59.2851374, 18.1336592, 1090, 3104); // kontroll 31
 
-D = spara(59.2844998, 18.1666946, 4181, 3069); // 17
+D = spara(59.2844998, 18.1666946, 4181, 3069); // kontroll 17
 
 
 // A = spara 59.300716, 18.125680,  197, 278 # Lilla halvön
@@ -96,34 +114,34 @@ D = spara(59.2844998, 18.1666946, 4181, 3069); // 17
 // D = spara 59.287806, 18.170784, 4525,2454 # Mittenhus t v
 FILENAME = '2019-SommarN.jpg';
 
-controls = {
-  1: [1830, 333],
-  2: [1506, 521],
-  3: [907, 711],
-  4: [1193, 873],
-  5: [472, 617],
-  6: [228, 841],
-  7: [672, 1013],
-  8: [1125, 1196],
-  9: [1430, 1290],
-  10: [4361, 503],
-  11: [4118, 1106],
-  12: [3830, 640],
-  13: [3192, 1133],
-  14: [2664, 873],
-  15: [2322, 1862],
-  16: [4120, 2699],
-  17: [4181, 3069],
-  19: [3340, 2904],
-  20: [2691, 2554],
-  24: [3366, 3217],
-  26: [390, 1935],
-  27: [547, 2143],
-  28: [1462, 2293],
-  29: [1055, 2620],
-  30: [371, 2502],
-  31: [1090, 3104],
-  32: [2250, 2750]
+controls = { // id: [x,y,littera,lat,lon]
+  1: [1830, 333, '', 0, 0],
+  2: [1506, 521, '', 0, 0],
+  3: [907, 711, '', 0, 0],
+  4: [1193, 873, '', 0, 0],
+  5: [472, 617, '', 0, 0],
+  6: [228, 841, '', 0, 0],
+  7: [672, 1013, '', 0, 0],
+  8: [1125, 1196, '', 0, 0],
+  9: [1430, 1290, '', 0, 0],
+  10: [4361, 503, '', 0, 0],
+  11: [4118, 1106, '', 0, 0],
+  12: [3830, 640, '', 0, 0],
+  13: [3192, 1133, '', 0, 0],
+  14: [2664, 873, '', 0, 0],
+  15: [2322, 1862, '', 0, 0],
+  16: [4120, 2699, '', 0, 0],
+  17: [4181, 3069, '', 0, 0],
+  19: [3340, 2904, '', 0, 0],
+  20: [2691, 2554, '', 0, 0],
+  24: [3366, 3217, '', 0, 0],
+  26: [390, 1935, '', 0, 0],
+  27: [547, 2143, '', 0, 0],
+  28: [1462, 2293, '', 0, 0],
+  29: [1055, 2620, '', 0, 0],
+  30: [371, 2502, '', 0, 0],
+  31: [1090, 3104, '', 0, 0],
+  32: [2250, 2750, '', 0, 0]
 };
 
 // 2019-SommarS
@@ -158,6 +176,56 @@ controls = {
 // 	50: [3231,2757]
 
 //################
+targets = []; // [id, littera, distance]
+
+initControls = function initControls() {
+  var control, key, lat, littera, lon, results, x, y;
+  results = [];
+  for (key in controls) {
+    control = controls[key];
+    var _control = control;
+
+    var _control2 = _slicedToArray(_control, 3);
+
+    x = _control2[0];
+    y = _control2[1];
+    littera = _control2[2];
+
+    var _gps$bmp2gps = gps.bmp2gps(x, y);
+
+    var _gps$bmp2gps2 = _slicedToArray(_gps$bmp2gps, 2);
+
+    lat = _gps$bmp2gps2[0];
+    lon = _gps$bmp2gps2[1];
+
+    control[3] = lat;
+    results.push(control[4] = lon);
+  }
+  return results;
+};
+
+makeTargets = function makeTargets() {
+  var b, c, control, key, lat, littera, lon, x, y;
+  targets = [];
+  c = LatLon(gpsLat, gpsLon);
+  for (key in controls) {
+    control = controls[key];
+    var _control3 = control;
+
+    var _control4 = _slicedToArray(_control3, 5);
+
+    x = _control4[0];
+    y = _control4[1];
+    littera = _control4[2];
+    lat = _control4[3];
+    lon = _control4[4];
+
+    b = LatLon(lat, lon);
+    targets.push([key, littera, round(b.distanceTo(c))]);
+  }
+  return targets;
+};
+
 DATA = "gpsKarta";
 
 WIDTH = null;
@@ -179,8 +247,7 @@ position = null; // gps position (pixels)
 
 track = []; // five latest GPS positions (pixels)
 
-buttons = [];
-
+// buttons = []
 speaker = null;
 
 img = null;
@@ -191,7 +258,7 @@ soundDown = null;
 
 soundQueue = 0; // neg=minskat avstånd pos=ökat avstånd
 
-messages = [];
+messages = ['', '', '', '', ''];
 
 gpsLat = 0;
 gpsLon = 0;
@@ -207,13 +274,21 @@ lastBearing = '';
 
 lastDistance = '';
 
-// sendMail '1 A 59.123456 18.123456 2019-05-12 12:34:56'
+w = null;
+
+h = null;
+
+released = true;
+
 sendMail = function sendMail(subject, body) {
   mail.href = 'mailto:' + MAIL + '?Subject=' + subject + '&body=' + body;
   return mail.click();
 };
 
 say = function say(m) {
+  if (speaker === null) {
+    return;
+  }
   speechSynthesis.cancel();
   speaker.text = m;
   return speechSynthesis.speak(speaker);
@@ -231,10 +306,7 @@ myround = function myround(x) {
   return x / Math.pow(10, dec);
 };
 
-show = function show(prompt, p) {
-  return print(prompt, 'http://maps.google.com/maps?q=' + p.lat + ',' + p.lon);
-};
-
+//show = (prompt,p) -> print prompt,"http://maps.google.com/maps?q=#{p.lat},#{p.lon}"	
 vercal = function vercal(a, b, y) {
   var lat, lon, x;
   x = map(y, a.y, b.y, a.x, b.x);
@@ -340,10 +412,7 @@ sayBearing = function sayBearing(a, b) {
   }
 };
 
-showSpeed = function showSpeed(sp) {
-  return buttons[0].prompt = myround(sp, 1);
-};
-
+//showSpeed = (sp) -> # buttons[0].prompt = myround sp, 1
 soundIndicator = function soundIndicator(p) {
   var a, b, bearinga, bearingb, c, dista, distance, distb;
   a = LatLon(p.coords.latitude, p.coords.longitude); // newest
@@ -352,23 +421,25 @@ soundIndicator = function soundIndicator(p) {
   dista = a.distanceTo(c);
   distb = b.distanceTo(c);
   distance = Math.round((dista - distb) / DIST);
-  buttons[5].prompt = Math.round(dista);
+  messages[2] = Math.round(dista);
   sayDistance(dista, distb);
   bearinga = a.bearingTo(c);
   bearingb = b.bearingTo(c);
   if (dista >= LIMIT) {
     sayBearing(bearinga, bearingb);
   }
-  showSpeed(abs(dista - distb));
+  messages[3] = DIST * distance; // abs dista-distb
+  if (abs(messages[3]) > 10) {
+    messages[3] = '';
+  }
   if (distance !== 0) {
     // update only if DIST detected. Otherwise some beeps will be lost.
     gpsLat = p.coords.latitude;
     gpsLon = p.coords.longitude;
   }
   if (abs(distance) < 10) {
-    soundQueue = distance; // ett antal DIST
+    return soundQueue = distance; // ett antal DIST
   }
-  return buttons[7].prompt = soundQueue;
 };
 
 playSound = function playSound() {
@@ -382,7 +453,7 @@ playSound = function playSound() {
     soundQueue--;
     soundUp.play();
   }
-  buttons[7].prompt = soundQueue;
+  messages[4] = soundQueue;
   if (soundQueue === 0) {
     return xdraw();
   }
@@ -405,22 +476,27 @@ locationUpdateFail = function locationUpdateFail(error) {
   }
 };
 
-initSpeaker = function initSpeaker() {
+initSpeaker = function initSpeaker(index) {
   var voices;
   speaker = new SpeechSynthesisUtterance();
   voices = speechSynthesis.getVoices();
-  speaker.voice = voices[5];
+  speaker.voice = voices[index];
   speaker.voiceURI = "native";
   speaker.volume = 1;
   speaker.rate = 0.8;
   speaker.pitch = 0.8;
   speaker.text = 'Välkommen!';
-  return speaker.lang = 'sv-SE';
+  speaker.lang = 'sv-SE';
+  return dialogues.clear();
 };
 
 setup = function setup() {
-  var x, x1, x2, y, y1, y2;
-  createCanvas(windowWidth, windowHeight);
+  var canvas, x, x1, x2, y, y1, y2;
+  canvas = createCanvas(innerWidth - 0.5, innerHeight - 0.5);
+  canvas.position(0, 0); // hides text field used for clipboard copy.
+  w = width / 8;
+  h = height / 4;
+  angleMode(DEGREES);
   WIDTH = img.width;
   HEIGHT = img.height;
   SCALE = 1;
@@ -435,52 +511,33 @@ setup = function setup() {
   x2 = width - 100;
   y1 = 100;
   y2 = height - 100;
-  buttons.push(new Button('S', x1, y1, function () {
-    // Store Bike Position
-    initSpeaker();
-    soundUp = loadSound('soundUp.wav');
-    soundDown = loadSound('soundDown.wav');
-    soundUp.setVolume(0.1);
-    soundDown.setVolume(0.1);
-    controls['bike'] = position;
-    buttons[2].prompt = 'bike';
-    clearInterval(timeout);
-    timeout = setInterval(playSound, DELAY);
-    return soundQueue = 0;
-  }));
-  buttons.push(new Button('U', x, y1, function () {
-    return cy -= 0.33 * height / SCALE;
-  }));
-  buttons.push(new Button('', x2, y1, function () {
-    return setTarget('bike');
-  }));
-  buttons.push(new Button('L', x1, y, function () {
-    return cx -= 0.33 * width / SCALE;
-  }));
-  buttons.push(new Button('', x, y, function () {
-    var _position, _position2;
+  // buttons.push new Button 'S',x1,y1, -> # Store Bike Position
+  // 	initSpeaker()
+  // 	soundUp = loadSound 'soundUp.wav'
+  // 	soundDown = loadSound 'soundDown.wav'
+  // 	soundUp.setVolume 0.1
+  // 	soundDown.setVolume 0.1
+  // 	controls['bike'] = position
+  // 	buttons[2].prompt = 'bike'
+  // 	clearInterval timeout
+  // 	timeout = setInterval playSound, DELAY
+  // 	soundQueue = 0
 
-    return _position = position, _position2 = _slicedToArray(_position, 2), cx = _position2[0], cy = _position2[1], _position;
-  }));
-  buttons.push(new Button('R', x2, y, function () {
-    return cx += 0.33 * width / SCALE;
-  }));
-  buttons.push(new Button('-', x1, y2, function () {
-    if (SCALE > 0.5) {
-      return SCALE /= 1.5;
-    }
-  }));
-  buttons.push(new Button('D', x, y2, function () {
-    return cy += 0.33 * height / SCALE;
-  }));
-  buttons.push(new Button('+', x2, y2, function () {
-    return SCALE *= 1.5;
-  }));
-  buttons.push(new Button('T', (x + x2) / 2, (y + y2) / 2, function () {
-    var d;
-    d = new Date();
-    return sendMail(currentControl, currentControl + ' ' + gpsLat + ' ' + gpsLon + ' ' + d.toISOString());
-  }));
+  // buttons.push new Button 'U',x,y1, -> cy -= 0.33*height/SCALE 
+  // buttons.push new Button '',x2,y1, -> setTarget 'bike'
+
+  // buttons.push new Button 'L',x1,y, -> cx -= 0.33*width/SCALE
+  // buttons.push new Button '', x,y, ->	[cx,cy] = position
+
+  // buttons.push new Button 'R',x2,y, -> cx += 0.33*width/SCALE
+  // buttons.push new Button '-',x1,y2, -> if SCALE > 0.5 then SCALE /= 1.5
+  // buttons.push new Button 'D',x,y2, -> cy += 0.33*height/SCALE
+  // buttons.push new Button '+',x2,y2, ->	SCALE *= 1.5
+
+  // buttons.push new Button 'T',(x+x2)/2,(y+y2)/2, ->
+  // 	d = new Date()
+  // 	sendMail currentControl, "#{currentControl} #{gpsLat} #{gpsLon} #{d.toISOString()}"
+  initControls();
   position = [WIDTH / 2, HEIGHT / 2];
   navigator.geolocation.watchPosition(locationUpdate, locationUpdateFail, {
     enableHighAccuracy: true,
@@ -522,8 +579,8 @@ drawControl = function drawControl() {
   latLon2 = LatLon(trgLat, trgLon);
   latLon1 = LatLon(gpsLat, gpsLon);
   bearing = latLon1.bearingTo(latLon2);
-  buttons[1].prompt = int(bearing);
-  buttons[3].prompt = currentControl;
+  messages[0] = currentControl;
+  messages[1] = int(bearing);
   control = controls[currentControl];
   x = control[0];
   y = control[1];
@@ -536,35 +593,26 @@ drawControl = function drawControl() {
   return pop();
 };
 
-drawButtons = function drawButtons() {
-  var button, j, len, results;
-  results = [];
-  for (j = 0, len = buttons.length; j < len; j++) {
-    button = buttons[j];
-    results.push(button.draw());
-  }
-  return results;
-};
-
 xdraw = function xdraw() {
-  var i, j, len, message, results;
-  bg(1, 1, 0);
+  var i, j, len, message;
+  bg(0, 1, 0);
   fc();
   image(img, 0, 0, width, height, cx - width / SCALE / 2, cy - height / SCALE / 2, width / SCALE, height / SCALE);
   drawTrack();
   drawControl();
-  drawButtons();
-  textSize(50);
-  results = [];
+  textSize(100);
+  fc(1, 1, 0);
+  sc(0);
+  sw(3);
   for (i = j = 0, len = messages.length; j < len; i = ++j) {
     message = messages[i];
-    results.push(text(message, width / 2, 50 * (i + 1)));
+    text(message, 50, 100 * (i + 1));
   }
-  return results;
+  return showDialogue();
 };
 
 setTarget = function setTarget(key) {
-  var _gps$bmp2gps, _gps$bmp2gps2;
+  var _gps$bmp2gps3, _gps$bmp2gps4;
 
   var control, x, y;
   if (controls[currentControl] === null) {
@@ -575,44 +623,358 @@ setTarget = function setTarget(key) {
   control = controls[currentControl];
   x = control[0];
   y = control[1];
-  return _gps$bmp2gps = gps.bmp2gps(x, y), _gps$bmp2gps2 = _slicedToArray(_gps$bmp2gps, 2), trgLat = _gps$bmp2gps2[0], trgLon = _gps$bmp2gps2[1], _gps$bmp2gps;
+  return _gps$bmp2gps3 = gps.bmp2gps(x, y), _gps$bmp2gps4 = _slicedToArray(_gps$bmp2gps3, 2), trgLat = _gps$bmp2gps4[0], trgLon = _gps$bmp2gps4[1], _gps$bmp2gps3;
 };
 
-myMousePressed = function myMousePressed(mx, my) {
-  var arr, button, closestControl, control, d, j, key, len;
-  for (j = 0, len = buttons.length; j < len; j++) {
-    button = buttons[j];
-    if (button.contains(mx, my)) {
-      button.click();
-      xdraw();
-      return;
-    }
-  }
-  arr = function () {
-    var results;
-    results = [];
-    for (key in controls) {
-      control = controls[key];
-      results.push([dist(cx - width / SCALE / 2 + mx / SCALE, cy - height / SCALE / 2 + my / SCALE, control[0], control[1]), key]);
-    }
-    return results;
-  }();
-  closestControl = _.min(arr, function (item) {
-    return item[0];
-  });
-  var _closestControl = closestControl;
-
-  var _closestControl2 = _slicedToArray(_closestControl, 2);
-
-  d = _closestControl2[0];
-  key = _closestControl2[1];
-
-  if (d < 85) {
-    setTarget(key);
-    return xdraw();
-  }
-};
+//myMousePressed = (mx,my) ->
+// for button in buttons
+// 	if button.contains mx,my
+// 		button.click()
+// 		xdraw()
+// 		return
+// arr = ([dist(cx-width/SCALE/2 + mx/SCALE, cy-height/SCALE/2+my/SCALE, control[0], control[1]), key] for key,control of controls)
+// closestControl = _.min arr, (item) -> item[0]
+// [d,key] = closestControl
+// if d < 85
+// 	setTarget key
+// 	xdraw()
 
 // only for debug on laptop
 //mousePressed = -> myMousePressed mouseX,mouseY
+
+//#########################
+Array.prototype.clear = function () {
+  return this.length = 0;
+};
+
+assert = function assert(a, b) {
+  var msg = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'Assert failure';
+
+  return chai.assert.deepEqual(a, b, msg);
+};
+
+menu1 = function menu1() {
+  // Main Menu
+  var dialogue, r1, r2;
+  dialogue = new Dialogue(1, int(4 * w), int(2 * h), int(0.15 * h));
+  r1 = 0.25 * height;
+  r2 = 0.11 * height;
+  dialogue.clock(' ', 5, r1, r2, true, 90 + 360 / 5);
+  dialogue.buttons[0].info('Take', true, function () {
+    return menu4();
+  });
+  dialogue.buttons[1].info('Target', true, function () {
+    return menu3();
+  });
+  dialogue.buttons[2].info('PanZoom', true, function () {
+    return menu2();
+  });
+  dialogue.buttons[3].info('Center', true, function () {
+    var _position = position;
+
+    var _position2 = _slicedToArray(_position, 2);
+
+    cx = _position2[0];
+    cy = _position2[1];
+
+    dialogues.clear();
+    return xdraw();
+  });
+  return dialogue.buttons[4].info('Speaker', true, function () {
+    return menu10();
+  });
+};
+
+menu2 = function menu2() {
+  // Pan Zoom
+  var dialogue, r1, r2;
+  dialogue = new Dialogue(2, int(4 * w), int(2 * h), int(0.15 * h));
+  r1 = 0.25 * height;
+  r2 = 0.09 * height;
+  dialogue.clock(' ', 8, r1, r2, false, 45 + 360 / 8);
+  dialogue.buttons[0].info('Up', true, function () {
+    return cy -= 0.33 * height / SCALE;
+  });
+  dialogue.buttons[1].info('Restore', true, function () {
+    setTarget('bike');
+    return dialogues.clear();
+  });
+  dialogue.buttons[2].info('Right', true, function () {
+    return cx += 0.33 * width / SCALE;
+  });
+  dialogue.buttons[3].info('Out', true, function () {
+    if (SCALE > 0.5) {
+      return SCALE /= 1.5;
+    }
+  });
+  dialogue.buttons[4].info('Down', true, function () {
+    return cy += 0.33 * height / SCALE;
+  });
+  dialogue.buttons[5].info('In', true, function () {
+    return SCALE *= 1.5;
+  });
+  dialogue.buttons[6].info('Left', true, function () {
+    return cx -= 0.33 * width / SCALE;
+  });
+  return dialogue.buttons[7].info('Save', true, function () {
+    return dialogues.clear();
+  });
+};
+
+menu3 = function menu3() {
+  // Target
+  var dialogue, lst;
+  targets = makeTargets();
+  lst = targets.slice();
+  lst = lst.sort(function (a, b) {
+    return a[2] - b[2];
+  });
+  dialogue = new Dialogue(3, 0, 0, int(0.15 * h));
+  return dialogue.list(lst, 8, false, function (arr) {
+    if (arr.length === 0) {
+      return;
+    }
+    currentControl = arr[0];
+    return dialogues.clear();
+  });
+};
+
+menu4 = function menu4() {
+  // Take
+  var dialogue, r1, r2;
+  dialogue = new Dialogue(4, int(4 * w), int(2 * h), int(0.15 * h));
+  r1 = 0.25 * height;
+  r2 = 0.11 * height;
+  dialogue.clock(' ', 5, r1, r2, false, 55 + 360 / 5);
+  dialogue.buttons[0].info('ABCDE', true, function () {
+    return menu5();
+  });
+  dialogue.buttons[1].info('FGHIJ', true, function () {
+    return menu6();
+  });
+  dialogue.buttons[2].info('KLMNO', true, function () {
+    return menu7();
+  });
+  dialogue.buttons[3].info('PQRST', true, function () {
+    return menu8();
+  });
+  return dialogue.buttons[4].info('UVWXYZ', true, function () {
+    return menu9();
+  });
+};
+
+update = function update(littera) {
+  var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
+
+  controls[currentControl][index] = littera;
+  return dialogues.clear();
+};
+
+menu5 = function menu5() {
+  // ABCDE
+  var dialogue, r1, r2;
+  dialogue = new Dialogue(5, int(4 * w), int(2 * h), int(0.15 * h));
+  r1 = 0.25 * height;
+  r2 = 0.11 * height;
+  dialogue.clock(' ', 5, r1, r2, false, 55 + 360 / 5);
+  dialogue.buttons[0].info('A', true, function () {
+    return update('A');
+  });
+  dialogue.buttons[1].info('B', true, function () {
+    return update('B');
+  });
+  dialogue.buttons[2].info('C', true, function () {
+    return update('C');
+  });
+  dialogue.buttons[3].info('D', true, function () {
+    return update('D');
+  });
+  return dialogue.buttons[4].info('E', true, function () {
+    return update('E');
+  });
+};
+
+menu6 = function menu6() {
+  // FGHIJ
+  var dialogue, r1, r2;
+  dialogue = new Dialogue(6, int(4 * w), int(2 * h), int(0.15 * h));
+  r1 = 0.25 * height;
+  r2 = 0.11 * height;
+  dialogue.clock(' ', 5, r1, r2, false, 55 + 360 / 5);
+  dialogue.buttons[0].info('F', true, function () {
+    return update('F');
+  });
+  dialogue.buttons[1].info('G', true, function () {
+    return update('G');
+  });
+  dialogue.buttons[2].info('H', true, function () {
+    return update('H');
+  });
+  dialogue.buttons[3].info('I', true, function () {
+    return update('I');
+  });
+  return dialogue.buttons[4].info('J', true, function () {
+    return update('J');
+  });
+};
+
+menu7 = function menu7() {
+  // KLMNO
+  var dialogue, r1, r2;
+  dialogue = new Dialogue(7, int(4 * w), int(2 * h), int(0.15 * h));
+  r1 = 0.25 * height;
+  r2 = 0.11 * height;
+  dialogue.clock(' ', 5, r1, r2, false, 55 + 360 / 5);
+  dialogue.buttons[0].info('K', true, function () {
+    return update('K');
+  });
+  dialogue.buttons[1].info('L', true, function () {
+    return update('L');
+  });
+  dialogue.buttons[2].info('M', true, function () {
+    return update('M');
+  });
+  dialogue.buttons[3].info('N', true, function () {
+    return update('N');
+  });
+  return dialogue.buttons[4].info('O', true, function () {
+    return update('O');
+  });
+};
+
+menu8 = function menu8() {
+  // PQRST
+  var dialogue, r1, r2;
+  dialogue = new Dialogue(8, int(4 * w), int(2 * h), int(0.15 * h));
+  r1 = 0.25 * height;
+  r2 = 0.11 * height;
+  dialogue.clock(' ', 5, r1, r2, false, 55 + 360 / 5);
+  dialogue.buttons[0].info('P', true, function () {
+    return update('P');
+  });
+  dialogue.buttons[1].info('Q', true, function () {
+    return update('Q');
+  });
+  dialogue.buttons[2].info('R', true, function () {
+    return update('R');
+  });
+  dialogue.buttons[3].info('S', true, function () {
+    return update('S');
+  });
+  return dialogue.buttons[4].info('T', true, function () {
+    return update('T');
+  });
+};
+
+menu9 = function menu9() {
+  // UVWXYZ
+  var dialogue, r1, r2;
+  dialogue = new Dialogue(9, int(4 * w), int(2 * h), int(0.15 * h));
+  r1 = 0.25 * height;
+  r2 = 0.11 * height;
+  dialogue.clock(' ', 6, r1, r2, false, 60 + 360 / 6);
+  dialogue.buttons[0].info('U', true, function () {
+    return update('U');
+  });
+  dialogue.buttons[1].info('V', true, function () {
+    return update('V');
+  });
+  dialogue.buttons[2].info('W', true, function () {
+    return update('W');
+  });
+  dialogue.buttons[3].info('X', true, function () {
+    return update('X');
+  });
+  dialogue.buttons[4].info('Y', true, function () {
+    return update('Y');
+  });
+  return dialogue.buttons[5].info('Z', true, function () {
+    return update('Z');
+  });
+};
+
+menu10 = function menu10() {
+  // speaker
+  var dialogue, r1, r2;
+  dialogue = new Dialogue(10, int(4 * w), int(2 * h), int(0.15 * h));
+  r1 = 0.27 * height;
+  r2 = 0.08 * height;
+  dialogue.clock(' ', 10, r1, r2, false, 60 + 360 / 10);
+  dialogue.buttons[0].info('0', true, function () {
+    return initSpeaker(0);
+  });
+  dialogue.buttons[1].info('1', true, function () {
+    return initSpeaker(1);
+  });
+  dialogue.buttons[2].info('2', true, function () {
+    return initSpeaker(2);
+  });
+  dialogue.buttons[3].info('3', true, function () {
+    return initSpeaker(3);
+  });
+  dialogue.buttons[4].info('4', true, function () {
+    return initSpeaker(4);
+  });
+  dialogue.buttons[5].info('5', true, function () {
+    return initSpeaker(5);
+  });
+  dialogue.buttons[6].info('6', true, function () {
+    return initSpeaker(6);
+  });
+  dialogue.buttons[7].info('7', true, function () {
+    return initSpeaker(7);
+  });
+  dialogue.buttons[8].info('8', true, function () {
+    return initSpeaker(8);
+  });
+  return dialogue.buttons[9].info('9', true, function () {
+    return initSpeaker(9);
+  });
+};
+
+display = function display() {
+  return xdraw();
+};
+
+showDialogue = function showDialogue() {
+  if (dialogues.length > 0) {
+    return _.last(dialogues).show();
+  }
+};
+
+mouseReleased = function mouseReleased() {
+  released = true;
+  return false;
+};
+
+myMousePressed = function myMousePressed(mx, my) {
+  var dialogue;
+  if (!released) {
+    return false;
+  }
+  released = false;
+
+  // if speaker == null 
+  // 	initSpeaker()
+  // 	return false
+  if (dialogues.length === 1 && dialogues[0].number === 0) {
+    dialogues.pop(); // dölj indikatorer
+  }
+  dialogue = _.last(dialogues);
+  if (dialogues.length === 0 || !dialogue.execute(mx, my)) {
+    if (dialogues.length === 0) {
+      menu1();
+    } else {
+      dialogues.pop();
+    }
+    display();
+    return false;
+  }
+  display();
+  return false;
+};
+
+mousePressed = function mousePressed() {
+  return myMousePressed(mouseX, mouseY);
+};
 //# sourceMappingURL=sketch.js.map

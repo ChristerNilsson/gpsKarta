@@ -8,10 +8,10 @@ spara = (lat,lon, x,y) -> {lat,lon, x,y}
 
 # 2019-SommarN
 
-A = spara 59.2987921, 18.1284073, 472, 617 #  5 kontroll
-B = spara 59.2985405, 18.1699098,4361, 503 # 10
-C = spara 59.2851374, 18.1336592,1090,3104 # 31
-D = spara 59.2844998, 18.1666946,4181,3069 # 17
+A = spara 59.2987921, 18.1284073, 472, 617 # kontroll  5
+B = spara 59.2985405, 18.1699098,4361, 503 # kontroll 10
+C = spara 59.2851374, 18.1336592,1090,3104 # kontroll 31
+D = spara 59.2844998, 18.1666946,4181,3069 # kontroll 17
 
 # A = spara 59.300716, 18.125680,  197, 278 # Lilla halvön
 # B = spara 59.299235, 18.169492, 4306, 367 # Kranglans väg/Östervägen
@@ -20,34 +20,34 @@ D = spara 59.2844998, 18.1666946,4181,3069 # 17
 
 FILENAME = '2019-SommarN.jpg' 
 
-controls = 
-	1: [1830,333]
-	2: [1506,521]
-	3: [907,711]
-	4: [1193,873]
-	5: [472,617]
-	6: [228,841]
-	7: [672,1013]
-	8: [1125,1196]
-	9: [1430,1290]
-	10: [4361,503]
-	11: [4118,1106]
-	12: [3830,640]
-	13: [3192,1133]
-	14: [2664,873]
-	15: [2322,1862]
-	16: [4120,2699]
-	17: [4181,3069]
-	19: [3340,2904]
-	20: [2691,2554]
-	24: [3366,3217]
-	26: [390,1935]
-	27: [547,2143]
-	28: [1462,2293]
-	29: [1055,2620]
-	30: [371,2502]
-	31: [1090,3104]
-	32: [2250,2750]
+controls = # id: [x,y,littera,lat,lon]
+	1: [1830,333,'',0,0] 
+	2: [1506,521,'',0,0]
+	3: [907,711,'',0,0]
+	4: [1193,873,'',0,0]
+	5: [472,617,'',0,0]
+	6: [228,841,'',0,0]
+	7: [672,1013,'',0,0]
+	8: [1125,1196,'',0,0]
+	9: [1430,1290,'',0,0]
+	10: [4361,503,'',0,0]
+	11: [4118,1106,'',0,0]
+	12: [3830,640,'',0,0]
+	13: [3192,1133,'',0,0]
+	14: [2664,873,'',0,0]
+	15: [2322,1862,'',0,0]
+	16: [4120,2699,'',0,0]
+	17: [4181,3069,'',0,0]
+	19: [3340,2904,'',0,0]
+	20: [2691,2554,'',0,0]
+	24: [3366,3217,'',0,0]
+	26: [390,1935,'',0,0]
+	27: [547,2143,'',0,0]
+	28: [1462,2293,'',0,0]
+	29: [1055,2620,'',0,0]
+	30: [371,2502,'',0,0]
+	31: [1090,3104,'',0,0]
+	32: [2250,2750,'',0,0]
 
 # 2019-SommarS
 # A = spara 59.279157, 18.149313, 2599,676 # Mellanbron
@@ -82,6 +82,24 @@ controls =
 
 #################
 
+targets = [] # [id, littera, distance]
+
+initControls = ->
+	for key,control of controls
+		[x,y,littera] = control
+		[lat,lon] = gps.bmp2gps x,y
+		control[3] = lat
+		control[4] = lon
+
+makeTargets = ->
+	targets = []
+	c = LatLon gpsLat, gpsLon 
+	for key,control of controls
+		[x,y,littera,lat,lon] = control
+		b = LatLon lat, lon
+		targets.push [key, littera, round b.distanceTo(c)]
+	targets
+
 DATA = "gpsKarta"
 WIDTH = null
 HEIGHT = null
@@ -92,7 +110,7 @@ gps = null
 TRACKED = 5 # circles shows the player's position
 position = null # gps position (pixels)
 track = [] # five latest GPS positions (pixels)
-buttons = []
+# buttons = []
 
 speaker = null
 
@@ -101,22 +119,27 @@ soundUp = null
 soundDown = null
 soundQueue = 0 # neg=minskat avstånd pos=ökat avstånd
 
-messages = []
+messages = ['','','','','']
 
 [gpsLat,gpsLon] = [0,0]
 [trgLat,trgLon] = [0,0]
 currentControl = "1"
+
 timeout = null
 
 lastBearing = ''
 lastDistance = ''
 
-# sendMail '1 A 59.123456 18.123456 2019-05-12 12:34:56'
+w = null
+h = null
+released = true 
+
 sendMail = (subject,body) ->
 	mail.href = "mailto:#{MAIL}?Subject=#{subject}&body=#{body}"
 	mail.click()
 
 say = (m) ->
+	if speaker == null then return 
 	speechSynthesis.cancel()
 	speaker.text = m
 	speechSynthesis.speak speaker
@@ -128,7 +151,7 @@ myround = (x,dec=6) ->
 	x = Math.round x
 	x/10**dec
 
-show = (prompt,p) -> print prompt,"http://maps.google.com/maps?q=#{p.lat},#{p.lon}"	
+#show = (prompt,p) -> print prompt,"http://maps.google.com/maps?q=#{p.lat},#{p.lon}"	
 
 vercal = (a,b,y) ->
 	x = map y, a.y,b.y, a.x,b.x
@@ -207,7 +230,7 @@ sayBearing = (a,b) -> # a is newer
 			say bearing
 			lastbearing = bearing
 
-showSpeed = (sp) -> buttons[0].prompt = myround sp, 1
+#showSpeed = (sp) -> # buttons[0].prompt = myround sp, 1
 
 soundIndicator = (p) ->
 
@@ -218,21 +241,21 @@ soundIndicator = (p) ->
 	dista = a.distanceTo c
 	distb = b.distanceTo c
 	distance = Math.round (dista - distb)/DIST
-	buttons[5].prompt = Math.round dista
+	messages[2] = Math.round dista
 
 	sayDistance dista,distb
 	bearinga = a.bearingTo c
 	bearingb = b.bearingTo c
 	if dista >= LIMIT then sayBearing bearinga,bearingb
 
-	showSpeed abs dista-distb
+	messages[3] = DIST * distance # abs dista-distb
+	if abs(messages[3]) > 10 then messages[3] = ''
 
 	if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = p.coords.latitude
 		gpsLon = p.coords.longitude
 
 	if abs(distance) < 10 then soundQueue = distance # ett antal DIST
-	buttons[7].prompt	= soundQueue
 
 playSound = ->
 	if soundQueue == 0 then return
@@ -242,7 +265,7 @@ playSound = ->
 	else if soundQueue > 0 and soundUp != null
 		soundQueue--
 		soundUp.play()
-	buttons[7].prompt	= soundQueue
+	messages[4]	= soundQueue
 	if soundQueue==0 then xdraw()
 
 locationUpdate = (p) ->
@@ -257,20 +280,26 @@ locationUpdate = (p) ->
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['Check location permissions']
 
-initSpeaker = ->
+initSpeaker = (index) ->
 	speaker = new SpeechSynthesisUtterance()
 	voices = speechSynthesis.getVoices()
-	speaker.voice = voices[5]	
+	speaker.voice = voices[index]	
 	speaker.voiceURI = "native"
 	speaker.volume = 1
 	speaker.rate = 0.8
 	speaker.pitch = 0.8
 	speaker.text = 'Välkommen!'
 	speaker.lang = 'sv-SE'
+	dialogues.clear()
 
 setup = ->
 
-	createCanvas windowWidth,windowHeight
+	canvas = createCanvas innerWidth-0.5, innerHeight-0.5
+	canvas.position 0,0 # hides text field used for clipboard copy.
+
+	w = width/8
+	h = height/4 
+	angleMode DEGREES
 
 	WIDTH = img.width
 	HEIGHT = img.height
@@ -288,32 +317,34 @@ setup = ->
 	y1 = 100
 	y2 = height-100
 
-	buttons.push new Button 'S',x1,y1, -> # Store Bike Position
-		initSpeaker()
-		soundUp = loadSound 'soundUp.wav'
-		soundDown = loadSound 'soundDown.wav'
-		soundUp.setVolume 0.1
-		soundDown.setVolume 0.1
-		controls['bike'] = position
-		buttons[2].prompt = 'bike'
-		clearInterval timeout
-		timeout = setInterval playSound, DELAY
-		soundQueue = 0
+	# buttons.push new Button 'S',x1,y1, -> # Store Bike Position
+	# 	initSpeaker()
+	# 	soundUp = loadSound 'soundUp.wav'
+	# 	soundDown = loadSound 'soundDown.wav'
+	# 	soundUp.setVolume 0.1
+	# 	soundDown.setVolume 0.1
+	# 	controls['bike'] = position
+	# 	buttons[2].prompt = 'bike'
+	# 	clearInterval timeout
+	# 	timeout = setInterval playSound, DELAY
+	# 	soundQueue = 0
 
-	buttons.push new Button 'U',x,y1, -> cy -= 0.33*height/SCALE 
-	buttons.push new Button '',x2,y1, -> setTarget 'bike'
+	# buttons.push new Button 'U',x,y1, -> cy -= 0.33*height/SCALE 
+	# buttons.push new Button '',x2,y1, -> setTarget 'bike'
 
-	buttons.push new Button 'L',x1,y, -> cx -= 0.33*width/SCALE
-	buttons.push new Button '', x,y, ->	[cx,cy] = position
+	# buttons.push new Button 'L',x1,y, -> cx -= 0.33*width/SCALE
+	# buttons.push new Button '', x,y, ->	[cx,cy] = position
 
-	buttons.push new Button 'R',x2,y, -> cx += 0.33*width/SCALE
-	buttons.push new Button '-',x1,y2, -> if SCALE > 0.5 then SCALE /= 1.5
-	buttons.push new Button 'D',x,y2, -> cy += 0.33*height/SCALE
-	buttons.push new Button '+',x2,y2, ->	SCALE *= 1.5
+	# buttons.push new Button 'R',x2,y, -> cx += 0.33*width/SCALE
+	# buttons.push new Button '-',x1,y2, -> if SCALE > 0.5 then SCALE /= 1.5
+	# buttons.push new Button 'D',x,y2, -> cy += 0.33*height/SCALE
+	# buttons.push new Button '+',x2,y2, ->	SCALE *= 1.5
 
-	buttons.push new Button 'T',(x+x2)/2,(y+y2)/2, ->
-		d = new Date()
-		sendMail currentControl, "#{currentControl} #{gpsLat} #{gpsLon} #{d.toISOString()}"
+	# buttons.push new Button 'T',(x+x2)/2,(y+y2)/2, ->
+	# 	d = new Date()
+	# 	sendMail currentControl, "#{currentControl} #{gpsLat} #{gpsLon} #{d.toISOString()}"
+
+	initControls()
 
 	position = [WIDTH/2,HEIGHT/2]
 
@@ -348,8 +379,8 @@ drawControl = ->
 	latLon1 = LatLon gpsLat,gpsLon
 
 	bearing = latLon1.bearingTo latLon2
-	buttons[1].prompt = int bearing
-	buttons[3].prompt = currentControl
+	messages[0] = currentControl
+	messages[1] = int bearing
 
 	control = controls[currentControl]
 	x = control[0]
@@ -363,18 +394,19 @@ drawControl = ->
 	circle x-cx, y-cy, 75
 	pop()
 
-drawButtons = -> button.draw() for button in buttons
-
 xdraw = ->
-	bg 1,1,0
+	bg 0,1,0
 	fc()
 	image img, 0,0, width,height, cx-width/SCALE/2, cy-height/SCALE/2, width/SCALE, height/SCALE
 	drawTrack()
 	drawControl()
-	drawButtons()
-	textSize 50
+	textSize 100
+	fc 1,1,0
+	sc 0
+	sw 3
 	for message,i in messages
-		text message,width/2,50*(i+1)
+		text message,50,100*(i+1)
+	showDialogue()
 
 setTarget = (key) ->
 	if controls[currentControl] == null then return
@@ -385,18 +417,199 @@ setTarget = (key) ->
 	y = control[1]
 	[trgLat,trgLon] = gps.bmp2gps x,y	
 
-myMousePressed = (mx,my) ->
-	for button in buttons
-		if button.contains mx,my
-			button.click()
-			xdraw()
-			return
-	arr = ([dist(cx-width/SCALE/2 + mx/SCALE, cy-height/SCALE/2+my/SCALE, control[0], control[1]), key] for key,control of controls)
-	closestControl = _.min arr, (item) -> item[0]
-	[d,key] = closestControl
-	if d < 85
-		setTarget key
-		xdraw()
+#myMousePressed = (mx,my) ->
+	# for button in buttons
+	# 	if button.contains mx,my
+	# 		button.click()
+	# 		xdraw()
+	# 		return
+	# arr = ([dist(cx-width/SCALE/2 + mx/SCALE, cy-height/SCALE/2+my/SCALE, control[0], control[1]), key] for key,control of controls)
+	# closestControl = _.min arr, (item) -> item[0]
+	# [d,key] = closestControl
+	# if d < 85
+	# 	setTarget key
+	# 	xdraw()
 
 # only for debug on laptop
 #mousePressed = -> myMousePressed mouseX,mouseY
+
+##########################
+
+Array.prototype.clear = -> @length = 0
+assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
+
+menu1 = -> # Main Menu
+	dialogue = new Dialogue 1,int(4*w),int(2*h),int(0.15*h) 
+
+	r1 = 0.25 * height
+	r2 = 0.11 * height
+	dialogue.clock ' ',5,r1,r2,true,90+360/5
+
+	dialogue.buttons[0].info 'Take', true, -> menu4()
+	dialogue.buttons[1].info 'Target', true, -> menu3()
+	dialogue.buttons[2].info 'PanZoom', true, -> menu2()
+	dialogue.buttons[3].info 'Center', true, -> 
+		[cx,cy] = position
+		dialogues.clear()	
+		xdraw()	
+	dialogue.buttons[4].info 'Speaker', true, -> menu10() 
+
+menu2 = -> # Pan Zoom
+	dialogue = new Dialogue 2,int(4*w),int(2*h),int(0.15*h) 
+
+	r1 = 0.25 * height 
+	r2 = 0.09 * height
+	dialogue.clock ' ',8,r1,r2,false,45+360/8
+
+	dialogue.buttons[0].info 'Up', true, -> cy -= 0.33*height/SCALE  
+	dialogue.buttons[1].info 'Restore', true, -> 
+		setTarget 'bike'
+		dialogues.clear()
+	dialogue.buttons[2].info 'Right', true, -> cx += 0.33*width/SCALE
+	dialogue.buttons[3].info 'Out', true, -> if SCALE > 0.5 then SCALE /= 1.5
+	dialogue.buttons[4].info 'Down', true, -> cy += 0.33*height/SCALE
+	dialogue.buttons[5].info 'In', true, -> SCALE *= 1.5
+	dialogue.buttons[6].info 'Left', true, -> cx -= 0.33*width/SCALE
+	dialogue.buttons[7].info 'Save', true, -> dialogues.clear()
+
+menu3 = -> # Target
+	targets = makeTargets()
+	lst = targets.slice()
+	lst = lst.sort (a,b) -> a[2] - b[2]
+	dialogue = new Dialogue 3, 0,0, int(0.15*h)
+	dialogue.list lst, 8, false, (arr) ->
+		if arr.length == 0 then return
+		currentControl = arr[0]
+		dialogues.clear()		
+
+menu4 = -> # Take
+	dialogue = new Dialogue 4,int(4*w),int(2*h),int(0.15*h) 
+
+	r1 = 0.25 * height 
+	r2 = 0.11 * height
+	dialogue.clock ' ',5,r1,r2,false,55+360/5
+
+	dialogue.buttons[0].info 'ABCDE', true, -> menu5()
+	dialogue.buttons[1].info 'FGHIJ', true, -> menu6()
+	dialogue.buttons[2].info 'KLMNO', true, -> menu7()
+	dialogue.buttons[3].info 'PQRST', true, -> menu8()
+	dialogue.buttons[4].info 'UVWXYZ', true, -> menu9()
+
+update = (littera,index=2) ->
+	controls[currentControl][index] = littera
+	dialogues.clear()
+
+menu5 = -> # ABCDE
+	dialogue = new Dialogue 5,int(4*w),int(2*h),int(0.15*h) 
+
+	r1 = 0.25 * height 
+	r2 = 0.11 * height
+	dialogue.clock ' ',5,r1,r2,false,55+360/5
+
+	dialogue.buttons[0].info 'A', true, -> update 'A'
+	dialogue.buttons[1].info 'B', true, -> update 'B'
+	dialogue.buttons[2].info 'C', true, -> update 'C'
+	dialogue.buttons[3].info 'D', true, -> update 'D'
+	dialogue.buttons[4].info 'E', true, -> update 'E'
+
+menu6 = -> # FGHIJ
+	dialogue = new Dialogue 6,int(4*w),int(2*h),int(0.15*h) 
+
+	r1 = 0.25 * height 
+	r2 = 0.11 * height
+	dialogue.clock ' ',5,r1,r2,false,55+360/5
+
+	dialogue.buttons[0].info 'F', true, -> update 'F'
+	dialogue.buttons[1].info 'G', true, -> update 'G'
+	dialogue.buttons[2].info 'H', true, -> update 'H'
+	dialogue.buttons[3].info 'I', true, -> update 'I'
+	dialogue.buttons[4].info 'J', true, -> update 'J'
+
+menu7 = -> # KLMNO
+	dialogue = new Dialogue 7,int(4*w),int(2*h),int(0.15*h) 
+
+	r1 = 0.25 * height 
+	r2 = 0.11 * height
+	dialogue.clock ' ',5,r1,r2,false,55+360/5
+
+	dialogue.buttons[0].info 'K', true, -> update 'K'
+	dialogue.buttons[1].info 'L', true, -> update 'L'
+	dialogue.buttons[2].info 'M', true, -> update 'M'
+	dialogue.buttons[3].info 'N', true, -> update 'N'
+	dialogue.buttons[4].info 'O', true, -> update 'O'
+
+menu8 = -> # PQRST
+	dialogue = new Dialogue 8,int(4*w),int(2*h),int(0.15*h) 
+
+	r1 = 0.25 * height
+	r2 = 0.11 * height
+	dialogue.clock ' ',5,r1,r2,false,55+360/5
+
+	dialogue.buttons[0].info 'P', true, -> update 'P'
+	dialogue.buttons[1].info 'Q', true, -> update 'Q'
+	dialogue.buttons[2].info 'R', true, -> update 'R'
+	dialogue.buttons[3].info 'S', true, -> update 'S'
+	dialogue.buttons[4].info 'T', true, -> update 'T'
+
+menu9 = -> # UVWXYZ
+	dialogue = new Dialogue 9,int(4*w),int(2*h),int(0.15*h) 
+
+	r1 = 0.25 * height 
+	r2 = 0.11 * height
+	dialogue.clock ' ',6,r1,r2,false,60+360/6
+
+	dialogue.buttons[0].info 'U', true, -> update 'U'
+	dialogue.buttons[1].info 'V', true, -> update 'V'
+	dialogue.buttons[2].info 'W', true, -> update 'W'
+	dialogue.buttons[3].info 'X', true, -> update 'X'
+	dialogue.buttons[4].info 'Y', true, -> update 'Y'
+	dialogue.buttons[5].info 'Z', true, -> update 'Z'
+
+menu10 = -> # speaker
+	dialogue = new Dialogue 10,int(4*w),int(2*h),int(0.15*h) 
+
+	r1 = 0.27 * height 
+	r2 = 0.08 * height
+	dialogue.clock ' ',10,r1,r2,false,60+360/10
+
+	dialogue.buttons[0].info '0', true, -> initSpeaker 0
+	dialogue.buttons[1].info '1', true, -> initSpeaker 1
+	dialogue.buttons[2].info '2', true, -> initSpeaker 2
+	dialogue.buttons[3].info '3', true, -> initSpeaker 3
+	dialogue.buttons[4].info '4', true, -> initSpeaker 4
+	dialogue.buttons[5].info '5', true, -> initSpeaker 5
+	dialogue.buttons[6].info '6', true, -> initSpeaker 6
+	dialogue.buttons[7].info '7', true, -> initSpeaker 7
+	dialogue.buttons[8].info '8', true, -> initSpeaker 8
+	dialogue.buttons[9].info '9', true, -> initSpeaker 9
+
+
+display = -> xdraw()
+
+showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
+
+mouseReleased = ->
+	released = true
+	false
+
+myMousePressed = (mx,my) -> 
+
+	if not released then return false
+	released = false 
+
+	# if speaker == null 
+	# 	initSpeaker()
+	# 	return false
+
+	if dialogues.length == 1 and dialogues[0].number == 0 then dialogues.pop() # dölj indikatorer
+
+	dialogue = _.last dialogues
+	if dialogues.length == 0 or not dialogue.execute mx,my 
+		if dialogues.length == 0 then menu1() else dialogues.pop()
+		display()
+		return false
+
+	display()
+	false 
+
+mousePressed = -> myMousePressed mouseX,mouseY
