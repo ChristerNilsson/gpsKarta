@@ -119,7 +119,7 @@ soundUp = null
 soundDown = null
 soundQueue = 0 # neg=minskat avstånd pos=ökat avstånd
 
-messages = [0,1,2,3,4,5,6,7]
+messages = [0,1,2,3,4,5]
 gpsCount = 0
 
 [gpsLat,gpsLon] = [0,0]
@@ -273,8 +273,8 @@ playSound = ->
 locationUpdate = (p) ->
 	gpsCount++
 	messages[5] = gpsCount
-	messages[6] = myround p.coords.latitude
-	messages[7] = myround p.coords.longitude
+	#messages[6] = myround p.coords.latitude
+	#messages[7] = myround p.coords.longitude
 	soundIndicator p
 
 	position = gps.gps2bmp gpsLat,gpsLon
@@ -369,9 +369,9 @@ drawControl = ->
 	latLon1 = LatLon gpsLat,gpsLon
 
 	bearing = latLon1.bearingTo latLon2
-	messages[0] = currentControl
-	messages[1] = "#{int bearing}º"
-	messages[2] = "#{Math.round(latLon1.distanceTo latLon2)} m"
+	messages[0] = "#{int bearing}º"
+	messages[1] = "#{Math.round(latLon1.distanceTo latLon2)} m"
+	messages[2] = currentControl
 
 	control = controls[currentControl]
 	x = control[0]
@@ -392,11 +392,17 @@ xdraw = ->
 	drawTrack()
 	drawControl()
 	textSize 100
-	fc 1,1,0
-	sc 0
+	fc 0
+	sc 1,1,0
 	sw 3
+	margin = 25
 	for message,i in messages
-		text message,50,100*(i+1)
+		if i % 2 == 0
+			textAlign LEFT,CENTER
+			text message,margin,100*(i//2+1) - margin
+		else
+			textAlign RIGHT,CENTER
+			text message,width-margin,100*(i//2+1) - margin
 	showDialogue()
 
 setTarget = (key) ->
@@ -583,4 +589,4 @@ myMousePressed = (mx,my) ->
 	display()
 	false 
 
-mousePressed = -> myMousePressed mouseX,mouseY
+#mousePressed = -> myMousePressed mouseX,mouseY

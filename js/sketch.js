@@ -53,7 +53,6 @@ var A,
     menu8,
     menu9,
     messages,
-    mousePressed,
     mouseReleased,
     myMousePressed,
     myround,
@@ -259,7 +258,7 @@ soundDown = null;
 
 soundQueue = 0; // neg=minskat avstånd pos=ökat avstånd
 
-messages = [0, 1, 2, 3, 4, 5, 6, 7];
+messages = [0, 1, 2, 3, 4, 5];
 
 gpsCount = 0;
 
@@ -467,8 +466,8 @@ playSound = function playSound() {
 locationUpdate = function locationUpdate(p) {
   gpsCount++;
   messages[5] = gpsCount;
-  messages[6] = myround(p.coords.latitude);
-  messages[7] = myround(p.coords.longitude);
+  //messages[6] = myround p.coords.latitude
+  //messages[7] = myround p.coords.longitude
   soundIndicator(p);
   position = gps.gps2bmp(gpsLat, gpsLon);
   track.push(position);
@@ -572,9 +571,9 @@ drawControl = function drawControl() {
   latLon2 = LatLon(trgLat, trgLon);
   latLon1 = LatLon(gpsLat, gpsLon);
   bearing = latLon1.bearingTo(latLon2);
-  messages[0] = currentControl;
-  messages[1] = int(bearing) + '\xBA';
-  messages[2] = Math.round(latLon1.distanceTo(latLon2)) + ' m';
+  messages[0] = int(bearing) + '\xBA';
+  messages[1] = Math.round(latLon1.distanceTo(latLon2)) + ' m';
+  messages[2] = currentControl;
   control = controls[currentControl];
   x = control[0];
   y = control[1];
@@ -588,19 +587,26 @@ drawControl = function drawControl() {
 };
 
 xdraw = function xdraw() {
-  var i, j, len, message;
+  var i, j, len, margin, message;
   bg(0, 1, 0);
   fc();
   image(img, 0, 0, width, height, cx - width / SCALE / 2, cy - height / SCALE / 2, width / SCALE, height / SCALE);
   drawTrack();
   drawControl();
   textSize(100);
-  fc(1, 1, 0);
-  sc(0);
+  fc(0);
+  sc(1, 1, 0);
   sw(3);
+  margin = 25;
   for (i = j = 0, len = messages.length; j < len; i = ++j) {
     message = messages[i];
-    text(message, 50, 100 * (i + 1));
+    if (i % 2 === 0) {
+      textAlign(LEFT, CENTER);
+      text(message, margin, 100 * (Math.floor(i / 2) + 1) - margin);
+    } else {
+      textAlign(RIGHT, CENTER);
+      text(message, width - margin, 100 * (Math.floor(i / 2) + 1) - margin);
+    }
   }
   return showDialogue();
 };
@@ -950,7 +956,5 @@ myMousePressed = function myMousePressed(mx, my) {
   return false;
 };
 
-mousePressed = function mousePressed() {
-  return myMousePressed(mouseX, mouseY);
-};
+//mousePressed = -> myMousePressed mouseX,mouseY
 //# sourceMappingURL=sketch.js.map
