@@ -574,4 +574,4 @@ myMousePressed = (mx,my) ->
 	display()
 	false 
 
-mousePressed = -> myMousePressed mouseX,mouseY
+#mousePressed = -> myMousePressed mouseX,mouseY

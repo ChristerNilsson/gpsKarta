@@ -53,7 +53,6 @@ var A,
     menu8,
     menu9,
     messages,
-    mousePressed,
     mouseReleased,
     myMousePressed,
     myround,
@@ -941,7 +940,5 @@ myMousePressed = function myMousePressed(mx, my) {
   return false;
 };
 
-mousePressed = function mousePressed() {
-  return myMousePressed(mouseX, mouseY);
-};
+//mousePressed = -> myMousePressed mouseX,mouseY
 //# sourceMappingURL=sketch.js.map
