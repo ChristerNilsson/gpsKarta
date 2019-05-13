@@ -28,6 +28,7 @@ var A,
     drawControl,
     drawTrack,
     gps,
+    gpsCount,
     gpsLat,
     gpsLon,
     h,
@@ -257,7 +258,9 @@ soundDown = null;
 
 soundQueue = 0; // neg=minskat avstånd pos=ökat avstånd
 
-messages = ['', '', '', '', ''];
+messages = [0, 1, 2, 3, 4, 5, 6, 7];
+
+gpsCount = 0;
 
 gpsLat = 0;
 gpsLon = 0;
@@ -461,6 +464,10 @@ playSound = function playSound() {
 };
 
 locationUpdate = function locationUpdate(p) {
+  messages[5] = gpsCount;
+  messages[6] = myRound(p.coords.latitude);
+  messages[7] = myRound(p.coords.longitude);
+  gpsCount++;
   soundIndicator(p);
   position = gps.gps2bmp(gpsLat, gpsLon);
   track.push(position);
@@ -620,17 +627,14 @@ menu1 = function menu1() {
   dialogue = new Dialogue(1, int(4 * w), int(2 * h), int(0.15 * h));
   r1 = 0.25 * height;
   r2 = 0.11 * height;
-  dialogue.clock(' ', 5, r1, r2, true, 90 + 360 / 5);
-  dialogue.buttons[0].info('Take', true, function () {
-    return menu4();
-  });
-  dialogue.buttons[1].info('Target', true, function () {
+  dialogue.clock(' ', 5, r1, r2, true);
+  dialogue.buttons[0].info('Target', true, function () {
     return menu3();
   });
-  dialogue.buttons[2].info('PanZoom', true, function () {
+  dialogue.buttons[1].info('PanZoom', true, function () {
     return menu2();
   });
-  dialogue.buttons[3].info('Center', true, function () {
+  dialogue.buttons[2].info('Center', true, function () {
     var _position = position;
 
     var _position2 = _slicedToArray(_position, 2);
@@ -641,8 +645,11 @@ menu1 = function menu1() {
     dialogues.clear();
     return xdraw();
   });
-  return dialogue.buttons[4].info('Speaker', true, function () {
+  dialogue.buttons[3].info('Speaker', true, function () {
     return menu10();
+  });
+  return dialogue.buttons[4].info('Take', true, function () {
+    return menu4();
   });
 };
 
@@ -652,7 +659,7 @@ menu2 = function menu2() {
   dialogue = new Dialogue(2, int(4 * w), int(2 * h), int(0.15 * h));
   r1 = 0.25 * height;
   r2 = 0.09 * height;
-  dialogue.clock(' ', 8, r1, r2, false, 45 + 360 / 8);
+  dialogue.clock(' ', 8, r1, r2, false);
   dialogue.buttons[0].info('Up', true, function () {
     return cy -= 0.33 * height / SCALE;
   });
@@ -705,7 +712,7 @@ menu4 = function menu4() {
   dialogue = new Dialogue(4, int(4 * w), int(2 * h), int(0.15 * h));
   r1 = 0.25 * height;
   r2 = 0.11 * height;
-  dialogue.clock(' ', 5, r1, r2, false, 55 + 360 / 5);
+  dialogue.clock(' ', 5, r1, r2, false);
   dialogue.buttons[0].info('ABCDE', true, function () {
     return menu5();
   });
@@ -739,7 +746,7 @@ menu5 = function menu5() {
   dialogue = new Dialogue(5, int(4 * w), int(2 * h), int(0.15 * h));
   r1 = 0.25 * height;
   r2 = 0.11 * height;
-  dialogue.clock(' ', 5, r1, r2, false, 55 + 360 / 5);
+  dialogue.clock(' ', 5, r1, r2, false);
   dialogue.buttons[0].info('A', true, function () {
     return update('A');
   });
@@ -763,7 +770,7 @@ menu6 = function menu6() {
   dialogue = new Dialogue(6, int(4 * w), int(2 * h), int(0.15 * h));
   r1 = 0.25 * height;
   r2 = 0.11 * height;
-  dialogue.clock(' ', 5, r1, r2, false, 55 + 360 / 5);
+  dialogue.clock(' ', 5, r1, r2, false);
   dialogue.buttons[0].info('F', true, function () {
     return update('F');
   });
@@ -787,7 +794,7 @@ menu7 = function menu7() {
   dialogue = new Dialogue(7, int(4 * w), int(2 * h), int(0.15 * h));
   r1 = 0.25 * height;
   r2 = 0.11 * height;
-  dialogue.clock(' ', 5, r1, r2, false, 55 + 360 / 5);
+  dialogue.clock(' ', 5, r1, r2, false);
   dialogue.buttons[0].info('K', true, function () {
     return update('K');
   });
@@ -811,7 +818,7 @@ menu8 = function menu8() {
   dialogue = new Dialogue(8, int(4 * w), int(2 * h), int(0.15 * h));
   r1 = 0.25 * height;
   r2 = 0.11 * height;
-  dialogue.clock(' ', 5, r1, r2, false, 55 + 360 / 5);
+  dialogue.clock(' ', 5, r1, r2, false);
   dialogue.buttons[0].info('P', true, function () {
     return update('P');
   });
@@ -835,7 +842,7 @@ menu9 = function menu9() {
   dialogue = new Dialogue(9, int(4 * w), int(2 * h), int(0.15 * h));
   r1 = 0.25 * height;
   r2 = 0.11 * height;
-  dialogue.clock(' ', 6, r1, r2, false, 60 + 360 / 6);
+  dialogue.clock(' ', 6, r1, r2, false);
   dialogue.buttons[0].info('U', true, function () {
     return update('U');
   });
@@ -862,7 +869,7 @@ menu10 = function menu10() {
   dialogue = new Dialogue(10, int(4 * w), int(2 * h), int(0.15 * h));
   r1 = 0.27 * height;
   r2 = 0.08 * height;
-  dialogue.clock(' ', 10, r1, r2, false, 60 + 360 / 10);
+  dialogue.clock(' ', 10, r1, r2, false);
   dialogue.buttons[0].info('0', true, function () {
     return initSpeaker(0);
   });

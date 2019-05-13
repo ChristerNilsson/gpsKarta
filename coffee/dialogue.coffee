@@ -13,7 +13,7 @@ class Dialogue
 
 	clock : (title,n,r1,r2, @backPop=true, turn=0) ->
 		for i in range n
-			v = i*360/n-turn
+			v = i*360/n + turn - 90
 			@add new Button '', r1*cos(v), r1*sin(v), r2, -> 
 		@add new Button title,0,0,r2, -> 
 			if @dlg.backPop then dialogues.pop() else dialogues.clear()

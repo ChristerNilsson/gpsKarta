@@ -119,7 +119,8 @@ soundUp = null
 soundDown = null
 soundQueue = 0 # neg=minskat avstånd pos=ökat avstånd
 
-messages = ['','','','','']
+messages = [0,1,2,3,4,5,6,7]
+gpsCount = 0
 
 [gpsLat,gpsLon] = [0,0]
 [trgLat,trgLon] = [0,0]
@@ -270,6 +271,10 @@ playSound = ->
 	if soundQueue==0 then xdraw()
 
 locationUpdate = (p) ->
+	messages[5] = gpsCount
+	messages[6] = myRound p.coords.latitude
+	messages[7] = myRound p.coords.longitude
+	gpsCount++
 	soundIndicator p
 
 	position = gps.gps2bmp gpsLat,gpsLon
@@ -403,23 +408,23 @@ menu1 = -> # Main Menu
 
 	r1 = 0.25 * height
 	r2 = 0.11 * height
-	dialogue.clock ' ',5,r1,r2,true,90+360/5
+	dialogue.clock ' ',5,r1,r2,true
 
-	dialogue.buttons[0].info 'Take', true, -> menu4()
-	dialogue.buttons[1].info 'Target', true, -> menu3()
-	dialogue.buttons[2].info 'PanZoom', true, -> menu2()
-	dialogue.buttons[3].info 'Center', true, -> 
+	dialogue.buttons[0].info 'Target', true, -> menu3()
+	dialogue.buttons[1].info 'PanZoom', true, -> menu2()
+	dialogue.buttons[2].info 'Center', true, -> 
 		[cx,cy] = position
 		dialogues.clear()	
 		xdraw()	
-	dialogue.buttons[4].info 'Speaker', true, -> menu10() 
+	dialogue.buttons[3].info 'Speaker', true, -> menu10() 
+	dialogue.buttons[4].info 'Take', true, -> menu4()
 
 menu2 = -> # Pan Zoom
 	dialogue = new Dialogue 2,int(4*w),int(2*h),int(0.15*h) 
 
 	r1 = 0.25 * height 
 	r2 = 0.09 * height
-	dialogue.clock ' ',8,r1,r2,false,45+360/8
+	dialogue.clock ' ',8,r1,r2,false
 
 	dialogue.buttons[0].info 'Up', true, -> cy -= 0.33*height/SCALE  
 	dialogue.buttons[1].info 'Restore', true, -> 
@@ -446,7 +451,7 @@ menu4 = -> # Take
 
 	r1 = 0.25 * height 
 	r2 = 0.11 * height
-	dialogue.clock ' ',5,r1,r2,false,55+360/5
+	dialogue.clock ' ',5,r1,r2,false
 
 	dialogue.buttons[0].info 'ABCDE', true, -> menu5()
 	dialogue.buttons[1].info 'FGHIJ', true, -> menu6()
@@ -465,7 +470,7 @@ menu5 = -> # ABCDE
 
 	r1 = 0.25 * height 
 	r2 = 0.11 * height
-	dialogue.clock ' ',5,r1,r2,false,55+360/5
+	dialogue.clock ' ',5,r1,r2,false
 
 	dialogue.buttons[0].info 'A', true, -> update 'A'
 	dialogue.buttons[1].info 'B', true, -> update 'B'
@@ -478,7 +483,7 @@ menu6 = -> # FGHIJ
 
 	r1 = 0.25 * height 
 	r2 = 0.11 * height
-	dialogue.clock ' ',5,r1,r2,false,55+360/5
+	dialogue.clock ' ',5,r1,r2,false
 
 	dialogue.buttons[0].info 'F', true, -> update 'F'
 	dialogue.buttons[1].info 'G', true, -> update 'G'
@@ -491,7 +496,7 @@ menu7 = -> # KLMNO
 
 	r1 = 0.25 * height 
 	r2 = 0.11 * height
-	dialogue.clock ' ',5,r1,r2,false,55+360/5
+	dialogue.clock ' ',5,r1,r2,false
 
 	dialogue.buttons[0].info 'K', true, -> update 'K'
 	dialogue.buttons[1].info 'L', true, -> update 'L'
@@ -504,7 +509,7 @@ menu8 = -> # PQRST
 
 	r1 = 0.25 * height
 	r2 = 0.11 * height
-	dialogue.clock ' ',5,r1,r2,false,55+360/5
+	dialogue.clock ' ',5,r1,r2,false
 
 	dialogue.buttons[0].info 'P', true, -> update 'P'
 	dialogue.buttons[1].info 'Q', true, -> update 'Q'
@@ -517,7 +522,7 @@ menu9 = -> # UVWXYZ
 
 	r1 = 0.25 * height 
 	r2 = 0.11 * height
-	dialogue.clock ' ',6,r1,r2,false,60+360/6
+	dialogue.clock ' ',6,r1,r2,false
 
 	dialogue.buttons[0].info 'U', true, -> update 'U'
 	dialogue.buttons[1].info 'V', true, -> update 'V'
@@ -531,7 +536,7 @@ menu10 = -> # speaker
 
 	r1 = 0.27 * height 
 	r2 = 0.08 * height
-	dialogue.clock ' ',10,r1,r2,false,60+360/10
+	dialogue.clock ' ',10,r1,r2,false
 
 	dialogue.buttons[0].info '0', true, -> initSpeaker 0
 	dialogue.buttons[1].info '1', true, -> initSpeaker 1

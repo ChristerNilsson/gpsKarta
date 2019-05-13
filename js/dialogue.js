@@ -39,7 +39,7 @@ Dialogue = function () {
       ref = range(n);
       for (j = 0, len = ref.length; j < len; j++) {
         i = ref[j];
-        v = i * 360 / n - turn;
+        v = i * 360 / n + turn - 90;
         this.add(new Button('', r1 * cos(v), r1 * sin(v), r2, function () {}));
       }
       return this.add(new Button(title, 0, 0, r2, function () {
