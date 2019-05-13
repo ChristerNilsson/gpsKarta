@@ -287,6 +287,16 @@ locationUpdate = (p) ->
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['Check location permissions']
 
 initSpeaker = (index) ->
+	soundUp = loadSound 'soundUp.wav'
+	soundDown = loadSound 'soundDown.wav'
+	soundUp.setVolume 0.1
+	soundDown.setVolume 0.1
+	#controls['bike'] = position
+	#buttons[2].prompt = 'bike'
+	clearInterval timeout
+	timeout = setInterval playSound, DELAY
+	soundQueue = 0	
+
 	speaker = new SpeechSynthesisUtterance()
 	voices = speechSynthesis.getVoices()
 	speaker.voice = voices[index]	
@@ -549,7 +559,6 @@ menu10 = -> # speaker
 	dialogue.buttons[8].info '8', true, -> initSpeaker 8
 	dialogue.buttons[9].info '9', true, -> initSpeaker 9
 
-
 display = -> xdraw()
 
 showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
@@ -574,4 +583,4 @@ myMousePressed = (mx,my) ->
 	display()
 	false 
 
-#mousePressed = -> myMousePressed mouseX,mouseY
+mousePressed = -> myMousePressed mouseX,mouseY

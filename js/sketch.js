@@ -53,6 +53,7 @@ var A,
     menu8,
     menu9,
     messages,
+    mousePressed,
     mouseReleased,
     myMousePressed,
     myround,
@@ -486,6 +487,15 @@ locationUpdateFail = function locationUpdateFail(error) {
 
 initSpeaker = function initSpeaker(index) {
   var voices;
+  soundUp = loadSound('soundUp.wav');
+  soundDown = loadSound('soundDown.wav');
+  soundUp.setVolume(0.1);
+  soundDown.setVolume(0.1);
+  //controls['bike'] = position
+  //buttons[2].prompt = 'bike'
+  clearInterval(timeout);
+  timeout = setInterval(playSound, DELAY);
+  soundQueue = 0;
   speaker = new SpeechSynthesisUtterance();
   voices = speechSynthesis.getVoices();
   speaker.voice = voices[index];
@@ -940,5 +950,7 @@ myMousePressed = function myMousePressed(mx, my) {
   return false;
 };
 
-//mousePressed = -> myMousePressed mouseX,mouseY
+mousePressed = function mousePressed() {
+  return myMousePressed(mouseX, mouseY);
+};
 //# sourceMappingURL=sketch.js.map
