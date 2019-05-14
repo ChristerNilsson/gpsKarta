@@ -1,29 +1,39 @@
 dialogues = []
 
+calcr1r2 = (n,w,h) ->
+	s = Math.min w,h
+	r2 = s/7
+	r1 = s/3
+	if n > 6 then r2 *= 7/n
+	[Math.round(r1),Math.round(r2)]
+assert [200,86], calcr1r2 4,600,800
+assert [200,75], calcr1r2 8,600,800
+
 class Dialogue 
 
-	constructor : (@number,@x,@y,@textSize) -> 
+	constructor : (@x = width/2, @y = height/2) -> 
 		@col = '#ff0b'
 		@buttons = []
 		dialogues.push @
 
-	add : (button) -> 
-		button.dlg = @
-		@buttons.push button	
+	add : (prompt,event) -> @buttons.push new Button @,prompt,event
 
-	# clock : (title,n,r1,r2, @backPop=true, turn=0) ->
-	# 	for i in range n
-	# 		v = i*360/n + turn - 90
-	# 		@add new Button '', r1*cos(v), r1*sin(v), r2, -> 
-	# 	@add new Button title,0,0,r2, -> 
-	# 		if @dlg.backPop then dialogues.pop() else dialogues.clear()
-
-	clock : (title,n,r1,r2, @backPop=true, turn=0) ->
-		for i in range n
+	clock : (title= ' ', @backPop=false, turn=0) ->
+		n = @buttons.length
+		[r1,r2] = calcr1r2 n,width,height
+		for button,i in @buttons
 			v = i*360/n + turn - 90
-			@add new Button '', r1*cos(v), r1*sin(v), r2, -> 
-		@add new Button title,0,0,r2, -> 
+			button.x = r1*cos v
+			button.y = r1*sin v
+			button.r = r2
+		button = new Button @, title, -> 
 			if @dlg.backPop then dialogues.pop() else dialogues.clear()
+		button.x = 0
+		button.y = 0
+		button.r = r2
+		@buttons.push button
+		chars = _.max (button.title.length for button in @buttons)
+		@textSize = if chars == 1 then 0.75*r2 else 2.5*r2/chars
 
 	update : (delta) -> # -1 eller +1
 		if 0 <= @pageStart + delta * @pageSize < @lst.length
@@ -45,11 +55,11 @@ class Dialogue
 			if i < @lst.length
 				item = @lst[i]
 				y = i*h
-				do (item) => @add new RectButton item, x,y,w,h, -> click @arr
-		@add new RectButton ['Prev'],   0*w/3,h*n, w/3,h, -> @dlg.update -1 
-		@add new RectButton ['Cancel'], 1*w/3,h*n, w/3,h, -> 
+				do (item) => @buttons.push new RectButton @, item, x,y,w,h, -> click @arr
+		@buttons.push new RectButton @, ['Prev'], 0*w/3,h*n, w/3,h, -> @dlg.update -1 
+		@buttons.push new RectButton @, ['Cancel'], 1*w/3,h*n, w/3,h, -> 
 			if @dlg.backPop then dialogues.pop() else dialogues.clear()
-		@add new RectButton ['Next'],   2*w/3,h*n, w/3,h, -> @dlg.update +1 
+		@buttons.push new RectButton @, ['Next'], 2*w/3,h*n, w/3,h, -> @dlg.update +1 
 
 	show : ->
 		push()
@@ -67,8 +77,8 @@ class Dialogue
 		false 
 
 class Button 
-	constructor : (@txt, @x, @y, @r, @event = -> print @txt) -> @active = true 
-	info : (@txt,@event) -> @active = true
+	constructor : (@dlg, @title, @event = -> print @txt) -> @active = true 
+	info : (@title,@event) -> @active = true
 	show : ->
 		if @active then fill @dlg.col else fill "#fff8"
 		stroke 0
@@ -78,7 +88,7 @@ class Button
 		noStroke()
 		textAlign CENTER,CENTER
 		textSize @dlg.textSize
-		arr = @txt.split ' '
+		arr = @title.split ' '
 		if arr.length == 1 
 			text arr[0], @x,@y
 		else 
@@ -90,7 +100,7 @@ class Button
 	execute : -> if @active then @event()
 
 class RectButton 
-	constructor : (@arr, @x, @y, @w, @h, @event = -> print @item) -> @active = true 
+	constructor : (@dlg, @arr, @x, @y, @w, @h, @event = -> print @item) -> @active = true 
 	info : (@arr,@event) -> @active = true
 	show : ->
 		if @active then fill @dlg.col else fill "#fff8"
