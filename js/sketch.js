@@ -24,9 +24,9 @@ var A,
     currentControl,
     cx,
     cy,
-    display,
     drawControl,
     drawTrack,
+    dump,
     gps,
     gpsCount,
     gpsLat,
@@ -52,6 +52,7 @@ var A,
     menu8,
     menu9,
     messages,
+    mousePressed,
     mouseReleased,
     myMousePressed,
     myround,
@@ -72,9 +73,11 @@ var A,
     soundUp,
     spara,
     speaker,
+    takes,
     targets,
     timeout,
     track,
+    trail,
     trgLat,
     trgLon,
     update,
@@ -246,7 +249,10 @@ position = null; // gps position (pixels)
 
 track = []; // five latest GPS positions (pixels)
 
-// buttons = []
+trail = []; // all gps points
+
+takes = []; // all littera takes
+
 speaker = null;
 
 img = null;
@@ -282,7 +288,12 @@ h = null;
 released = true;
 
 sendMail = function sendMail(subject, body) {
-  mail.href = 'mailto:' + MAIL + '?Subject=' + subject + '&body=' + body;
+  var s;
+  s = encodeURI('mailto:' + MAIL + '?subject=' + subject + '&body=' + body);
+  //print escape s
+  //print encodeURI s  
+  //print encodeURIComponent s 
+  mail.href = s;
   return mail.click();
 };
 
@@ -415,7 +426,9 @@ sayBearing = function sayBearing(a, b) {
 
 //showSpeed = (sp) -> # buttons[0].prompt = myround sp, 1
 soundIndicator = function soundIndicator(p) {
-  var a, b, bearinga, bearingb, c, dista, distance, distb;
+  var a, b, bearinga, bearingb, c, d, dista, distance, distb;
+  d = new Date();
+  trail.push(p.coords.latitude + ' ' + p.coords.longitude + ' ' + d.toISOString());
   a = LatLon(p.coords.latitude, p.coords.longitude); // newest
   b = LatLon(gpsLat, gpsLon);
   c = LatLon(trgLat, trgLon); // target
@@ -465,8 +478,6 @@ playSound = function playSound() {
 locationUpdate = function locationUpdate(p) {
   gpsCount++;
   messages[5] = gpsCount;
-  //messages[6] = myround p.coords.latitude
-  //messages[7] = myround p.coords.longitude
   soundIndicator(p);
   position = gps.gps2bmp(gpsLat, gpsLon);
   track.push(position);
@@ -489,8 +500,6 @@ initSpeaker = function initSpeaker(index) {
   soundDown = loadSound('soundDown.wav');
   soundUp.setVolume(0.1);
   soundDown.setVolume(0.1);
-  //controls['bike'] = position
-  //buttons[2].prompt = 'bike'
   clearInterval(timeout);
   timeout = setInterval(playSound, DELAY);
   soundQueue = 0;
@@ -625,6 +634,17 @@ setTarget = function setTarget(key) {
   return _gps$bmp2gps3 = gps.bmp2gps(x, y), _gps$bmp2gps4 = _slicedToArray(_gps$bmp2gps3, 2), trgLat = _gps$bmp2gps4[0], trgLon = _gps$bmp2gps4[1], _gps$bmp2gps3;
 };
 
+dump = function dump() {
+  // Sends the trail and all the takes
+  var s;
+  s = takes.join("\n");
+  s += "\n\n";
+  s += trail.join("\n");
+  sendMail('Takes:' + takes.length + ' Trail:' + trail.length, s);
+  takes = [];
+  return trail = [];
+};
+
 //#########################
 Array.prototype.clear = function () {
   return this.length = 0;
@@ -642,14 +662,14 @@ menu1 = function menu1() {
   dialogue = new Dialogue(1, int(4 * w), int(2 * h), int(0.15 * h));
   r1 = 0.25 * height;
   r2 = 0.11 * height;
-  dialogue.clock(' ', 5, r1, r2, true);
-  dialogue.buttons[0].info('Target', true, function () {
+  dialogue.clock(' ', 6, r1, r2, true);
+  dialogue.buttons[0].info('Target', function () {
     return menu3();
   });
-  dialogue.buttons[1].info('PanZoom', true, function () {
+  dialogue.buttons[1].info('PanZoom', function () {
     return menu2();
   });
-  dialogue.buttons[2].info('Center', true, function () {
+  dialogue.buttons[2].info('Center', function () {
     var _position = position;
 
     var _position2 = _slicedToArray(_position, 2);
@@ -660,10 +680,13 @@ menu1 = function menu1() {
     dialogues.clear();
     return xdraw();
   });
-  dialogue.buttons[3].info('Speaker', true, function () {
+  dialogue.buttons[3].info('Dump', function () {
+    return dump();
+  });
+  dialogue.buttons[4].info('Speaker', function () {
     return initSpeaker(5);
   });
-  return dialogue.buttons[4].info('Take', true, function () {
+  return dialogue.buttons[5].info('Take', function () {
     return menu4();
   });
 };
@@ -675,31 +698,32 @@ menu2 = function menu2() {
   r1 = 0.25 * height;
   r2 = 0.09 * height;
   dialogue.clock(' ', 8, r1, r2, false);
-  dialogue.buttons[0].info('Up', true, function () {
+  dialogue.buttons[0].info('Up', function () {
     return cy -= 0.33 * height / SCALE;
   });
-  dialogue.buttons[1].info('Restore', true, function () {
+  dialogue.buttons[1].info('Restore', function () {
     setTarget('bike');
     return dialogues.clear();
   });
-  dialogue.buttons[2].info('Right', true, function () {
+  dialogue.buttons[2].info('Right', function () {
     return cx += 0.33 * width / SCALE;
   });
-  dialogue.buttons[3].info('Out', true, function () {
+  dialogue.buttons[3].info('Out', function () {
     if (SCALE > 0.5) {
       return SCALE /= 1.5;
     }
   });
-  dialogue.buttons[4].info('Down', true, function () {
+  dialogue.buttons[4].info('Down', function () {
     return cy += 0.33 * height / SCALE;
   });
-  dialogue.buttons[5].info('In', true, function () {
+  dialogue.buttons[5].info('In', function () {
     return SCALE *= 1.5;
   });
-  dialogue.buttons[6].info('Left', true, function () {
+  dialogue.buttons[6].info('Left', function () {
     return cx -= 0.33 * width / SCALE;
   });
-  return dialogue.buttons[7].info('Save', true, function () {
+  return dialogue.buttons[7].info('Save', function () {
+    controls['bike'] = position;
     return dialogues.clear();
   });
 };
@@ -728,19 +752,19 @@ menu4 = function menu4() {
   r1 = 0.25 * height;
   r2 = 0.11 * height;
   dialogue.clock(' ', 5, r1, r2, false);
-  dialogue.buttons[0].info('ABCDE', true, function () {
+  dialogue.buttons[0].info('ABCDE', function () {
     return menu5();
   });
-  dialogue.buttons[1].info('FGHIJ', true, function () {
+  dialogue.buttons[1].info('FGHIJ', function () {
     return menu6();
   });
-  dialogue.buttons[2].info('KLMNO', true, function () {
+  dialogue.buttons[2].info('KLMNO', function () {
     return menu7();
   });
-  dialogue.buttons[3].info('PQRST', true, function () {
+  dialogue.buttons[3].info('PQRST', function () {
     return menu8();
   });
-  return dialogue.buttons[4].info('UVWXYZ', true, function () {
+  return dialogue.buttons[4].info('UVWXYZ', function () {
     return menu9();
   });
 };
@@ -750,7 +774,7 @@ update = function update(littera) {
 
   var d;
   d = new Date();
-  sendMail(currentControl, currentControl + ' ' + littera + ' ' + gpsLat + ' ' + gpsLon + ' ' + d.toISOString());
+  takes.push(gpsLat + ' ' + gpsLon + ' ' + d.toISOString() + ' ' + currentControl + ' ' + littera);
   controls[currentControl][index] = littera;
   return dialogues.clear();
 };
@@ -762,19 +786,19 @@ menu5 = function menu5() {
   r1 = 0.25 * height;
   r2 = 0.11 * height;
   dialogue.clock(' ', 5, r1, r2, false);
-  dialogue.buttons[0].info('A', true, function () {
+  dialogue.buttons[0].info('A', function () {
     return update('A');
   });
-  dialogue.buttons[1].info('B', true, function () {
+  dialogue.buttons[1].info('B', function () {
     return update('B');
   });
-  dialogue.buttons[2].info('C', true, function () {
+  dialogue.buttons[2].info('C', function () {
     return update('C');
   });
-  dialogue.buttons[3].info('D', true, function () {
+  dialogue.buttons[3].info('D', function () {
     return update('D');
   });
-  return dialogue.buttons[4].info('E', true, function () {
+  return dialogue.buttons[4].info('E', function () {
     return update('E');
   });
 };
@@ -786,19 +810,19 @@ menu6 = function menu6() {
   r1 = 0.25 * height;
   r2 = 0.11 * height;
   dialogue.clock(' ', 5, r1, r2, false);
-  dialogue.buttons[0].info('F', true, function () {
+  dialogue.buttons[0].info('F', function () {
     return update('F');
   });
-  dialogue.buttons[1].info('G', true, function () {
+  dialogue.buttons[1].info('G', function () {
     return update('G');
   });
-  dialogue.buttons[2].info('H', true, function () {
+  dialogue.buttons[2].info('H', function () {
     return update('H');
   });
-  dialogue.buttons[3].info('I', true, function () {
+  dialogue.buttons[3].info('I', function () {
     return update('I');
   });
-  return dialogue.buttons[4].info('J', true, function () {
+  return dialogue.buttons[4].info('J', function () {
     return update('J');
   });
 };
@@ -810,19 +834,19 @@ menu7 = function menu7() {
   r1 = 0.25 * height;
   r2 = 0.11 * height;
   dialogue.clock(' ', 5, r1, r2, false);
-  dialogue.buttons[0].info('K', true, function () {
+  dialogue.buttons[0].info('K', function () {
     return update('K');
   });
-  dialogue.buttons[1].info('L', true, function () {
+  dialogue.buttons[1].info('L', function () {
     return update('L');
   });
-  dialogue.buttons[2].info('M', true, function () {
+  dialogue.buttons[2].info('M', function () {
     return update('M');
   });
-  dialogue.buttons[3].info('N', true, function () {
+  dialogue.buttons[3].info('N', function () {
     return update('N');
   });
-  return dialogue.buttons[4].info('O', true, function () {
+  return dialogue.buttons[4].info('O', function () {
     return update('O');
   });
 };
@@ -834,19 +858,19 @@ menu8 = function menu8() {
   r1 = 0.25 * height;
   r2 = 0.11 * height;
   dialogue.clock(' ', 5, r1, r2, false);
-  dialogue.buttons[0].info('P', true, function () {
+  dialogue.buttons[0].info('P', function () {
     return update('P');
   });
-  dialogue.buttons[1].info('Q', true, function () {
+  dialogue.buttons[1].info('Q', function () {
     return update('Q');
   });
-  dialogue.buttons[2].info('R', true, function () {
+  dialogue.buttons[2].info('R', function () {
     return update('R');
   });
-  dialogue.buttons[3].info('S', true, function () {
+  dialogue.buttons[3].info('S', function () {
     return update('S');
   });
-  return dialogue.buttons[4].info('T', true, function () {
+  return dialogue.buttons[4].info('T', function () {
     return update('T');
   });
 };
@@ -858,45 +882,24 @@ menu9 = function menu9() {
   r1 = 0.25 * height;
   r2 = 0.11 * height;
   dialogue.clock(' ', 6, r1, r2, false);
-  dialogue.buttons[0].info('U', true, function () {
+  dialogue.buttons[0].info('U', function () {
     return update('U');
   });
-  dialogue.buttons[1].info('V', true, function () {
+  dialogue.buttons[1].info('V', function () {
     return update('V');
   });
-  dialogue.buttons[2].info('W', true, function () {
+  dialogue.buttons[2].info('W', function () {
     return update('W');
   });
-  dialogue.buttons[3].info('X', true, function () {
+  dialogue.buttons[3].info('X', function () {
     return update('X');
   });
-  dialogue.buttons[4].info('Y', true, function () {
+  dialogue.buttons[4].info('Y', function () {
     return update('Y');
   });
-  return dialogue.buttons[5].info('Z', true, function () {
+  return dialogue.buttons[5].info('Z', function () {
     return update('Z');
   });
-};
-
-// menu10 = -> # speaker
-// 	dialogue = new Dialogue 10,int(4*w),int(2*h),int(0.15*h) 
-
-// 	r1 = 0.27 * height 
-// 	r2 = 0.08 * height
-// 	dialogue.clock ' ',10,r1,r2,false
-
-// 	dialogue.buttons[0].info '0', true, -> initSpeaker 0
-// 	dialogue.buttons[1].info '1', true, -> initSpeaker 1
-// 	dialogue.buttons[2].info '2', true, -> initSpeaker 2
-// 	dialogue.buttons[3].info '3', true, -> initSpeaker 3
-// 	dialogue.buttons[4].info '4', true, -> initSpeaker 4
-// 	dialogue.buttons[5].info '5', true, -> initSpeaker 5
-// 	dialogue.buttons[6].info '6', true, -> initSpeaker 6
-// 	dialogue.buttons[7].info '7', true, -> initSpeaker 7
-// 	dialogue.buttons[8].info '8', true, -> initSpeaker 8
-// 	dialogue.buttons[9].info '9', true, -> initSpeaker 9
-display = function display() {
-  return xdraw();
 };
 
 showDialogue = function showDialogue() {
@@ -926,12 +929,14 @@ myMousePressed = function myMousePressed(mx, my) {
     } else {
       dialogues.pop();
     }
-    display();
+    xdraw();
     return false;
   }
-  display();
+  xdraw();
   return false;
 };
 
-//mousePressed = -> myMousePressed mouseX,mouseY
+mousePressed = function mousePressed() {
+  return myMousePressed(mouseX, mouseY);
+};
 //# sourceMappingURL=sketch.js.map

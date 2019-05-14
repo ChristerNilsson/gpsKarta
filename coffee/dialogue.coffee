@@ -11,6 +11,13 @@ class Dialogue
 		button.dlg = @
 		@buttons.push button	
 
+	# clock : (title,n,r1,r2, @backPop=true, turn=0) ->
+	# 	for i in range n
+	# 		v = i*360/n + turn - 90
+	# 		@add new Button '', r1*cos(v), r1*sin(v), r2, -> 
+	# 	@add new Button title,0,0,r2, -> 
+	# 		if @dlg.backPop then dialogues.pop() else dialogues.clear()
+
 	clock : (title,n,r1,r2, @backPop=true, turn=0) ->
 		for i in range n
 			v = i*360/n + turn - 90
@@ -61,7 +68,7 @@ class Dialogue
 
 class Button 
 	constructor : (@txt, @x, @y, @r, @event = -> print @txt) -> @active = true 
-	info : (@txt,@active,@event) ->
+	info : (@txt,@event) -> @active = true
 	show : ->
 		if @active then fill @dlg.col else fill "#fff8"
 		stroke 0
@@ -84,7 +91,7 @@ class Button
 
 class RectButton 
 	constructor : (@arr, @x, @y, @w, @h, @event = -> print @item) -> @active = true 
-	info : (@arr,@active,@event) ->
+	info : (@arr,@event) -> @active = true
 	show : ->
 		if @active then fill @dlg.col else fill "#fff8"
 		stroke 0

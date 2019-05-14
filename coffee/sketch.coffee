@@ -110,7 +110,8 @@ gps = null
 TRACKED = 5 # circles shows the player's position
 position = null # gps position (pixels)
 track = [] # five latest GPS positions (pixels)
-# buttons = []
+trail = [] # all gps points
+takes = [] # all littera takes
 
 speaker = null
 
@@ -136,7 +137,11 @@ h = null
 released = true 
 
 sendMail = (subject,body) ->
-	mail.href = "mailto:#{MAIL}?Subject=#{subject}&body=#{body}"
+	s = encodeURI "mailto:#{MAIL}?subject=#{subject}&body=#{body}"
+	#print escape s
+	#print encodeURI s  
+	#print encodeURIComponent s 
+	mail.href = s
 	mail.click()
 
 say = (m) ->
@@ -235,6 +240,9 @@ sayBearing = (a,b) -> # a is newer
 
 soundIndicator = (p) ->
 
+	d = new Date()
+	trail.push "#{p.coords.latitude} #{p.coords.longitude} #{d.toISOString()}"
+
 	a = LatLon p.coords.latitude,p.coords.longitude # newest
 	b = LatLon gpsLat, gpsLon
 	c = LatLon trgLat, trgLon # target
@@ -273,8 +281,6 @@ playSound = ->
 locationUpdate = (p) ->
 	gpsCount++
 	messages[5] = gpsCount
-	#messages[6] = myround p.coords.latitude
-	#messages[7] = myround p.coords.longitude
 	soundIndicator p
 
 	position = gps.gps2bmp gpsLat,gpsLon
@@ -291,8 +297,6 @@ initSpeaker = (index) ->
 	soundDown = loadSound 'soundDown.wav'
 	soundUp.setVolume 0.1
 	soundDown.setVolume 0.1
-	#controls['bike'] = position
-	#buttons[2].prompt = 'bike'
 	clearInterval timeout
 	timeout = setInterval playSound, DELAY
 	soundQueue = 0	
@@ -414,6 +418,14 @@ setTarget = (key) ->
 	y = control[1]
 	[trgLat,trgLon] = gps.bmp2gps x,y	
 
+dump = -> # Sends the trail and all the takes
+	s = takes.join "\n"
+	s += "\n\n"
+	s += trail.join "\n"
+	sendMail "Takes:#{takes.length} Trail:#{trail.length}", s
+	takes = []
+	trail = []
+
 ##########################
 
 Array.prototype.clear = -> @length = 0
@@ -424,16 +436,17 @@ menu1 = -> # Main Menu
 
 	r1 = 0.25 * height
 	r2 = 0.11 * height
-	dialogue.clock ' ',5,r1,r2,true
+	dialogue.clock ' ',6,r1,r2,true
 
-	dialogue.buttons[0].info 'Target', true, -> menu3()
-	dialogue.buttons[1].info 'PanZoom', true, -> menu2()
-	dialogue.buttons[2].info 'Center', true, -> 
+	dialogue.buttons[0].info 'Target', -> menu3()
+	dialogue.buttons[1].info 'PanZoom', -> menu2()
+	dialogue.buttons[2].info 'Center', -> 
 		[cx,cy] = position
 		dialogues.clear()	
 		xdraw()	
-	dialogue.buttons[3].info 'Speaker', true, -> initSpeaker 5
-	dialogue.buttons[4].info 'Take', true, -> menu4()
+	dialogue.buttons[3].info 'Dump', -> dump()
+	dialogue.buttons[4].info 'Speaker', -> initSpeaker 5
+	dialogue.buttons[5].info 'Take', -> menu4()
 
 menu2 = -> # Pan Zoom
 	dialogue = new Dialogue 2,int(4*w),int(2*h),int(0.15*h) 
@@ -442,16 +455,18 @@ menu2 = -> # Pan Zoom
 	r2 = 0.09 * height
 	dialogue.clock ' ',8,r1,r2,false
 
-	dialogue.buttons[0].info 'Up', true, -> cy -= 0.33*height/SCALE  
-	dialogue.buttons[1].info 'Restore', true, -> 
+	dialogue.buttons[0].info 'Up', -> cy -= 0.33*height/SCALE  
+	dialogue.buttons[1].info 'Restore', -> 
 		setTarget 'bike'
 		dialogues.clear()
-	dialogue.buttons[2].info 'Right', true, -> cx += 0.33*width/SCALE
-	dialogue.buttons[3].info 'Out', true, -> if SCALE > 0.5 then SCALE /= 1.5
-	dialogue.buttons[4].info 'Down', true, -> cy += 0.33*height/SCALE
-	dialogue.buttons[5].info 'In', true, -> SCALE *= 1.5
-	dialogue.buttons[6].info 'Left', true, -> cx -= 0.33*width/SCALE
-	dialogue.buttons[7].info 'Save', true, -> dialogues.clear()
+	dialogue.buttons[2].info 'Right', -> cx += 0.33*width/SCALE
+	dialogue.buttons[3].info 'Out', -> if SCALE > 0.5 then SCALE /= 1.5
+	dialogue.buttons[4].info 'Down', -> cy += 0.33*height/SCALE
+	dialogue.buttons[5].info 'In', -> SCALE *= 1.5
+	dialogue.buttons[6].info 'Left', -> cx -= 0.33*width/SCALE
+	dialogue.buttons[7].info 'Save', -> 
+		controls['bike'] = position
+		dialogues.clear()
 
 menu3 = -> # Target
 	targets = makeTargets()
@@ -469,15 +484,15 @@ menu4 = -> # Take
 	r2 = 0.11 * height
 	dialogue.clock ' ',5,r1,r2,false
 
-	dialogue.buttons[0].info 'ABCDE', true, -> menu5()
-	dialogue.buttons[1].info 'FGHIJ', true, -> menu6()
-	dialogue.buttons[2].info 'KLMNO', true, -> menu7()
-	dialogue.buttons[3].info 'PQRST', true, -> menu8()
-	dialogue.buttons[4].info 'UVWXYZ', true, -> menu9()
+	dialogue.buttons[0].info 'ABCDE', -> menu5()
+	dialogue.buttons[1].info 'FGHIJ', -> menu6()
+	dialogue.buttons[2].info 'KLMNO', -> menu7()
+	dialogue.buttons[3].info 'PQRST', -> menu8()
+	dialogue.buttons[4].info 'UVWXYZ', -> menu9()
 
 update = (littera,index=2) ->
 	d = new Date()
-	sendMail currentControl, "#{currentControl} #{littera} #{gpsLat} #{gpsLon} #{d.toISOString()}"
+	takes.push "#{gpsLat} #{gpsLon} #{d.toISOString()} #{currentControl} #{littera}"
 	controls[currentControl][index] = littera
 	dialogues.clear()
 
@@ -488,11 +503,11 @@ menu5 = -> # ABCDE
 	r2 = 0.11 * height
 	dialogue.clock ' ',5,r1,r2,false
 
-	dialogue.buttons[0].info 'A', true, -> update 'A'
-	dialogue.buttons[1].info 'B', true, -> update 'B'
-	dialogue.buttons[2].info 'C', true, -> update 'C'
-	dialogue.buttons[3].info 'D', true, -> update 'D'
-	dialogue.buttons[4].info 'E', true, -> update 'E'
+	dialogue.buttons[0].info 'A', -> update 'A'
+	dialogue.buttons[1].info 'B', -> update 'B'
+	dialogue.buttons[2].info 'C', -> update 'C'
+	dialogue.buttons[3].info 'D', -> update 'D'
+	dialogue.buttons[4].info 'E', -> update 'E'
 
 menu6 = -> # FGHIJ
 	dialogue = new Dialogue 6,int(4*w),int(2*h),int(0.15*h) 
@@ -501,11 +516,11 @@ menu6 = -> # FGHIJ
 	r2 = 0.11 * height
 	dialogue.clock ' ',5,r1,r2,false
 
-	dialogue.buttons[0].info 'F', true, -> update 'F'
-	dialogue.buttons[1].info 'G', true, -> update 'G'
-	dialogue.buttons[2].info 'H', true, -> update 'H'
-	dialogue.buttons[3].info 'I', true, -> update 'I'
-	dialogue.buttons[4].info 'J', true, -> update 'J'
+	dialogue.buttons[0].info 'F', -> update 'F'
+	dialogue.buttons[1].info 'G', -> update 'G'
+	dialogue.buttons[2].info 'H', -> update 'H'
+	dialogue.buttons[3].info 'I', -> update 'I'
+	dialogue.buttons[4].info 'J', -> update 'J'
 
 menu7 = -> # KLMNO
 	dialogue = new Dialogue 7,int(4*w),int(2*h),int(0.15*h) 
@@ -514,11 +529,11 @@ menu7 = -> # KLMNO
 	r2 = 0.11 * height
 	dialogue.clock ' ',5,r1,r2,false
 
-	dialogue.buttons[0].info 'K', true, -> update 'K'
-	dialogue.buttons[1].info 'L', true, -> update 'L'
-	dialogue.buttons[2].info 'M', true, -> update 'M'
-	dialogue.buttons[3].info 'N', true, -> update 'N'
-	dialogue.buttons[4].info 'O', true, -> update 'O'
+	dialogue.buttons[0].info 'K', -> update 'K'
+	dialogue.buttons[1].info 'L', -> update 'L'
+	dialogue.buttons[2].info 'M', -> update 'M'
+	dialogue.buttons[3].info 'N', -> update 'N'
+	dialogue.buttons[4].info 'O', -> update 'O'
 
 menu8 = -> # PQRST
 	dialogue = new Dialogue 8,int(4*w),int(2*h),int(0.15*h) 
@@ -527,11 +542,11 @@ menu8 = -> # PQRST
 	r2 = 0.11 * height
 	dialogue.clock ' ',5,r1,r2,false
 
-	dialogue.buttons[0].info 'P', true, -> update 'P'
-	dialogue.buttons[1].info 'Q', true, -> update 'Q'
-	dialogue.buttons[2].info 'R', true, -> update 'R'
-	dialogue.buttons[3].info 'S', true, -> update 'S'
-	dialogue.buttons[4].info 'T', true, -> update 'T'
+	dialogue.buttons[0].info 'P', -> update 'P'
+	dialogue.buttons[1].info 'Q', -> update 'Q'
+	dialogue.buttons[2].info 'R', -> update 'R'
+	dialogue.buttons[3].info 'S', -> update 'S'
+	dialogue.buttons[4].info 'T', -> update 'T'
 
 menu9 = -> # UVWXYZ
 	dialogue = new Dialogue 9,int(4*w),int(2*h),int(0.15*h) 
@@ -540,32 +555,12 @@ menu9 = -> # UVWXYZ
 	r2 = 0.11 * height
 	dialogue.clock ' ',6,r1,r2,false
 
-	dialogue.buttons[0].info 'U', true, -> update 'U'
-	dialogue.buttons[1].info 'V', true, -> update 'V'
-	dialogue.buttons[2].info 'W', true, -> update 'W'
-	dialogue.buttons[3].info 'X', true, -> update 'X'
-	dialogue.buttons[4].info 'Y', true, -> update 'Y'
-	dialogue.buttons[5].info 'Z', true, -> update 'Z'
-
-# menu10 = -> # speaker
-# 	dialogue = new Dialogue 10,int(4*w),int(2*h),int(0.15*h) 
-
-# 	r1 = 0.27 * height 
-# 	r2 = 0.08 * height
-# 	dialogue.clock ' ',10,r1,r2,false
-
-# 	dialogue.buttons[0].info '0', true, -> initSpeaker 0
-# 	dialogue.buttons[1].info '1', true, -> initSpeaker 1
-# 	dialogue.buttons[2].info '2', true, -> initSpeaker 2
-# 	dialogue.buttons[3].info '3', true, -> initSpeaker 3
-# 	dialogue.buttons[4].info '4', true, -> initSpeaker 4
-# 	dialogue.buttons[5].info '5', true, -> initSpeaker 5
-# 	dialogue.buttons[6].info '6', true, -> initSpeaker 6
-# 	dialogue.buttons[7].info '7', true, -> initSpeaker 7
-# 	dialogue.buttons[8].info '8', true, -> initSpeaker 8
-# 	dialogue.buttons[9].info '9', true, -> initSpeaker 9
-
-display = -> xdraw()
+	dialogue.buttons[0].info 'U', -> update 'U'
+	dialogue.buttons[1].info 'V', -> update 'V'
+	dialogue.buttons[2].info 'W', -> update 'W'
+	dialogue.buttons[3].info 'X', -> update 'X'
+	dialogue.buttons[4].info 'Y', -> update 'Y'
+	dialogue.buttons[5].info 'Z', -> update 'Z'
 
 showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
 
@@ -583,10 +578,10 @@ myMousePressed = (mx,my) ->
 	dialogue = _.last dialogues
 	if dialogues.length == 0 or not dialogue.execute mx,my 
 		if dialogues.length == 0 then menu1() else dialogues.pop()
-		display()
+		xdraw()
 		return false
 
-	display()
+	xdraw()
 	false 
 
-#mousePressed = -> myMousePressed mouseX,mouseY
+mousePressed = -> myMousePressed mouseX,mouseY

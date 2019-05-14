@@ -28,6 +28,14 @@ Dialogue = function () {
       button.dlg = this;
       return this.buttons.push(button);
     }
+
+    // clock : (title,n,r1,r2, @backPop=true, turn=0) ->
+    // 	for i in range n
+    // 		v = i*360/n + turn - 90
+    // 		@add new Button '', r1*cos(v), r1*sin(v), r2, -> 
+    // 	@add new Button title,0,0,r2, -> 
+    // 		if @dlg.backPop then dialogues.pop() else dialogues.clear()
+
   }, {
     key: 'clock',
     value: function clock(title, n, r1, r2) {
@@ -170,10 +178,10 @@ Button = function () {
 
   _createClass(Button, [{
     key: 'info',
-    value: function info(txt, active, event) {
+    value: function info(txt, event) {
       this.txt = txt;
-      this.active = active;
       this.event = event;
+      return this.active = true;
     }
   }, {
     key: 'show',
@@ -240,10 +248,10 @@ RectButton = function () {
 
   _createClass(RectButton, [{
     key: 'info',
-    value: function info(arr1, active, event) {
+    value: function info(arr1, event) {
       this.arr = arr1;
-      this.active = active;
       this.event = event;
+      return this.active = true;
     }
   }, {
     key: 'show',
