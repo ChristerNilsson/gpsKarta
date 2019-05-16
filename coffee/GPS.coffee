@@ -20,6 +20,7 @@ class GPS # hanterar GPS konvertering
 		q1 = @map_lon mlat,mlon,@nw,@ne
 		q2 = @map_lon mlat,mlon,@sw,@se
 		x = round map mlat, q1.lat,q2.lat, q1.x,q2.x
+		#x = round map mlon, q1.lon,q2.lon, q1.x,q2.x
 		y = round map mlat, q1.lat,q2.lat, q1.y,q2.y
 		[x,y]
 

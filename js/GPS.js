@@ -50,6 +50,7 @@ GPS = function () {
       q1 = this.map_lon(mlat, mlon, this.nw, this.ne);
       q2 = this.map_lon(mlat, mlon, this.sw, this.se);
       x = round(map(mlat, q1.lat, q2.lat, q1.x, q2.x));
+      //x = round map mlon, q1.lon,q2.lon, q1.x,q2.x
       y = round(map(mlat, q1.lat, q2.lat, q1.y, q2.y));
       return [x, y];
     }
