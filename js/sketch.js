@@ -10,6 +10,7 @@ var A,
     DATA,
     DELAY,
     DIST,
+    DISTLIST,
     FILENAME,
     HEIGHT,
     LIMIT,
@@ -92,6 +93,8 @@ DELAY = 100; // ms, delay between sounds
 DIST = 1; // meter. Movement less than DIST makes no sound 1=walk. 5=bike
 
 LIMIT = 20; // meter. Under this, no bearing. Also distance voice every meter.
+
+DISTLIST = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000];
 
 MAIL = 'janchrister.nilsson@gmail.com';
 
@@ -377,28 +380,17 @@ assert('5', coarse(5.4));
 assert('5', coarse(4.6));
 
 sayDistance = function sayDistance(a, b) {
-  // anropa say om någon gräns passeras 1,2,3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,30,...
-  var distance, sa, sb;
+  // a is newer
+  var d, distance, j, len;
+  // anropa say om någon gräns passeras
   // if a border is crossed, play a sound
-  if (a <= LIMIT) {
-    if (Math.round(a) !== Math.round(b)) {
-      distance = Math.round(a).toString();
-      if (distance !== lastDistance) {
-        say(distance);
-        lastDistance = distance;
-      }
+  for (j = 0, len = DISTLIST.length; j < len; j++) {
+    d = DISTLIST[j];
+    if ((a - d) * (b - d) < 0) {
+      distance = a >= LIMIT ? 'distans ' + sa : sa;
+      say(distance);
       return;
     }
-  }
-  sa = coarse(a);
-  sb = coarse(b);
-  if (sa === sb) {
-    return;
-  }
-  distance = a >= LIMIT ? 'distans ' + sa : sa;
-  if (distance !== lastDistance) {
-    say(distance);
-    return lastDistance = distance;
   }
 };
 

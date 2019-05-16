@@ -2,6 +2,7 @@ DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this, no bearing. Also distance voice every meter.
 
+DISTLIST = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,30,40,50,60,70,80,90,100,200,300,400,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000]
 MAIL = 'janchrister.nilsson@gmail.com'
 
 spara = (lat,lon, x,y) -> {lat,lon, x,y}
@@ -205,22 +206,14 @@ assert '40', coarse 36.8
 assert '5', coarse 5.4
 assert '5', coarse 4.6
 
-sayDistance = (a,b) -> # anropa say om någon gräns passeras 1,2,3,4,5,6,8,9,10,11,12,13,14,15,16,17,18,19,20,30,...
+sayDistance = (a,b) -> # a is newer
+	# anropa say om någon gräns passeras
 	# if a border is crossed, play a sound
-	if a <= LIMIT
-		if Math.round(a) != Math.round(b)
-			distance = (Math.round a).toString()
-			if distance != lastDistance 
-				say distance 
-				lastDistance = distance
+	for d in DISTLIST
+		if (a-d) * (b-d) < 0
+			distance = if a >= LIMIT then 'distans ' + sa else sa
+			say distance
 			return
-	sa = coarse a
-	sb = coarse b
-	if sa == sb then return
-	distance = if a >= LIMIT then 'distans ' + sa else sa
-	if distance != lastDistance 
-		say distance
-		lastDistance = distance 
 
 # eventuellt kräva tio sekunder sedan föregående bäring sades
 sayBearing = (a,b) -> # a is newer
