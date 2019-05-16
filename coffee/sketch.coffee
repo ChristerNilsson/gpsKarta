@@ -211,7 +211,7 @@ sayDistance = (a,b) -> # a is newer
 	# if a border is crossed, play a sound
 	for d in DISTLIST
 		if (a-d) * (b-d) < 0
-			distance = if a >= LIMIT then 'distans ' + sa else sa
+			distance = if a >= LIMIT then 'distans ' + d else d
 			say distance
 			return
 

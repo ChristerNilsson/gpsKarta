@@ -387,7 +387,7 @@ sayDistance = function sayDistance(a, b) {
   for (j = 0, len = DISTLIST.length; j < len; j++) {
     d = DISTLIST[j];
     if ((a - d) * (b - d) < 0) {
-      distance = a >= LIMIT ? 'distans ' + sa : sa;
+      distance = a >= LIMIT ? 'distans ' + d : d;
       say(distance);
       return;
     }
