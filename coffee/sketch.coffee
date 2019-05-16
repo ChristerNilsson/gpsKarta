@@ -426,15 +426,15 @@ assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
 
 menu1 = -> # Main Menu
 	dialogue = new Dialogue() 
-	dialogue.add 'Target', -> menu3()
-	dialogue.add 'PanZoom', -> menu2()
+	dialogue.add 'Target..', -> menu3()
+	dialogue.add 'PanZoom..', -> menu2()
 	dialogue.add 'Center', -> 
 		[cx,cy] = position
 		dialogues.clear()	
 		xdraw()	
 	dialogue.add 'Mail', -> executeMail()
 	dialogue.add 'Speaker', -> initSpeaker 5
-	dialogue.add 'Take', -> menu4()
+	dialogue.add 'Take..', -> menu4()
 	dialogue.clock ' ',true
 
 menu2 = -> # Pan Zoom
@@ -465,11 +465,11 @@ menu3 = -> # Target
 
 menu4 = -> # Take
 	dialogue = new Dialogue()
-	dialogue.add 'ABCDE', -> menu5 'ABCDE'
-	dialogue.add 'FGHIJ', -> menu5 'FGHIJ'
-	dialogue.add 'KLMNO', -> menu5 'KLMNO'
-	dialogue.add 'PQRST', -> menu5 'PQRST'
-	dialogue.add 'UVWXYZ', -> menu5 'UVWXYZ'
+	dialogue.add 'ABCDE..', -> menu5 'ABCDE'
+	dialogue.add 'FGHIJ..', -> menu5 'FGHIJ'
+	dialogue.add 'KLMNO..', -> menu5 'KLMNO'
+	dialogue.add 'PQRST..', -> menu5 'PQRST'
+	dialogue.add 'UVWXYZ..', -> menu5 'UVWXYZ'
 	dialogue.clock()
 
 addZero = (n) -> if n <= 9 then "0" + n else n

@@ -651,10 +651,10 @@ menu1 = function menu1() {
   // Main Menu
   var dialogue;
   dialogue = new Dialogue();
-  dialogue.add('Target', function () {
+  dialogue.add('Target..', function () {
     return menu3();
   });
-  dialogue.add('PanZoom', function () {
+  dialogue.add('PanZoom..', function () {
     return menu2();
   });
   dialogue.add('Center', function () {
@@ -674,7 +674,7 @@ menu1 = function menu1() {
   dialogue.add('Speaker', function () {
     return initSpeaker(5);
   });
-  dialogue.add('Take', function () {
+  dialogue.add('Take..', function () {
     return menu4();
   });
   return dialogue.clock(' ', true);
@@ -745,19 +745,19 @@ menu4 = function menu4() {
   // Take
   var dialogue;
   dialogue = new Dialogue();
-  dialogue.add('ABCDE', function () {
+  dialogue.add('ABCDE..', function () {
     return menu5('ABCDE');
   });
-  dialogue.add('FGHIJ', function () {
+  dialogue.add('FGHIJ..', function () {
     return menu5('FGHIJ');
   });
-  dialogue.add('KLMNO', function () {
+  dialogue.add('KLMNO..', function () {
     return menu5('KLMNO');
   });
-  dialogue.add('PQRST', function () {
+  dialogue.add('PQRST..', function () {
     return menu5('PQRST');
   });
-  dialogue.add('UVWXYZ', function () {
+  dialogue.add('UVWXYZ..', function () {
     return menu5('UVWXYZ');
   });
   return dialogue.clock();
