@@ -83,6 +83,7 @@ controls = # id: [x,y,littera,lat,lon]
 #################
 
 targets = [] # [id, littera, distance]
+platform = null
 
 initControls = ->
 	for key,control of controls
@@ -315,6 +316,8 @@ setup = ->
 	canvas = createCanvas innerWidth-0.5, innerHeight-0.5
 	canvas.position 0,0 # hides text field used for clipboard copy.
 
+	platform = window.navigator.platform
+
 	w = width/8
 	h = height/4 
 	angleMode DEGREES
@@ -516,4 +519,6 @@ myMousePressed = (mx,my) ->
 	xdraw()
 	false 
 
-mousePressed = -> myMousePressed mouseX,mouseY
+mousePressed = -> 
+	if platform == 'Win32' then myMousePressed mouseX,mouseY
+	false

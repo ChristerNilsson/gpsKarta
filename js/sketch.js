@@ -53,6 +53,7 @@ var A,
     mouseReleased,
     myMousePressed,
     myround,
+    platform,
     playSound,
     position,
     preload,
@@ -177,6 +178,8 @@ controls = { // id: [x,y,littera,lat,lon]
 
 //################
 targets = []; // [id, littera, distance]
+
+platform = null;
 
 initControls = function initControls() {
   var control, key, lat, littera, lon, results, x, y;
@@ -516,6 +519,7 @@ setup = function setup() {
   var canvas, x, x1, x2, y, y1, y2;
   canvas = createCanvas(innerWidth - 0.5, innerHeight - 0.5);
   canvas.position(0, 0); // hides text field used for clipboard copy.
+  platform = window.navigator.platform;
   w = width / 8;
   h = height / 4;
   angleMode(DEGREES);
@@ -838,6 +842,9 @@ myMousePressed = function myMousePressed(mx, my) {
 };
 
 mousePressed = function mousePressed() {
-  return myMousePressed(mouseX, mouseY);
+  if (platform === 'Win32') {
+    myMousePressed(mouseX, mouseY);
+  }
+  return false;
 };
 //# sourceMappingURL=sketch.js.map

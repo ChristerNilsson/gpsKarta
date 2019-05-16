@@ -35,7 +35,7 @@ Dialogue = function () {
 
     this.x = x1;
     this.y = y1;
-    this.col = '#ff0b';
+    this.col = '#ff06';
     this.buttons = [];
     dialogues.push(this);
   }

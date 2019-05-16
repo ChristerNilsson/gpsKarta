@@ -12,7 +12,7 @@ assert [200,75], calcr1r2 8,600,800
 class Dialogue 
 
 	constructor : (@x = width/2, @y = height/2) -> 
-		@col = '#ff0b'
+		@col = '#ff06'
 		@buttons = []
 		dialogues.push @
 
