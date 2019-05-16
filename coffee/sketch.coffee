@@ -197,14 +197,14 @@ makeCorners = ->
 
 	gps = new GPS nw,ne,se,sw,WIDTH,HEIGHT
 
-coarse = (x) ->
-	n = Math.round(x).toString().length
-	myround(x,1-n).toString()
-assert '4000', coarse 3917.5	
-assert '400', coarse 421.2	
-assert '40', coarse 36.8
-assert '5', coarse 5.4
-assert '5', coarse 4.6
+# coarse = (x) ->
+# 	n = Math.round(x).toString().length
+# 	myround(x,1-n).toString()
+# assert '4000', coarse 3917.5	
+# assert '400', coarse 421.2	
+# assert '40', coarse 36.8
+# assert '5', coarse 5.4
+# assert '5', coarse 4.6
 
 sayDistance = (a,b) -> # a is newer
 	# anropa say om någon gräns passeras
@@ -436,9 +436,7 @@ menu1 = -> # Main Menu
 menu2 = -> # Pan Zoom
 	dialogue = new Dialogue()
 	dialogue.add 'Up', -> cy -= 0.33*height/SCALE  
-	dialogue.add ' ', -> 
-		# setTarget 'bike'
-		# dialogues.clear()
+	dialogue.add ' ', -> # Not Used
 	dialogue.add 'Right', -> cx += 0.33*width/SCALE
 	dialogue.add 'Out', -> if SCALE > 0.5 then SCALE /= 1.5
 	dialogue.add 'Down', -> cy += 0.33*height/SCALE
@@ -446,7 +444,7 @@ menu2 = -> # Pan Zoom
 	dialogue.add 'Left', -> cx -= 0.33*width/SCALE
 	dialogue.add 'Bike', -> 
 		[x,y] = gps.gps2bmp gpsLat,gpsLon
-		controls['bike'] = [x,y,'',0,0]
+		controls['bike'] = [x,y,'',gpsLat,gpsLon]
 		dialogues.clear()
 	dialogue.clock()
 

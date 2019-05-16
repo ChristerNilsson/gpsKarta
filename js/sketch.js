@@ -20,7 +20,6 @@ var A,
     WIDTH,
     addZero,
     assert,
-    coarse,
     controls,
     corner,
     currentControl,
@@ -363,22 +362,14 @@ makeCorners = function makeCorners() {
   return gps = new GPS(nw, ne, se, sw, WIDTH, HEIGHT);
 };
 
-coarse = function coarse(x) {
-  var n;
-  n = Math.round(x).toString().length;
-  return myround(x, 1 - n).toString();
-};
-
-assert('4000', coarse(3917.5));
-
-assert('400', coarse(421.2));
-
-assert('40', coarse(36.8));
-
-assert('5', coarse(5.4));
-
-assert('5', coarse(4.6));
-
+// coarse = (x) ->
+// 	n = Math.round(x).toString().length
+// 	myround(x,1-n).toString()
+// assert '4000', coarse 3917.5	
+// assert '400', coarse 421.2	
+// assert '40', coarse 36.8
+// assert '5', coarse 5.4
+// assert '5', coarse 4.6
 sayDistance = function sayDistance(a, b) {
   // a is newer
   var d, distance, j, len;
@@ -683,10 +674,7 @@ menu2 = function menu2() {
   dialogue.add('Up', function () {
     return cy -= 0.33 * height / SCALE;
   });
-  dialogue.add(' ', function () {});
-
-  // setTarget 'bike'
-  // dialogues.clear()
+  dialogue.add(' ', function () {}); // Not Used
   dialogue.add('Right', function () {
     return cx += 0.33 * width / SCALE;
   });
@@ -714,7 +702,7 @@ menu2 = function menu2() {
     x = _gps$gps2bmp2[0];
     y = _gps$gps2bmp2[1];
 
-    controls['bike'] = [x, y, '', 0, 0];
+    controls['bike'] = [x, y, '', gpsLat, gpsLon];
     return dialogues.clear();
   });
   return dialogue.clock();
