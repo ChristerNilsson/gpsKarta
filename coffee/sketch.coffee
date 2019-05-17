@@ -46,10 +46,16 @@ spara = (lat,lon, x,y) -> {lat,lon, x,y}
 # 	'32': [2250,2750,'',0,0]
 
 # 2019-SommarS
-A = spara 59.279157, 18.149313, 2599,676 # Mellanbron
-B = spara 59.275129, 18.169590, 4531,1328 # Ulvsjön Vändplan Huset
-C = spara 59.270072, 18.150229, 2763,2334 # Brotorpsbron
-D = spara 59.267894, 18.167087, 4339,2645 # Älta huset
+
+A = spara 59.2801716, 18.152609,  2894,485  # 38 P
+B = spara 59.2810534, 18.1676281, 4303,255  # 21 B
+C = spara 59.2677013, 18.1548921, 3231,2757 # 50 K
+D = spara 59.2687144, 18.1660263, 4256,2514 # 48 M
+
+# A = spara 59.279157, 18.149313, 2599,676 # Mellanbron
+# B = spara 59.275129, 18.169590, 4531,1328 # Ulvsjön Vändplan Huset
+# C = spara 59.270072, 18.150229, 2763,2334 # Brotorpsbron
+# D = spara 59.267894, 18.167087, 4339,2645 # Älta huset
 
 FILENAME = '2019-SommarS.jpg' 
 
@@ -122,23 +128,20 @@ gpsCount = 0
 
 [gpsLat,gpsLon] = [0,0]
 [trgLat,trgLon] = [0,0]
-currentControl = "1"
+currentControl = "21"
 
 timeout = null
 
-lastBearing = ''
-lastDistance = ''
+pastSayings = {} # for preventing sayings every second.
+#lastBearing = ''
+#lastDistance = ''
 
 w = null
 h = null
 released = true 
 
 sendMail = (subject,body) ->
-	s = encodeURI "mailto:#{MAIL}?subject=#{subject}&body=#{body}"
-	#print escape s
-	#print encodeURI s  
-	#print encodeURIComponent s 
-	mail.href = s
+	mail.href = encodeURI "mailto:#{MAIL}?subject=#{subject}&body=#{body}"
 	mail.click()
 
 say = (m) ->
@@ -207,7 +210,10 @@ sayDistance = (a,b) -> # a is newer
 	for d in DISTLIST
 		if (a-d) * (b-d) < 0
 			distance = if a >= LIMIT then 'distans ' + d else d
-			say distance
+			now = Date.now()
+			if now > pastSayings[distance] + 2000 # ms
+				pastSayings[distance] = now
+				say distance
 			return
 
 # eventuellt kräva tio sekunder sedan föregående bäring sades
@@ -221,9 +227,10 @@ sayBearing = (a,b) -> # a is newer
 		c = tr[a//10]
 		d = tr[a%%10]
 		bearing = 'bäring ' + c + ' ' + d
-		if bearing != lastBearing
+		now = Date.now()
+		if now > pastSayings[bearing] + 2000 # ms
+			pastSayings[bearing] = now
 			say bearing
-			lastbearing = bearing
 
 soundIndicator = (p) ->
 
@@ -473,7 +480,10 @@ stdDateTime = (date) ->
 	"#{y}-#{m}-#{d} #{h}:#{M}:#{s}"
 
 update = (littera,index=2) ->
-	takes.push "#{gpsLat} #{gpsLon} #{stdDateTime new Date()} #{currentControl} #{littera}"
+	control = controls[currentControl]
+	a = LatLon control[3],control[4] 
+	b = LatLon gpsLat, gpsLon
+	takes.push "#{gpsLat} #{gpsLon} #{stdDateTime new Date()} #{currentControl} #{littera} (#{Math.round a.distanceTo b})"
 	controls[currentControl][index] = littera
 	dialogues.clear()
 
