@@ -211,6 +211,7 @@ sayDistance = (a,b) -> # a is newer
 		if (a-d) * (b-d) < 0
 			distance = if a >= LIMIT then 'distans ' + d else d
 			now = Date.now()
+			if distance not of pastSayings then pastSayings[distance] = 0
 			if now > pastSayings[distance] + 2000 # ms
 				pastSayings[distance] = now
 				say distance
@@ -228,6 +229,7 @@ sayBearing = (a,b) -> # a is newer
 		d = tr[a%%10]
 		bearing = 'bäring ' + c + ' ' + d
 		now = Date.now()
+		if bearing not of pastSayings then pastSayings[bearing] = 0
 		if now > pastSayings[bearing] + 2000 # ms
 			pastSayings[bearing] = now
 			say bearing

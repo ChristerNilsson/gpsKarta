@@ -375,6 +375,9 @@ sayDistance = function sayDistance(a, b) {
     if ((a - d) * (b - d) < 0) {
       distance = a >= LIMIT ? 'distans ' + d : d;
       now = Date.now();
+      if (!(distance in pastSayings)) {
+        pastSayings[distance] = 0;
+      }
       if (now > pastSayings[distance] + 2000) {
         // ms
         pastSayings[distance] = now;
@@ -402,6 +405,9 @@ sayBearing = function sayBearing(a, b) {
     d = tr[modulo(a, 10)];
     bearing = 'bäring ' + c + ' ' + d;
     now = Date.now();
+    if (!(bearing in pastSayings)) {
+      pastSayings[bearing] = 0;
+    }
     if (now > pastSayings[bearing] + 2000) {
       // ms
       pastSayings[bearing] = now;
