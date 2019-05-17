@@ -291,8 +291,10 @@ RectButton = function () {
   }, {
     key: 'show',
     value: function show() {
+      var col;
+      col = '#ff0';
       if (this.active) {
-        fill(this.dlg.col);
+        fill(col);
       } else {
         fill("#fff8");
       }

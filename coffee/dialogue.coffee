@@ -103,7 +103,9 @@ class RectButton
 	constructor : (@dlg, @arr, @x, @y, @w, @h, @event = -> print @item) -> @active = true 
 	info : (@arr,@event) -> @active = true
 	show : ->
-		if @active then fill @dlg.col else fill "#fff8"
+		col = '#ff0'
+
+		if @active then fill col else fill "#fff8"
 		stroke 0
 		rect @x,@y,@w,@h
 		push()
