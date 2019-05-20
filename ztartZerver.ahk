@@ -6,7 +6,7 @@ WinWait, ahk_class ConsoleWindowClass
 WinActivate, ahk_class ConsoleWindowClass
 WinMove A,, A_ScreenWidth*xp, 0, A_ScreenWidth*(1-xp), A_ScreenHeight*(1-yp)
 
-Run, subl -a .
+Run, code .
 WinWait, ahk_class PX_WINDOW_CLASS
 WinActivate, ahk_class PX_WINDOW_CLASS
 WinMove A,, 0,0, A_ScreenWidth*xp, A_ScreenHeight

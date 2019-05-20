@@ -155,6 +155,9 @@ D = spara(59.2687144, 18.1660263, 4256, 2514); // 48 M
 FILENAME = '2019-SommarS.jpg';
 
 controls = {
+
+  //'Brotorp':     59.2705658 18.1480179 2019-05-20 18:32:15 43 B (794)
+  //'Skarpnäck T': 59.2662226 18.1331561 2019-05-20 18:37:25 bike S (973)
   21: [4303, 255, '', 0, 0],
   22: [4066, 407, '', 0, 0],
   23: [3436, 158, '', 0, 0],
@@ -777,11 +780,20 @@ stdDateTime = function stdDateTime(date) {
 update = function update(littera) {
   var index = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 2;
 
-  var a, b, control;
+  var a, b, control, x, y;
   control = controls[currentControl];
   a = LatLon(control[3], control[4]);
   b = LatLon(gpsLat, gpsLon);
-  takes.push(gpsLat + ' ' + gpsLon + ' ' + stdDateTime(new Date()) + ' ' + currentControl + ' ' + littera + ' (' + Math.round(a.distanceTo(b)) + ')');
+
+  var _gps$gps2bmp3 = gps.gps2bmp(gpsLat, gpsLon);
+
+  var _gps$gps2bmp4 = _slicedToArray(_gps$gps2bmp3, 2);
+
+  x = _gps$gps2bmp4[0];
+  y = _gps$gps2bmp4[1];
+
+  print(x, y);
+  takes.push('[' + x + ', ' + y + ',\'\', ' + gpsLat + ', ' + gpsLon + '] ' + stdDateTime(new Date()) + ' ' + currentControl + ' ' + littera + ' (' + Math.round(a.distanceTo(b)) + ')');
   controls[currentControl][index] = littera;
   return dialogues.clear();
 };
