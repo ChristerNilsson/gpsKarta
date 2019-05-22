@@ -1,6 +1,10 @@
 # 043-gpsKarta
 
-## Digital orienteering.
+## Digital orienteering
+
+* [Orienteering](https://en.wikipedia.org/wiki/Orienteering)
+* [Naturpasset](https://www.facebook.com/Naturpasset.Nackareservatet)
+* [Compass](https://en.wikipedia.org/wiki/Compass)
 
 Buy the paper map [here](http://www.skogsluffarna.se/Arrangemang/Naturpasset)
 
@@ -14,7 +18,7 @@ The size of the controls are rougly 100 meter.
 * Right : Move your position right
 * Up : Move your position up
 * Down : Move your position down
-* Out : Zooms ut
+* Out : Zooms out
 * In : Zooms in
 * Vehicle : Saves current position.
 
@@ -35,7 +39,7 @@ Stop screen rotation on Android like this:
 * Start walking in that direction.
 * Modify the Compass when the voice speaks a new bearing.
 * "Bearing Two Seven" => 270 degrees = West
-* Distances are read now an then as "Distance One Hundred" (meter)
+* Distances are read now and then as "Distance One Hundred" (meter)
 * Every meter closer to the target can be heard as a click.
 * When distance is less than 20 meter, no Bearing is given. The Bearing is changing every second, when you are so close to the Target.
 
