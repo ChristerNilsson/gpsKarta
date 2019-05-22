@@ -1,55 +1,45 @@
 # 043-gpsKarta
 
-Underlättar orientering.
+## Digital orienteering.
 
-Köp kartan [här](http://www.skogsluffarna.se/Arrangemang/Naturpasset)
+Buy the paper map [here](http://www.skogsluffarna.se/Arrangemang/Naturpasset)
 
-## Funktionalitet
+## Functionality
 
-Man ser karta, kontroller samt egen position hela tiden.
-Kontrollernas diameter är cirka 100 meter.
+You see the map, controls and position all the time.
+The size of the controls are rougly 100 meter.
 
-*   : Centrerar aktuell position
-* L : Flyttar vänster
-* R : Flyttar höger
-* U : Flyttar upp
-* D : Flyttar ner
-* Minus : Zoomar ut
-* Plus : Zoomar in
-* S : Sparar aktuell position. Visas med rött.
-* P : Droppar senast sparad position. Visar antalet sparade.
+* Center : Centers your position
+* Left : Move your position left
+* Right : Move your position right
+* Up : Move your position up
+* Down : Move your position down
+* Out : Zooms ut
+* In : Zooms in
+* Vehicle : Saves current position.
 
-Praktisk noggrannhet tycks ligga kring 10 meter.
+Accuracy : Ten meters
 
-Den egna positionen visas med fem svarta cirklar. Den minsta cirkeln är den senaste.
+Your position is shown with five black circles. The smallest circle is the most recent.
 
-Hindra skärmrotation på din mobil (Android) :
+Stop screen rotation on Android like this:
 * Settings
 * Display
 * When device is rotated: Stay in portrait view
 
-## Klicka på kontroll
-Genom att klicka på en kontroll kan man se bäring och avstånd till kontrollen.
+## How To
 
-## Arbetsgång
-* Koppla in hörlurarna.
-* Avläs bäring till kontrollen
-* Ställ in den på kompassen
-* Gå i den bäringen eller gå runt hinder
-* Justera bäringen då rösten säger t ex "bearing 2 7" (270 grader = västerut)
-* Avstånd läses upp som t ex "distance 100" (meter)
-* Då avståndet < 10 meter ges ingen bäring. Utnyttja eventuellt bildskärmen för finlir på slutet.
-* Om hastigheten mot målet minskar till noll, gör en 90-graders sväng. Behövs ej om man följer rätt bäring.
+* Connect your headphones.
+* Choose Target
+* Read the Bearing and turn your analog Compass house.
+* Start walking in that direction.
+* Modify the Compass when the voice speaks a new bearing.
+* "Bearing Two Seven" => 270 degrees = West
+* Distances are read now an then as "Distance One Hundred" (meter)
+* Every meter closer to the target can be heard as a click.
+* When distance is less than 20 meter, no Bearing is given. The Bearing is changing every second, when you are so close to the Target.
 
-## ToDo:
-
-*	Drag och pinch istf knappar
-
-## Intern info
-
-* playSound måste göra ett minimum för att hinna med 10 Hz.
-
-## Förslag
+## Future Development
 
 * Låt localStorage lagras i molnet vid wifikontakt (typ Google Photo)
 * Då man går in på en annan enhet kopieras localStorage ner till den enheten (typ Google Photo)
