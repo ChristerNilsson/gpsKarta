@@ -1,4 +1,4 @@
-# 043-gpsKarta
+# gpsKarta
 
 ## Digital orienteering
 
@@ -11,7 +11,7 @@ Buy the paper map [here](http://www.skogsluffarna.se/Arrangemang/Naturpasset)
 ## Functionality
 
 You see the map, controls and position all the time.
-The size of the controls are rougly 100 meter.
+The size of the controls are roughly 100 meter.
 
 * Center : Centers your position
 * Left : Move your position left
@@ -22,7 +22,7 @@ The size of the controls are rougly 100 meter.
 * In : Zooms in
 * Vehicle : Saves current position.
 
-Accuracy : Ten meters
+Accuracy : Approx ten meters
 
 Your position is shown with five black circles. The smallest circle is the most recent.
 
