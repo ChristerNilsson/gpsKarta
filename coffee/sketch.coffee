@@ -127,6 +127,7 @@ img = null
 soundUp = null
 soundDown = null
 soundQueue = 0 # neg=minskat avstånd pos=ökat avstånd
+jcnindex = 0
 
 messages = [0,1,2,3,4,5]
 gpsCount = 0
@@ -311,7 +312,8 @@ initSpeaker = (index) ->
 	speaker.text = ''
 	speaker.lang = 'sv-SE'
 	dialogues.clear()
-	say "speaker #{index}"
+	say "speaker #{jcnindex}"
+	jcnindex++
 
 setup = ->
 
