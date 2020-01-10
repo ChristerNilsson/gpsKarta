@@ -416,7 +416,8 @@ setTarget = (key) ->
 	control = controls[currentControl]
 	x = control[0]
 	y = control[1]
-	[trgLat,trgLon] = gps.bmp2gps x,y	
+	[trgLat,trgLon] = gps.bmp2gps x,y
+	# if key != 'bike' then setBike()
 
 executeMail = -> # Sends the trail and all the takes
 	s = takes.join "\n"
@@ -430,6 +431,13 @@ executeMail = -> # Sends the trail and all the takes
 
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
+
+getBike = -> setTarget 'bike'
+
+setBike = ->
+	[x,y] = gps.gps2bmp gpsLat,gpsLon
+	controls.bike = [x,y,'',gpsLat,gpsLon]
+	dialogues.clear()
 
 menu1 = -> # Main Menu
 	dialogue = new Dialogue() 
@@ -453,10 +461,7 @@ menu2 = -> # Pan Zoom
 	dialogue.add 'Down', -> cy += 0.33*height/SCALE
 	dialogue.add 'In', -> SCALE *= 1.5
 	dialogue.add 'Left', -> cx -= 0.33*width/SCALE
-	dialogue.add 'Bike', -> 
-		[x,y] = gps.gps2bmp gpsLat,gpsLon
-		controls['bike'] = [x,y,'',gpsLat,gpsLon]
-		dialogues.clear()
+	dialogue.add 'Bike', -> setBike()
 	dialogue.clock()
 
 menu3 = -> # Target
@@ -497,6 +502,7 @@ update = (littera,index=2) ->
 	takes.push "[#{x}, #{y},'', #{gpsLat}, #{gpsLon}] #{stdDateTime new Date()} #{currentControl} #{littera} (#{Math.round a.distanceTo b})"
 	controls[currentControl][index] = littera
 	dialogues.clear()
+	getBike()
 
 menu5 = (letters) -> # ABCDE
 	dialogue = new Dialogue() 
