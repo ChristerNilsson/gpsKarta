@@ -454,6 +454,7 @@ menu1 = -> # Main Menu
 	dialogue.add 'Store Bike', -> setBike()
 
 	dialogue.clock ' ',true
+	dialogue.textSize *= 1.5
 
 menu2 = -> # Pan Zoom
 	dialogue = new Dialogue()
@@ -520,7 +521,6 @@ mouseReleased = ->
 	false
 
 myMousePressed = (mx,my) -> 
-
 	if not released then return false
 	released = false 
 
