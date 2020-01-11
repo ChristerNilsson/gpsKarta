@@ -417,7 +417,7 @@ setTarget = (key) ->
 	x = control[0]
 	y = control[1]
 	[trgLat,trgLon] = gps.bmp2gps x,y
-	# if key != 'bike' then setBike()
+	dialogues.clear()
 
 executeMail = -> # Sends the trail and all the takes
 	s = takes.join "\n"
@@ -441,15 +441,18 @@ setBike = ->
 
 menu1 = -> # Main Menu
 	dialogue = new Dialogue() 
-	dialogue.add 'Target', -> menu3()
-	dialogue.add 'PanZoom', -> menu2()
+	dialogue.add 'Pan Zoom', -> menu2()
+	dialogue.add 'Goto Bike', -> setTarget 'bike'
+	dialogue.add 'Take', -> menu4()
+	dialogue.add 'Mail', -> executeMail()
 	dialogue.add 'Center', -> 
 		[cx,cy] = position
 		dialogues.clear()	
 		xdraw()	
-	dialogue.add 'Mail', -> executeMail()
 	dialogue.add 'Speaker', -> initSpeaker 5
-	dialogue.add 'Take', -> menu4()
+	dialogue.add 'Target', -> menu3()
+	dialogue.add 'Store Bike', -> setBike()
+
 	dialogue.clock ' ',true
 
 menu2 = -> # Pan Zoom
@@ -461,7 +464,7 @@ menu2 = -> # Pan Zoom
 	dialogue.add 'Down', -> cy += 0.33*height/SCALE
 	dialogue.add 'In', -> SCALE *= 1.5
 	dialogue.add 'Left', -> cx -= 0.33*width/SCALE
-	dialogue.add 'Bike', -> setBike()
+	dialogue.add ' ', -> # Not used
 	dialogue.clock()
 
 menu3 = -> # Target
@@ -471,7 +474,7 @@ menu3 = -> # Target
 	lst = lst.sort (a,b) -> a[2] - b[2]
 	dialogue.list lst, 8, false, (arr) ->
 		if arr.length > 0 then setTarget arr[0]
-		dialogues.clear()		
+		dialogues.clear()
 
 menu4 = -> # Take
 	dialogue = new Dialogue()
