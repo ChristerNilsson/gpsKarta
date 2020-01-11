@@ -13,14 +13,25 @@ Buy the paper map [here](http://www.skogsluffarna.se/Arrangemang/Naturpasset)
 You see the map, controls and position all the time.
 The size of the controls are roughly 100 meter.
 
-* Center : Centers your position
-* Left : Move your position left
-* Right : Move your position right
-* Up : Move your position up
-* Down : Move your position down
-* Out : Zooms out
-* In : Zooms in
-* Vehicle : Saves current position.
+* Pan Zoom
+	* Left (Move your position left)
+	* Right (Move your position right)
+	* Up (Move your position up)
+	* Down (Move your position down)
+	* Out (Zooms out)
+	* In (Zooms in)
+* Goto Bike (sets target to starting position)
+* Take (marks a target with littera)
+	* ABCDE
+	* FGHIJ
+	* KLMNO
+	* PQRST
+	* UVWXYZ
+* Mail (sends data in a mail)
+* Center (centers your position)
+* Speaker (Starts the speaker)
+* Target (choose target)
+* Store Bike (stores starting position)
 
 Accuracy : Approx ten meters
 
@@ -31,17 +42,29 @@ Stop screen rotation on Android like this:
 * Display
 * When device is rotated: Stay in portrait view
 
+Allow the app to work even if your phone is turned off
+* Settings
+* Apps & notifications
+* Special app access
+* Unrestricted data access
+* Chrome On
+
 ## How To
 
 * Connect your headphones.
+* Click on Speaker
+* Set Bike
 * Choose Target
-* Read the Bearing and turn your analog Compass house.
-* Start walking in that direction.
-* Modify the Compass when the voice speaks a new bearing.
-* "Bearing Two Seven" => 270 degrees = West
+* If you have a compass
+	* When the Bearing changes, turn your analog Compass house.
+	* "Bearing Two Seven" => 270 degrees = West
+	* Start walking in that direction.
 * Distances are read now and then as "Distance One Hundred" (meter)
-* Every meter closer to the target can be heard as a click.
-* When distance is less than 20 meter, no Bearing is given. The Bearing is changing every second, when you are so close to the Target.
+* Every meter closer to the target can be heard as a coin drop.
+* Every meter lost to the target can be heard as a small explosion.
+* When distance is less than twenty meter, no Bearing is given. The Bearing is changing very often, when you are so close to the Target.
+* Click on take when you have found your target
+* Goto Bike
 
 ## Future Development
 
