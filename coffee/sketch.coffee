@@ -95,7 +95,10 @@ platform = null
 saveControls = -> localStorage.gpsKarta = JSON.stringify controls
 getControls = ->
 	try
-		controls = JSON.parse localStorage.gpsKarta
+		controls1 = JSON.parse localStorage.gpsKarta
+		n1 =  _.keys(controls1).length
+		n0 =  _.keys(controls).length
+		if abs(n0-n1) <= 1 then controls = controls1 
 	catch
 		initControls()
 clearControls = ->
