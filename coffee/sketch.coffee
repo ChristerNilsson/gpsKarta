@@ -111,7 +111,7 @@ initControls = ->
 
 makeTargets = ->
 	targets = []
-	c = LatLon gpsLat, gpsLon 
+	c = LatLon gpsLat, gpsLon
 	for key,control of controls
 		[x,y,littera,lat,lon] = control
 		b = LatLon lat, lon
@@ -355,6 +355,8 @@ setup = ->
 	# initControls()
 	getControls()
 
+	#sendMail 'controls', JSON.stringify controls
+
 	position = [WIDTH/2,HEIGHT/2]
 
 	navigator.geolocation.watchPosition locationUpdate, locationUpdateFail,
@@ -393,7 +395,7 @@ drawControl = ->
 	messages[2] = "#{Math.round(latLon1.distanceTo latLon2)} m"
 
 	control = controls[currentControl]
-	console.log currentControl,control
+	# console.log currentControl,control
 	x = control[0]
 	y = control[1]
 
@@ -426,20 +428,27 @@ setTarget = (key) ->
 	if controls[currentControl] == null then return
 	soundQueue = 0
 	currentControl = key
-	console.log currentControl,controls
+	#console.log currentControl,controls
 	control = controls[currentControl]
 	x = control[0]
 	y = control[1]
 	[trgLat,trgLon] = gps.bmp2gps x,y
 	dialogues.clear()
 
-executeMail = -> # Sends the trail and all the takes
-	s = takes.join "\n"
-	s += "\n\n"
-	s += trail.join "\n"
-	sendMail "Takes:#{takes.length} Trail:#{trail.length}", s
-	takes = []
-	trail = []
+# executeMail = -> # Sends the trail and all the takes
+# 	s = takes.join "\n"
+# 	s += "\n\n"
+# 	s += trail.join "\n"
+# 	sendMail "Takes:#{takes.length} Trail:#{trail.length}", s
+# 	takes = []
+# 	trail = []
+
+executeMail = ->
+	arr = []
+	for key,control of controls
+		arr.push "#{key} #{JSON.stringify control}"
+	s = arr.join "\n"
+	sendMail "controls", s
 
 ##########################
 
