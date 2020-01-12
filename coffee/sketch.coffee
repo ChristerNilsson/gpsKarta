@@ -304,7 +304,7 @@ initSpeaker = (index) ->
 
 	speaker = new SpeechSynthesisUtterance()
 	voices = speechSynthesis.getVoices()
-	speaker.voice = voices[index]	
+	speaker.voice = voices[jcnindex]	
 	speaker.voiceURI = "native"
 	speaker.volume = 1
 	speaker.rate = 0.8

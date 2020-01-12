@@ -13,6 +13,8 @@ Buy the paper map [here](http://www.skogsluffarna.se/Arrangemang/Naturpasset)
 You see the map, controls and position all the time.
 The size of the controls are roughly 100 meter.
 
+* Speaker (Starts the speaker)
+* Center (centers your position)
 * Pan Zoom
 	* Left (Move your position left)
 	* Right (Move your position right)
@@ -20,7 +22,9 @@ The size of the controls are roughly 100 meter.
 	* Down (Move your position down)
 	* Out (Zooms out)
 	* In (Zooms in)
+* Store Bike (stores starting position)
 * Goto Bike (sets target to starting position)
+* Target (choose target)
 * Take (marks a target with littera)
 	* ABCDE
 	* FGHIJ
@@ -28,10 +32,6 @@ The size of the controls are roughly 100 meter.
 	* PQRST
 	* UVWXYZ
 * Mail (sends data in a mail)
-* Center (centers your position)
-* Speaker (Starts the speaker)
-* Target (choose target)
-* Store Bike (stores starting position)
 
 Accuracy : Approx ten meters
 
@@ -65,6 +65,12 @@ Allow the app to work even if your phone is turned off
 * When distance is less than twenty meter, no Bearing is given. The Bearing is changing very often, when you are so close to the Target.
 * Click on take when you have found your target
 * Goto Bike
+
+## Methods
+
+* 1. Listen to bearings and use a compass. Most efficient method.
+* 2. Listen to distance indicating sounds (coins and explosions)
+* 3. Look at the map on the screen and the five circles.
 
 ## Future Development
 
