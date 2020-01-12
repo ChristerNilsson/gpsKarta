@@ -92,6 +92,16 @@ controls =
 targets = [] # [id, littera, distance]
 platform = null
 
+saveControls = -> localStorage.gpsKarta = JSON.stringify controls
+getControls = ->
+	try
+		controls = JSON.parse localStorage.gpsKarta
+	catch
+		initControls()
+clearControls = ->
+	for key,control of controls
+		control[2] = ''
+	saveControls()
 initControls = ->
 	for key,control of controls
 		[x,y,littera] = control
@@ -342,7 +352,8 @@ setup = ->
 	y1 = 100
 	y2 = height-100
 
-	initControls()
+	# initControls()
+	getControls()
 
 	position = [WIDTH/2,HEIGHT/2]
 
@@ -382,6 +393,7 @@ drawControl = ->
 	messages[2] = "#{Math.round(latLon1.distanceTo latLon2)} m"
 
 	control = controls[currentControl]
+	console.log currentControl,control
 	x = control[0]
 	y = control[1]
 
@@ -410,9 +422,11 @@ xdraw = ->
 	showDialogue()
 
 setTarget = (key) ->
+	if key not of controls then return
 	if controls[currentControl] == null then return
 	soundQueue = 0
 	currentControl = key
+	console.log currentControl,controls
 	control = controls[currentControl]
 	x = control[0]
 	y = control[1]
@@ -444,7 +458,7 @@ menu1 = -> # Main Menu
 	dialogue.add 'Pan Zoom', -> menu2()
 	dialogue.add 'Goto Bike', -> setTarget 'bike'
 	dialogue.add 'Take', -> menu4()
-	dialogue.add 'Mail', -> executeMail()
+	dialogue.add 'More', -> menu6()
 	dialogue.add 'Center', -> 
 		[cx,cy] = position
 		dialogues.clear()	
@@ -486,6 +500,14 @@ menu4 = -> # Take
 	dialogue.add 'UVWXYZ', -> menu5 'UVWXYZ'
 	dialogue.clock()
 
+menu6 = -> # More
+	dialogue = new Dialogue()
+	dialogue.add 'Mail', -> executeMail()
+	dialogue.add 'Clear', -> 
+		clearControls()
+		dialogues.clear()
+	dialogue.clock()
+
 addZero = (n) -> if n <= 9 then "0" + n else n
 
 stdDateTime = (date) ->
@@ -505,6 +527,7 @@ update = (littera,index=2) ->
 	print x,y
 	takes.push "[#{x}, #{y},'', #{gpsLat}, #{gpsLon}] #{stdDateTime new Date()} #{currentControl} #{littera} (#{Math.round a.distanceTo b})"
 	controls[currentControl][index] = littera
+	saveControls()
 	dialogues.clear()
 	getBike()
 
