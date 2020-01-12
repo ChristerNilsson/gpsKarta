@@ -99,6 +99,7 @@ getControls = ->
 		n1 =  _.keys(controls1).length
 		n0 =  _.keys(controls).length
 		if abs(n0-n1) <= 1 then controls = controls1 
+		initControls()
 	catch
 		initControls()
 clearControls = ->
