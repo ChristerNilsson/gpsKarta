@@ -64,48 +64,50 @@ B = spara 59.283048, 18.179902, 4299,1948 # Stora fårhuset
 C = spara 59.270077, 18.150339, 488,5566 # Brotorpsbron Ö
 D = spara 59.269496, 18.168739, 2963,5596 # Bergsätrav/Klisätrav
 
-controls = 
+controls = {}
 	#'Brotorp':     59.2705658 18.1480179 2019-05-20 18:32:15 43 B (794)
 	#'Skarpnäck T': 59.2662226 18.1331561 2019-05-20 18:37:25 bike S (973)
-	1: [604,6069,'',0,0]
-	2: [1415,6153,'',0,0]
-	3: [918,5525,'',0,0]
-	4: [2157,5841,'',0,0]
-	5: [1872,5261,'',0,0]
-	6: [1430,4485,'',0,0]
-	7: [2460,4629,'',0,0]
-	8: [1828,4044,'',0,0]
-	9: [1130,3042,'',0,0]
-	10: [1371,2479,'',0,0]
-	11: [1088,1656,'',0,0]
-	12: [1669,1684,'',0,0]
-	13: [2461,2092,'',0,0]
-	14: [3503,1675,'',0,0]
-	15: [3965,2167,'',0,0]
-	16: [4064,2716,'',0,0]
-	17: [3539,3097,'',0,0]
-	18: [2724,3108,'',0,0]
-	19: [3282,3697,'',0,0]
-	20: [2676,4189,'',0,0]
+clearControls = ->
+	controls = 
+		1: [604,6069,'',0,0]
+		2: [1415,6153,'',0,0]
+		3: [918,5525,'',0,0]
+		4: [2157,5841,'',0,0]
+		5: [1872,5261,'',0,0]
+		6: [1430,4485,'',0,0]
+		7: [2460,4629,'',0,0]
+		8: [1828,4044,'',0,0]
+		9: [1130,3042,'',0,0]
+		10: [1371,2479,'',0,0]
+		11: [1088,1656,'',0,0]
+		12: [1669,1684,'',0,0]
+		13: [2461,2092,'',0,0]
+		14: [3503,1675,'',0,0]
+		15: [3965,2167,'',0,0]
+		16: [4064,2716,'',0,0]
+		17: [3539,3097,'',0,0]
+		18: [2724,3108,'',0,0]
+		19: [3282,3697,'',0,0]
+		20: [2676,4189,'',0,0]
+	initControls()
+	saveControls()
 #################
 
 targets = [] # [id, littera, distance]
 platform = null
 
 saveControls = -> localStorage.gpsKarta = JSON.stringify controls
+
 getControls = ->
 	try
-		controls1 = JSON.parse localStorage.gpsKarta
-		n1 =  _.keys(controls1).length
-		n0 =  _.keys(controls).length
-		if abs(n0-n1) <= 1 then controls = controls1 
-		initControls()
+		controls = JSON.parse localStorage.gpsKarta
+		#n1 =  _.keys(controls1).length
+		#n0 =  _.keys(controls).length
+		#if abs(n0-n1) <= 1 then controls = controls1 
+		#initControls()
 	catch
-		initControls()
-clearControls = ->
-	for key,control of controls
-		control[2] = ''
-	saveControls()
+		clearControls()
+
 initControls = ->
 	for key,control of controls
 		[x,y,littera] = control
