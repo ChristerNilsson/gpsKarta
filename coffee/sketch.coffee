@@ -232,10 +232,7 @@ sayDistance = (a,b) -> # a is newer
 	# if a border is crossed, play a sound
 	for d in DISTLIST
 		if (a-d) * (b-d) < 0
-			distance = if a >= LIMIT then 'distans ' + d else d
-			if distance != lastDistance
-				voiceQueue.push distance
-				lastDistance = distance
+			voiceQueue.push if a >= LIMIT then 'distans ' + d else d
 			return
 
 # eventuellt kräva tio sekunder sedan föregående bäring sades
@@ -248,10 +245,7 @@ sayBearing = (a,b) -> # a is newer
 		tr = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
 		c = tr[a//10]
 		d = tr[a%%10]
-		bearing = 'bäring ' + c + ' ' + d
-		if bearing != lastBearing
-			voiceQueue.push bearing
-			lastBearing = bearing
+		voiceQueue.push 'bäring ' + c + ' ' + d
 		return
 
 soundIndicator = (p) ->
@@ -298,7 +292,18 @@ locationUpdate = (p) ->
 	messages[5] = gpsCount
 	soundIndicator p
 
-	if voiceQueue.length > 0 then say voiceQueue.pop()
+	if voiceQueue.length > 0 
+
+		msg = voiceQueue.shift()
+
+		if 0 == msg.indexOf 'bäring'
+			if msg != lastBearing 
+				lastBearing = msg
+				say msg
+		else
+			if msg != lastDistance 
+				lastDistance = msg
+				say msg
 
 	position = gps.gps2bmp gpsLat,gpsLon
 
@@ -316,7 +321,7 @@ initSpeaker = (index) ->
 	soundDown.setVolume 0.1
 	clearInterval timeout
 	timeout = setInterval playSound, DELAY
-	soundQueue = 0	
+	soundQueue = 0
 
 	speaker = new SpeechSynthesisUtterance()
 	voices = speechSynthesis.getVoices()
