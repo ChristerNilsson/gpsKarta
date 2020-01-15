@@ -139,7 +139,7 @@ takes = [] # all littera takes
 
 speaker = null
 
-img = null 
+img = null
 soundUp = null
 soundDown = null
 soundQueue = 0 # neg=minskat avstånd pos=ökat avstånd
@@ -154,13 +154,14 @@ currentControl = "1"
 
 timeout = null
 
-pastSayings = {} # for preventing sayings every second.
-#lastBearing = ''
-#lastDistance = ''
+#pastSayings = {} # for preventing sayings every second.
+voiceQueue = [] 
+lastBearing = ''
+lastDistance = ''
 
 w = null
 h = null
-released = true 
+released = true
 
 sendMail = (subject,body) ->
 	mail.href = encodeURI "mailto:#{MAIL}?subject=#{subject}&body=#{body}"
@@ -184,17 +185,17 @@ myround = (x,dec=6) ->
 vercal = (a,b,y) ->
 	x = map y, a.y,b.y, a.x,b.x
 	lat = map y, a.y,b.y, a.lat,b.lat
-	lon = map y, a.y,b.y, a.lon,b.lon  
-	{lat,lon,x,y} 	
+	lon = map y, a.y,b.y, a.lon,b.lon
+	{lat,lon,x,y}
 
 hortal = (a,b,x) ->
 	y = map x, a.x,b.x, a.y,b.y
 	lat = map x, a.x,b.x, a.lat,b.lat
-	lon = map x, a.x,b.x, a.lon,b.lon  
-	{lat,lon,x,y} 	
+	lon = map x, a.x,b.x, a.lon,b.lon
+	{lat,lon,x,y}
 
 corner = (a,b,c,d,x,y)->
-	lat = map y, c.y,d.y, c.lat,d.lat  
+	lat = map y, c.y,d.y, c.lat,d.lat
 	lon = map x, a.x,b.x, a.lon,b.lon
 	{lat,lon,x,y}
 
@@ -232,11 +233,9 @@ sayDistance = (a,b) -> # a is newer
 	for d in DISTLIST
 		if (a-d) * (b-d) < 0
 			distance = if a >= LIMIT then 'distans ' + d else d
-			now = Date.now()
-			if distance not of pastSayings then pastSayings[distance] = 0
-			if now > pastSayings[distance] + 2000 # ms
-				pastSayings[distance] = now
-				say distance
+			if distance != lastDistance
+				voiceQueue.push distance
+				lastDistance = distance
 			return
 
 # eventuellt kräva tio sekunder sedan föregående bäring sades
@@ -250,11 +249,10 @@ sayBearing = (a,b) -> # a is newer
 		c = tr[a//10]
 		d = tr[a%%10]
 		bearing = 'bäring ' + c + ' ' + d
-		now = Date.now()
-		if bearing not of pastSayings then pastSayings[bearing] = 0
-		if now > pastSayings[bearing] + 2000 # ms
-			pastSayings[bearing] = now
-			say bearing
+		if bearing != lastBearing
+			voiceQueue.push bearing
+			lastBearing = bearing
+		return
 
 soundIndicator = (p) ->
 
@@ -299,6 +297,8 @@ locationUpdate = (p) ->
 	gpsCount++
 	messages[5] = gpsCount
 	soundIndicator p
+
+	if voiceQueue.length > 0 then say voiceQueue.pop()
 
 	position = gps.gps2bmp gpsLat,gpsLon
 
@@ -401,7 +401,6 @@ drawControl = ->
 	messages[2] = "#{Math.round(latLon1.distanceTo latLon2)} m"
 
 	control = controls[currentControl]
-	# console.log currentControl,control
 	x = control[0]
 	y = control[1]
 
@@ -434,27 +433,26 @@ setTarget = (key) ->
 	if controls[currentControl] == null then return
 	soundQueue = 0
 	currentControl = key
-	#console.log currentControl,controls
 	control = controls[currentControl]
 	x = control[0]
 	y = control[1]
 	[trgLat,trgLon] = gps.bmp2gps x,y
 	dialogues.clear()
 
-# executeMail = -> # Sends the trail and all the takes
-# 	s = takes.join "\n"
-# 	s += "\n\n"
-# 	s += trail.join "\n"
-# 	sendMail "Takes:#{takes.length} Trail:#{trail.length}", s
-# 	takes = []
-# 	trail = []
+executeMail = -> # Sends the trail and all the takes
+	s = takes.join "\n"
+	s += "\n\n"
+	s += trail.join "\n"
+	sendMail "Takes:#{takes.length} Trail:#{trail.length}", s
+	takes = []
+	trail = []
 
-executeMail = ->
-	arr = []
-	for key,control of controls
-		arr.push "#{key} #{JSON.stringify control}"
-	s = arr.join "\n"
-	sendMail "controls", s
+# executeMail = ->
+# 	arr = []
+# 	for key,control of controls
+# 		arr.push "#{key} #{JSON.stringify control}"
+# 	s = arr.join "\n"
+# 	sendMail "controls", s
 
 ##########################
 
