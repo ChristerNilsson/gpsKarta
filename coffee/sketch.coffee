@@ -273,7 +273,7 @@ locationUpdate = (p) ->
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['Check location permissions']
 
-initSpeaker = (index) ->
+initSpeaker = (index=5) ->
 	soundUp = loadSound 'soundUp.wav'
 	soundDown = loadSound 'soundDown.wav'
 	soundUp.setVolume 0.1
@@ -284,7 +284,7 @@ initSpeaker = (index) ->
 
 	speaker = new SpeechSynthesisUtterance()
 	voices = speechSynthesis.getVoices()
-	speaker.voice = voices[jcnindex]	
+	speaker.voice = voices[index]	
 	speaker.voiceURI = "native"
 	speaker.volume = 1
 	speaker.rate = 0.8
@@ -292,8 +292,8 @@ initSpeaker = (index) ->
 	speaker.text = ''
 	#speaker.lang = 'sv-SE'
 	dialogues.clear()
-	say "speaker #{jcnindex}"
-	jcnindex++
+	say "speaker #{index}"
+	#jcnindex++
 
 setup = ->
 
@@ -399,6 +399,7 @@ xdraw = ->
 setTarget = (key) ->
 	if key not of controls then return
 	if controls[currentControl] == null then return
+	say 'target ' + key
 	soundQueue = 0
 	currentControl = key
 	control = controls[currentControl]
@@ -532,7 +533,7 @@ myMousePressed = (mx,my) ->
 	released = false 
 
 	if state == 0
-		initSpeaker 5
+		initSpeaker()
 		console.log controls[currentControl]
 		console.log controls
 		state = 1 
