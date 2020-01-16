@@ -5,57 +5,9 @@ LIMIT = 20 # meter. Under this, no bearing. Also distance voice every meter.
 DISTLIST = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,30,40,50,60,70,80,90,100,120,140,160,180,200,250,300,400,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000]
 MAIL = 'janchrister.nilsson@gmail.com'
 
+state = 0 # 0=uninitialized 1=initialized
+
 spara = (lat,lon, x,y) -> {lat,lon, x,y}
-
-# 2019-SommarN
-
-# A = spara 59.2987921, 18.1284073, 472, 617 # kontroll  5
-# B = spara 59.2985405, 18.1699098,4361, 503 # kontroll 10
-# C = spara 59.2851374, 18.1336592,1090,3104 # kontroll 31
-# D = spara 59.2844998, 18.1666946,4181,3069 # kontroll 17
-
-# FILENAME = '2019-SommarN.jpg' 
-
-# controls = # id: [x,y,littera,lat,lon]
-# 	'1': [1830,333,'',0,0] 
-# 	'2': [1506,521,'',0,0]
-# 	'3': [907,711,'',0,0]
-# 	'4': [1193,873,'',0,0]
-# 	'5': [472,617,'',0,0]
-# 	'6': [228,841,'',0,0]
-# 	'7': [672,1013,'',0,0]
-# 	'8': [1125,1196,'',0,0]
-# 	'9': [1430,1290,'',0,0]
-# 	'10': [4361,503,'',0,0]
-# 	'11': [4118,1106,'',0,0]
-# 	'12': [3830,640,'',0,0]
-# 	'13': [3192,1133,'',0,0]
-# 	'14': [2664,873,'',0,0]
-# 	'15': [2322,1862,'',0,0]
-# 	'16': [4120,2699,'',0,0]
-# 	'17': [4181,3069,'',0,0]
-# 	'19': [3340,2904,'',0,0]
-# 	'20': [2691,2554,'',0,0]
-# 	'24': [3366,3217,'',0,0]
-# 	'26': [390,1935,'',0,0]
-# 	'27': [547,2143,'',0,0]
-# 	'28': [1462,2293,'',0,0]
-# 	'29': [1055,2620,'',0,0]
-# 	'30': [371,2502,'',0,0]
-# 	'31': [1090,3104,'',0,0]
-# 	'32': [2250,2750,'',0,0]
-
-# 2019-SommarS
-
-# A = spara 59.2801716, 18.152609,  2894,485  # 38 P
-# B = spara 59.2810534, 18.1676281, 4303,255  # 21 B
-# C = spara 59.2677013, 18.1548921, 3231,2757 # 50 K
-# D = spara 59.2687144, 18.1660263, 4256,2514 # 48 M
-
-# A = spara 59.279157, 18.149313, 2599,676 # Mellanbron
-# B = spara 59.275129, 18.169590, 4531,1328 # Ulvsjön Vändplan Huset
-# C = spara 59.270072, 18.150229, 2763,2334 # Brotorpsbron
-# D = spara 59.267894, 18.167087, 4339,2645 # Älta huset
 
 FILENAME = '2020-Vinter.jpg' 
 
@@ -101,19 +53,19 @@ saveControls = -> localStorage.gpsKarta = JSON.stringify controls
 getControls = ->
 	try
 		controls = JSON.parse localStorage.gpsKarta
-		#n1 =  _.keys(controls1).length
-		#n0 =  _.keys(controls).length
-		#if abs(n0-n1) <= 1 then controls = controls1 
-		#initControls()
 	catch
 		clearControls()
 
 initControls = ->
+	console.log 'initControls'
 	for key,control of controls
 		[x,y,littera] = control
 		[lat,lon] = gps.bmp2gps x,y
 		control[3] = lat
 		control[4] = lon
+	if currentControl != null 
+		[gpsLat,gpsLon,z99,trgLat,trgLon] = controls[currentControl]
+	#console.log controls[currentControl]
 
 makeTargets = ->
 	targets = []
@@ -128,7 +80,7 @@ DATA = "gpsKarta"
 WIDTH = null
 HEIGHT = null
 [cx,cy] = [0,0] # center (image coordinates)
-SCALE = 1
+SCALE = null
 
 gps = null
 TRACKED = 5 # circles shows the player's position
@@ -145,12 +97,12 @@ soundDown = null
 soundQueue = 0 # neg=minskat avstånd pos=ökat avstånd
 jcnindex = 0
 
-messages = [0,1,2,3,4,5]
+messages = ['','','','','','']
 gpsCount = 0
 
 [gpsLat,gpsLon] = [0,0]
 [trgLat,trgLon] = [0,0]
-currentControl = "1"
+currentControl = null
 
 timeout = null
 
@@ -169,6 +121,7 @@ sendMail = (subject,body) ->
 
 say = (m) ->
 	if speaker == null then return 
+	console.log 'say',m
 	speechSynthesis.cancel()
 	speaker.text = m
 	speechSynthesis.speak speaker
@@ -232,7 +185,7 @@ sayDistance = (a,b) -> # a is newer
 	# if a border is crossed, play a sound
 	for d in DISTLIST
 		if (a-d) * (b-d) < 0
-			voiceQueue.push if a >= LIMIT then 'distans ' + d else d
+			voiceQueue.push if a >= LIMIT then 'distance ' + d else d
 			return
 
 # eventuellt kräva tio sekunder sedan föregående bäring sades
@@ -242,10 +195,11 @@ sayBearing = (a,b) -> # a is newer
 	b = Math.round b/10
 	if a != b # 0..35
 		if a == 0 then a = 36
-		tr = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
+		# tr = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
+		tr = 'zero one two three four five six seven eight nine'.split ' '
 		c = tr[a//10]
 		d = tr[a%%10]
-		voiceQueue.push 'bäring ' + c + ' ' + d
+		voiceQueue.push 'bearing ' + c + ' ' + d
 		return
 
 soundIndicator = (p) ->
@@ -270,6 +224,7 @@ soundIndicator = (p) ->
 	else
 		messages[3] = ''
 
+	console.log 'soundIndicator',distance
 	if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = p.coords.latitude
 		gpsLon = p.coords.longitude
@@ -288,15 +243,20 @@ playSound = ->
 	if soundQueue==0 then xdraw()
 
 locationUpdate = (p) ->
+	if gpsLat != 0 then position = gps.gps2bmp gpsLat,gpsLon
+	console.log 'locationUpdate',p.coords.latitude,p.coords.longitude,gpsLat,gpsLon,position
+
+	soundIndicator p
+
 	gpsCount++
 	messages[5] = gpsCount
-	soundIndicator p
+	if currentControl == null then return
 
 	if voiceQueue.length > 0 
 
 		msg = voiceQueue.shift()
 
-		if 0 == msg.indexOf 'bäring'
+		if 0 == msg.indexOf 'bearing'
 			if msg != lastBearing 
 				lastBearing = msg
 				say msg
@@ -305,7 +265,6 @@ locationUpdate = (p) ->
 				lastDistance = msg
 				say msg
 
-	position = gps.gps2bmp gpsLat,gpsLon
 
 	track.push position
 	if track.length > TRACKED then track.shift()
@@ -331,7 +290,7 @@ initSpeaker = (index) ->
 	speaker.rate = 0.8
 	speaker.pitch = 0.8
 	speaker.text = ''
-	speaker.lang = 'sv-SE'
+	#speaker.lang = 'sv-SE'
 	dialogues.clear()
 	say "speaker #{jcnindex}"
 	jcnindex++
@@ -350,11 +309,11 @@ setup = ->
 	WIDTH = img.width
 	HEIGHT = img.height
 
-	SCALE = 1
+	SCALE = 1/2
 	[cx,cy] = [width,height]
 	
 	makeCorners()
-	setTarget _.keys(controls)[0]
+	# setTarget _.keys(controls)[0]
 
 	x = width/2
 	y = height/2
@@ -363,10 +322,7 @@ setup = ->
 	y1 = 100
 	y2 = height-100
 
-	# initControls()
 	getControls()
-
-	#sendMail 'controls', JSON.stringify controls
 
 	position = [WIDTH/2,HEIGHT/2]
 
@@ -397,6 +353,11 @@ drawTrack = ->
 
 drawControl = ->
 
+	if trgLat == 0 and trgLon == 0 then return
+
+	console.log trgLat,trgLon
+	console.log gpsLat,gpsLon
+
 	latLon2 = LatLon trgLat,trgLon
 	latLon1 = LatLon gpsLat,gpsLon
 
@@ -419,6 +380,8 @@ drawControl = ->
 
 xdraw = ->
 	bg 0,1,0
+	if state==0 then return 
+
 	fc()
 	image img, 0,0, width,height, cx-width/SCALE/2, cy-height/SCALE/2, width/SCALE, height/SCALE
 	drawTrack()
@@ -439,9 +402,11 @@ setTarget = (key) ->
 	soundQueue = 0
 	currentControl = key
 	control = controls[currentControl]
+	console.log 'setTarget',currentControl,control
 	x = control[0]
 	y = control[1]
 	[trgLat,trgLon] = gps.bmp2gps x,y
+	console.log 'setTarget',x,y,trgLat,trgLon
 	dialogues.clear()
 
 executeMail = -> # Sends the trail and all the takes
@@ -468,20 +433,21 @@ getBike = -> setTarget 'bike'
 
 setBike = ->
 	[x,y] = gps.gps2bmp gpsLat,gpsLon
+	console.log 'setBike',gpsLat,gpsLon,x,y
 	controls.bike = [x,y,'',gpsLat,gpsLon]
 	dialogues.clear()
 
 menu1 = -> # Main Menu
-	dialogue = new Dialogue() 
+	dialogue = new Dialogue()
 	dialogue.add 'Pan Zoom', -> menu2()
 	dialogue.add 'Goto Bike', -> setTarget 'bike'
 	dialogue.add 'Take', -> menu4()
 	dialogue.add 'More', -> menu6()
 	dialogue.add 'Center', -> 
 		[cx,cy] = position
-		dialogues.clear()	
+		dialogues.clear()
 		xdraw()	
-	dialogue.add 'Speaker', -> initSpeaker 5
+	dialogue.add '', ->
 	dialogue.add 'Target', -> menu3()
 	dialogue.add 'Store Bike', -> setBike()
 
@@ -490,7 +456,7 @@ menu1 = -> # Main Menu
 
 menu2 = -> # Pan Zoom
 	dialogue = new Dialogue()
-	dialogue.add 'Up', -> cy -= 0.33*height/SCALE  
+	dialogue.add 'Up', -> cy -= 0.33*height/SCALE
 	dialogue.add ' ', -> # Not Used
 	dialogue.add 'Right', -> cx += 0.33*width/SCALE
 	dialogue.add 'Out', -> if SCALE > 0.5 then SCALE /= 1.5
@@ -561,9 +527,15 @@ mouseReleased = ->
 	released = true
 	false
 
-myMousePressed = (mx,my) -> 
+myMousePressed = (mx,my) ->
 	if not released then return false
 	released = false 
+
+	if state == 0
+		initSpeaker 5
+		console.log controls[currentControl]
+		console.log controls
+		state = 1 
 
 	if dialogues.length == 1 and dialogues[0].number == 0 then dialogues.pop() # dölj indikatorer
 
