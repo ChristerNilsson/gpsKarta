@@ -173,24 +173,14 @@ makeCorners = ->
 
 	gps = new GPS nw,ne,se,sw,WIDTH,HEIGHT
 
-# coarse = (x) ->
-# 	n = Math.round(x).toString().length
-# 	myround(x,1-n).toString()
-# assert '4000', coarse 3917.5	
-# assert '400', coarse 421.2	
-# assert '40', coarse 36.8
-# assert '5', coarse 5.4
-# assert '5', coarse 4.6
-
 sayDistance = (a,b) -> # a is newer
 	# anropa say om någon gräns passeras
 	# if a border is crossed, play a sound
 	for d in DISTLIST
 		if (a-d) * (b-d) < 0
-			voiceQueue.push if a >= LIMIT then 'distance ' + d else d
+			voiceQueue.push 'distance ' + d
 			return
 
-# eventuellt kräva tio sekunder sedan föregående bäring sades
 sayBearing = (a,b) -> # a is newer
 	# if a border is crossed, tell the new bearing
 	a = Math.round a/10
@@ -254,7 +244,7 @@ locationUpdate = (p) ->
 	messages[5] = gpsCount
 	if currentControl == null then return
 
-	if voiceQueue.length > 0 
+	if voiceQueue.length > 0
 
 		msg = voiceQueue.shift()
 
@@ -263,10 +253,12 @@ locationUpdate = (p) ->
 				lastBearing = msg
 				say msg
 		else
+			arr = msg.split ' '
+			if LIMIT > parseInt arr[1] then msg = arr[a1]
+			say msg
 			if msg != lastDistance 
 				lastDistance = msg
 				say msg
-
 
 	track.push position
 	if track.length > TRACKED then track.shift()
