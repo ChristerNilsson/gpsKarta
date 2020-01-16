@@ -254,7 +254,7 @@ locationUpdate = (p) ->
 				say msg
 		else
 			arr = msg.split ' '
-			if LIMIT > parseInt arr[1] then msg = arr[a1]
+			if LIMIT > parseInt arr[1] then msg = arr[1] 
 			say msg
 			if msg != lastDistance 
 				lastDistance = msg
