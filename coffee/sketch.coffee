@@ -294,8 +294,7 @@ initSpeaker = (index=5) ->
 	speaker.text = ''
 	#speaker.lang = 'sv-SE'
 	dialogues.clear()
-	say "speaker #{index}"
-	#jcnindex++
+	say "speaker #{index} distance bearing zero one two three four five six seven eight nine"
 
 setup = ->
 
@@ -450,7 +449,8 @@ menu1 = -> # Main Menu
 		[cx,cy] = position
 		dialogues.clear()
 		xdraw()	
-	dialogue.add '', ->
+	dialogue.add 'Speaker', -> initSpeaker jcnindex++
+
 	dialogue.add 'Target', -> menu3()
 	dialogue.add 'Store Bike', -> setBike()
 
