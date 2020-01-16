@@ -178,7 +178,7 @@ sayDistance = (a,b) -> # a is newer
 	# if a border is crossed, play a sound
 	for d in DISTLIST
 		if (a-d) * (b-d) < 0
-			voiceQueue.push 'distance ' + d
+			voiceQueue.push 'distans ' + d
 			return
 
 sayBearing = (a,b) -> # a is newer
@@ -187,11 +187,10 @@ sayBearing = (a,b) -> # a is newer
 	b = Math.round b/10
 	if a != b # 0..35
 		if a == 0 then a = 36
-		# tr = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
-		tr = 'zero one two three four five six seven eight nine'.split ' '
+		tr = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
 		c = tr[a//10]
 		d = tr[a%%10]
-		voiceQueue.push 'bearing ' + c + ' ' + d
+		voiceQueue.push 'bäring ' + c + ' ' + d
 		return
 
 soundIndicator = (p) ->
@@ -249,14 +248,13 @@ locationUpdate = (p) ->
 		msg = voiceQueue.shift()
 
 		if 0 == msg.indexOf 'bearing'
-			if msg != lastBearing 
+			if msg != lastBearing
 				lastBearing = msg
 				say msg
 		else
 			arr = msg.split ' '
-			if LIMIT > parseInt arr[1] then msg = arr[1] 
-			say msg
-			if msg != lastDistance 
+			if LIMIT > parseInt arr[1] then msg = arr[1]
+			if msg != lastDistance
 				lastDistance = msg
 				say msg
 
@@ -278,15 +276,15 @@ initSpeaker = (index=5) ->
 
 	speaker = new SpeechSynthesisUtterance()
 	voices = speechSynthesis.getVoices()
-	speaker.voice = voices[index]	
+	speaker.voice = voices[index]
 	speaker.voiceURI = "native"
 	speaker.volume = 1
 	speaker.rate = 0.8
 	speaker.pitch = 0.8
 	speaker.text = ''
-	#speaker.lang = 'sv-SE'
+	speaker.lang = 'sv-SE'
 	dialogues.clear()
-	say "speaker #{index} distance bearing zero one two three four five six seven eight nine"
+	say "speaker #{index} distans nolla etta två tre fyra bäring fem sex sjua åtta nio"
 
 setup = ->
 
