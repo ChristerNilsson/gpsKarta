@@ -11,9 +11,9 @@ spara = (lat,lon, x,y) -> {lat,lon, x,y}
 
 FILENAME = '2020-Vinter.jpg' 
 
-A = spara 59.285624, 18.150709, 338,1491 # Övre bron Ö
+A = spara 59.285624, 18.150709, 338,1491  # Övre bron Ö
 B = spara 59.283048, 18.179902, 4299,1948 # Stora fårhuset
-C = spara 59.270077, 18.150339, 488,5566 # Brotorpsbron Ö
+C = spara 59.270077, 18.150339, 488,5566  # Brotorpsbron Ö
 D = spara 59.269496, 18.168739, 2963,5596 # Bergsätrav/Klisätrav
 
 controls = {}
@@ -41,6 +41,7 @@ clearControls = ->
 		18: [2724,3108,'',0,0]
 		19: [3282,3697,'',0,0]
 		20: [2676,4189,'',0,0]
+	[trgLat,trgLon] = [0,0]
 	currentControl = null
 	initControls()
 	saveControls()
@@ -64,7 +65,7 @@ initControls = ->
 		[lat,lon] = gps.bmp2gps x,y
 		control[3] = lat
 		control[4] = lon
-	if currentControl != null 
+	if currentControl != null
 		[gpsLat,gpsLon,z99,trgLat,trgLon] = controls[currentControl]
 	#console.log controls[currentControl]
 
