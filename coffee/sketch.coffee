@@ -41,6 +41,7 @@ clearControls = ->
 		18: [2724,3108,'',0,0]
 		19: [3282,3697,'',0,0]
 		20: [2676,4189,'',0,0]
+	currentControl = null
 	initControls()
 	saveControls()
 #################
