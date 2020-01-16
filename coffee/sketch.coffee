@@ -59,7 +59,7 @@ getControls = ->
 		clearControls()
 
 initControls = ->
-	console.log 'initControls'
+	#console.log 'initControls'
 	for key,control of controls
 		[x,y,littera] = control
 		[lat,lon] = gps.bmp2gps x,y
@@ -123,7 +123,7 @@ sendMail = (subject,body) ->
 
 say = (m) ->
 	if speaker == null then return 
-	console.log 'say',m
+	#console.log 'say',m
 	speechSynthesis.cancel()
 	speaker.text = m
 	speechSynthesis.speak speaker
@@ -215,7 +215,7 @@ soundIndicator = (p) ->
 	else
 		messages[3] = ''
 
-	console.log 'soundIndicator',distance
+	#console.log 'soundIndicator',distance
 	if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = p.coords.latitude
 		gpsLon = p.coords.longitude
@@ -235,7 +235,7 @@ playSound = ->
 
 locationUpdate = (p) ->
 	if gpsLat != 0 then position = gps.gps2bmp gpsLat,gpsLon
-	console.log 'locationUpdate',p.coords.latitude,p.coords.longitude,gpsLat,gpsLon,position
+	#console.log 'locationUpdate',p.coords.latitude,p.coords.longitude,gpsLat,gpsLon,position
 
 	soundIndicator p
 
@@ -346,8 +346,8 @@ drawControl = ->
 
 	if trgLat == 0 and trgLon == 0 then return
 
-	console.log trgLat,trgLon
-	console.log gpsLat,gpsLon
+	#console.log trgLat,trgLon
+	#console.log gpsLat,gpsLon
 
 	latLon2 = LatLon trgLat,trgLon
 	latLon1 = LatLon gpsLat,gpsLon
@@ -390,15 +390,15 @@ xdraw = ->
 setTarget = (key) ->
 	if key not of controls then return
 	if controls[currentControl] == null then return
-	say 'target ' + key
+	say 'target: ' + key
 	soundQueue = 0
 	currentControl = key
 	control = controls[currentControl]
-	console.log 'setTarget',currentControl,control
+	#console.log 'setTarget',currentControl,control
 	x = control[0]
 	y = control[1]
 	[trgLat,trgLon] = gps.bmp2gps x,y
-	console.log 'setTarget',x,y,trgLat,trgLon
+	#console.log 'setTarget',x,y,trgLat,trgLon
 	dialogues.clear()
 
 executeMail = -> # Sends the trail and all the takes
@@ -425,7 +425,7 @@ getBike = -> setTarget 'bike'
 
 setBike = ->
 	[x,y] = gps.gps2bmp gpsLat,gpsLon
-	console.log 'setBike',gpsLat,gpsLon,x,y
+	#console.log 'setBike',gpsLat,gpsLon,x,y
 	controls.bike = [x,y,'',gpsLat,gpsLon]
 	dialogues.clear()
 
@@ -526,8 +526,8 @@ myMousePressed = (mx,my) ->
 
 	if state == 0
 		initSpeaker()
-		console.log controls[currentControl]
-		console.log controls
+		#console.log controls[currentControl]
+		#console.log controls
 		state = 1 
 
 	if dialogues.length == 1 and dialogues[0].number == 0 then dialogues.pop() # dölj indikatorer
