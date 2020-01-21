@@ -284,7 +284,7 @@ initSpeaker = (index=5) ->
 	speaker.text = ''
 	speaker.lang = 'sv-SE'
 	dialogues.clear()
-	say "speaker #{index} distans nolla etta två tre fyra bäring fem sex sjua åtta nio"
+	say "Välkommen!"
 
 setup = ->
 
@@ -471,10 +471,11 @@ menu3 = -> # Target
 menu4 = -> # Take
 	dialogue = new Dialogue()
 	dialogue.add 'ABCDE', -> menu5 'ABCDE'
-	dialogue.add 'FGHIJ', -> menu5 'FGHIJ'
 	dialogue.add 'KLMNO', -> menu5 'KLMNO'
-	dialogue.add 'PQRST', -> menu5 'PQRST'
 	dialogue.add 'UVWXYZ', -> menu5 'UVWXYZ'
+	dialogue.add 'Clear', -> update ' '
+	dialogue.add 'PQRST', -> menu5 'PQRST'
+	dialogue.add 'FGHIJ', -> menu5 'FGHIJ'
 	dialogue.clock()
 
 menu6 = -> # More
@@ -509,7 +510,7 @@ update = (littera,index=2) ->
 	getBike()
 
 menu5 = (letters) -> # ABCDE
-	dialogue = new Dialogue() 
+	dialogue = new Dialogue()
 	for letter in letters
 		dialogue.add letter, -> update @title
 	dialogue.clock()
