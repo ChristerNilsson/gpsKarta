@@ -346,8 +346,8 @@ drawTrack = ->
 drawTrail = ->
 	push()
 	fc()
-	sw 3
-	sc 1,0,0 # RED
+	sw 6
+	sc 1,0,0,0.5 # RED
 	translate width/2, height/2
 	scale SCALE
 	for [x,y] in trail
