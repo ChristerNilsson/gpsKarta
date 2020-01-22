@@ -267,7 +267,7 @@ locationUpdate = (p) ->
 		else
 			[x1,y1] = _.last trail
 			[x2,y2] = position
-			if 12 < dist x1,y1,x2,y2 then trail.push position
+			if 1 < dist x1,y1,x2,y2 then trail.push position # 12
 
 	track.push position
 	if track.length > TRACKED then track.shift()
