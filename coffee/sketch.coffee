@@ -88,7 +88,10 @@ gps = null
 TRACKED = 5 # circles shows the player's position
 position = null # gps position (pixels)
 track = [] # five latest GPS positions (pixels)
+
 trail = [] # all gps points
+recordingTrail = false
+
 takes = [] # all littera takes
 
 speaker = null
@@ -258,7 +261,14 @@ locationUpdate = (p) ->
 				lastDistance = msg
 				say msg
 
-	trail.push position
+	if recordingTrail
+		if trail.length == 0
+			trail.push position
+		else
+			[x1,y1] = _.last trail
+			[x2,y2] = position
+			if 12 < dist x1,y1,x2,y2 then trail.push position
+
 	track.push position
 	if track.length > TRACKED then track.shift()
 	xdraw()
@@ -346,7 +356,7 @@ drawTrack = ->
 drawTrail = ->
 	push()
 	fc()
-	sw 6
+	sw 12
 	sc 1,0,0,0.5 # RED
 	translate width/2, height/2
 	scale SCALE
@@ -404,6 +414,7 @@ setTarget = (key) ->
 	if key not of controls then return
 	if controls[currentControl] == null then return
 	trail = []
+	recordingTrail = true
 	say 'target: ' + key
 	soundQueue = 0
 	currentControl = key
@@ -418,7 +429,8 @@ setTarget = (key) ->
 executeMail = -> # Sends the trail and all the takes
 	s = takes.join "\n"
 	s += "\n\n"
-	s += trail.join "\n"
+	arr = "[#{x},#{y}]," for [x,y] in trail
+	s += arr.join '\n'
 	sendMail "Takes:#{takes.length} Trail:#{trail.length}", s
 	takes = []
 	trail = []
@@ -512,6 +524,7 @@ stdDateTime = (date) ->
 	"#{y}-#{m}-#{d} #{h}:#{M}:#{s}"
 
 update = (littera,index=2) ->
+	recordingTrail = false
 	control = controls[currentControl]
 	a = LatLon control[3],control[4]
 	b = LatLon gpsLat, gpsLon
