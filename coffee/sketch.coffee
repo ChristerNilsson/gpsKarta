@@ -5,6 +5,11 @@ LIMIT = 20 # meter. Under this, no bearing. Also distance voice every meter.
 DISTLIST = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,30,40,50,60,70,80,90,100,120,140,160,180,200,250,300,400,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000]
 MAIL = 'janchrister.nilsson@gmail.com'
 
+trail = [	# insert bitmap points from mail here
+	[1767,2942], [1772,2946], [1773,2948], [1776,2950], [1780,2954], [1782,2956], [1782,2958], [1780,2958] 
+]
+recordingTrail = false
+
 state = 0 # 0=uninitialized 1=initialized
 
 spara = (lat,lon, x,y) -> {lat,lon, x,y}
@@ -89,8 +94,6 @@ TRACKED = 5 # circles shows the player's position
 position = null # gps position (pixels)
 track = [] # five latest GPS positions (pixels)
 
-trail = [] # all gps points
-recordingTrail = false
 
 takes = [] # all littera takes
 
@@ -268,7 +271,7 @@ locationUpdate = (p) ->
 		else
 			[x1,y1] = _.last trail
 			[x2,y2] = position
-			if 1 < dist x1,y1,x2,y2 then trail.push position # 12
+			if 12 < dist x1,y1,x2,y2 then trail.push position
 
 	track.push position
 	if track.length > TRACKED then track.shift()
@@ -428,13 +431,13 @@ setTarget = (key) ->
 	dialogues.clear()
 
 executeMail = -> # Sends the trail and all the takes
-	s = takes.join "\n"
-	s += "\n\n"
+	#s = takes.join "\n"
+	#s += "\n\n"
 	#trail.unshift [1000,2000]
 	#trail.unshift [1100,2100]
 	arr = ("[#{x},#{y}]" for [x,y] in trail)
-	s += arr.join ",\n"
-	sendMail "Takes:#{takes.length} Trail:#{trail.length}", s
+	s = arr.join ",\n"
+	sendMail "#{currentControl} #{littera} Trail:#{trail.length}", s
 	#takes = []
 	#trail = []
 
@@ -532,11 +535,12 @@ update = (littera,index=2) ->
 	a = LatLon control[3],control[4]
 	b = LatLon gpsLat, gpsLon
 	[x,y] = gps.gps2bmp gpsLat, gpsLon
-	print x,y
-	takes.push "[#{x}, #{y},'', #{gpsLat}, #{gpsLon}] #{stdDateTime new Date()} #{currentControl} #{littera} (#{Math.round a.distanceTo b})"
+	#print x,y
+	#takes.push "[#{x}, #{y},'', #{gpsLat}, #{gpsLon}] #{stdDateTime new Date()} #{currentControl} #{littera} (#{Math.round a.distanceTo b})"
 	controls[currentControl][index] = littera
 	saveControls()
 	dialogues.clear()
+	executeMail()
 	getBike()
 
 menu5 = (letters) -> # ABCDE
