@@ -9,7 +9,7 @@ state = 0 # 0=uninitialized 1=initialized
 
 spara = (lat,lon, x,y) -> {lat,lon, x,y}
 
-FILENAME = '2020-Vinter.jpg' 
+FILENAME = '2020-Vinter.jpg'
 
 A = spara 59.285624, 18.150709, 338,1491  # Övre bron Ö
 B = spara 59.283048, 18.179902, 4299,1948 # Stora fårhuset
@@ -20,7 +20,7 @@ controls = {}
 	#'Brotorp':     59.2705658 18.1480179 2019-05-20 18:32:15 43 B (794)
 	#'Skarpnäck T': 59.2662226 18.1331561 2019-05-20 18:37:25 bike S (973)
 clearControls = ->
-	controls = 
+	controls =
 		1: [604,6069,'',0,0]
 		2: [1415,6153,'',0,0]
 		3: [918,5525,'',0,0]
@@ -109,7 +109,7 @@ currentControl = null
 timeout = null
 
 #pastSayings = {} # for preventing sayings every second.
-voiceQueue = [] 
+voiceQueue = []
 lastBearing = ''
 lastDistance = ''
 
@@ -122,7 +122,7 @@ sendMail = (subject,body) ->
 	mail.click()
 
 say = (m) ->
-	if speaker == null then return 
+	if speaker == null then return
 	#console.log 'say',m
 	speechSynthesis.cancel()
 	speaker.text = m
@@ -195,7 +195,7 @@ sayBearing = (a,b) -> # a is newer
 
 soundIndicator = (p) ->
 
-	trail.push "#{p.coords.latitude} #{p.coords.longitude} #{stdDateTime new Date()}"
+	# trail.push "#{p.coords.latitude} #{p.coords.longitude} #{stdDateTime new Date()}"
 
 	a = LatLon p.coords.latitude,p.coords.longitude # newest
 	b = LatLon gpsLat, gpsLon
@@ -258,6 +258,7 @@ locationUpdate = (p) ->
 				lastDistance = msg
 				say msg
 
+	trail.push position
 	track.push position
 	if track.length > TRACKED then track.shift()
 	xdraw()
@@ -294,7 +295,7 @@ setup = ->
 	platform = window.navigator.platform
 
 	w = width/8
-	h = height/4 
+	h = height/4
 	angleMode DEGREES
 
 	WIDTH = img.width
@@ -342,6 +343,17 @@ drawTrack = ->
 		circle x-cx, y-cy, 10 * (track.length-i)
 	pop()
 
+drawTrail = ->
+	push()
+	fc()
+	sw 3
+	sc 1,0,0 # RED
+	translate width/2, height/2
+	scale SCALE
+	for [x,y] in trail
+		point x-cx, y-cy
+	pop()
+
 drawControl = ->
 
 	if trgLat == 0 and trgLon == 0 then return
@@ -371,10 +383,11 @@ drawControl = ->
 
 xdraw = ->
 	bg 0,1,0
-	if state==0 then return 
+	if state==0 then return
 
 	fc()
 	image img, 0,0, width,height, cx-width/SCALE/2, cy-height/SCALE/2, width/SCALE, height/SCALE
+	drawTrail()
 	drawTrack()
 	drawControl()
 	textSize 100
@@ -390,6 +403,7 @@ xdraw = ->
 setTarget = (key) ->
 	if key not of controls then return
 	if controls[currentControl] == null then return
+	trail = []
 	say 'target: ' + key
 	soundQueue = 0
 	currentControl = key
@@ -435,10 +449,10 @@ menu1 = -> # Main Menu
 	dialogue.add 'Goto Bike', -> setTarget 'bike'
 	dialogue.add 'Take', -> menu4()
 	dialogue.add 'More', -> menu6()
-	dialogue.add 'Center', -> 
+	dialogue.add 'Center', ->
 		[cx,cy] = position
 		dialogues.clear()
-		xdraw()	
+		xdraw()
 	dialogue.add 'Speaker', -> initSpeaker jcnindex++
 
 	dialogue.add 'Target', -> menu3()
@@ -481,7 +495,7 @@ menu4 = -> # Take
 menu6 = -> # More
 	dialogue = new Dialogue()
 	dialogue.add 'Mail', -> executeMail()
-	dialogue.add 'Clear', -> 
+	dialogue.add 'Clear', ->
 		clearControls()
 		dialogues.clear()
 	dialogue.clock()
@@ -499,8 +513,8 @@ stdDateTime = (date) ->
 
 update = (littera,index=2) ->
 	control = controls[currentControl]
-	a = LatLon control[3],control[4] 
-	b = LatLon gpsLat, gpsLon 
+	a = LatLon control[3],control[4]
+	b = LatLon gpsLat, gpsLon
 	[x,y] = gps.gps2bmp gpsLat, gpsLon
 	print x,y
 	takes.push "[#{x}, #{y},'', #{gpsLat}, #{gpsLon}] #{stdDateTime new Date()} #{currentControl} #{littera} (#{Math.round a.distanceTo b})"
@@ -523,25 +537,25 @@ mouseReleased = ->
 
 myMousePressed = (mx,my) ->
 	if not released then return false
-	released = false 
+	released = false
 
 	if state == 0
 		initSpeaker()
 		#console.log controls[currentControl]
 		#console.log controls
-		state = 1 
+		state = 1
 
 	if dialogues.length == 1 and dialogues[0].number == 0 then dialogues.pop() # dölj indikatorer
 
 	dialogue = _.last dialogues
-	if dialogues.length == 0 or not dialogue.execute mx,my 
+	if dialogues.length == 0 or not dialogue.execute mx,my
 		if dialogues.length == 0 then menu1() else dialogues.pop()
 		xdraw()
 		return false
 
 	xdraw()
-	false 
+	false
 
-mousePressed = -> 
+mousePressed = ->
 	if platform == 'Win32' then myMousePressed mouseX,mouseY
 	false
