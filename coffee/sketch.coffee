@@ -429,8 +429,8 @@ setTarget = (key) ->
 executeMail = -> # Sends the trail and all the takes
 	s = takes.join "\n"
 	s += "\n\n"
-	arr = ("[#{x},#{y}]," for [x,y] in trail)
-	s += arr.join '\n'
+	arr = ("[#{x},#{y}],\n" for [x,y] in trail)
+	s += arr.join()
 	sendMail "Takes:#{takes.length} Trail:#{trail.length}", s
 	takes = []
 	trail = []
