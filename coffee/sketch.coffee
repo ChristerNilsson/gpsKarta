@@ -122,6 +122,7 @@ released = true
 
 sendMail = (subject,body) ->
 	mail.href = encodeURI "mailto:#{MAIL}?subject=#{subject}&body=#{body}"
+	console.log mail.href
 	mail.click()
 
 say = (m) ->
@@ -429,11 +430,13 @@ setTarget = (key) ->
 executeMail = -> # Sends the trail and all the takes
 	s = takes.join "\n"
 	s += "\n\n"
+	#trail.unshift [1000,2000]
+	#trail.unshift [1100,2100]
 	arr = ("[#{x},#{y}]" for [x,y] in trail)
-	s += arr.join ",\n\r"
+	s += arr.join ",\n"
 	sendMail "Takes:#{takes.length} Trail:#{trail.length}", s
-	takes = []
-	trail = []
+	#takes = []
+	#trail = []
 
 # executeMail = ->
 # 	arr = []
@@ -465,7 +468,7 @@ menu1 = -> # Main Menu
 		[cx,cy] = position
 		dialogues.clear()
 		xdraw()
-	dialogue.add 'Speaker', -> initSpeaker jcnindex++
+	dialogue.add 'Init', -> initSpeaker jcnindex++
 
 	dialogue.add 'Target', -> menu3()
 	dialogue.add 'Store Bike', -> setBike()
