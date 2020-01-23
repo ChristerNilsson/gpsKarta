@@ -1,4 +1,4 @@
-VERSION = 2
+VERSION = 3
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this, no bearing. Also distance voice every meter.
@@ -502,13 +502,34 @@ menu4 = -> # Take
 	dialogue.add 'FGHIJ', -> menu5 'FGHIJ'
 	dialogue.clock()
 
+menu5 = (letters) -> # ABCDE
+	dialogue = new Dialogue()
+	for letter in letters
+		dialogue.add letter, -> update @title
+	dialogue.clock()
+
 menu6 = -> # More
 	dialogue = new Dialogue()
 	dialogue.add 'Mail', -> executeMail()
+	dialogue.add 'Angle', -> menu7()
 	dialogue.add 'Clear', ->
 		clearControls()
 		dialogues.clear()
 	dialogue.clock()
+
+menu7 = -> # Angle
+	dialogue = new Dialogue()
+	dialogue.add '10', -> setAngle 10
+	dialogue.add '20', -> setAngle 20
+	dialogue.add '30', -> setAngle 30
+	dialogue.add '45', -> setAngle 45
+	dialogue.add '60', -> setAngle 60
+	dialogue.add '90', -> setAngle 90
+	dialogue.clock()
+
+setAngle = (angle) ->
+	ANGLE = angle
+	dialogues.clear()
 
 addZero = (n) -> if n <= 9 then "0" + n else n
 
@@ -532,12 +553,6 @@ update = (littera,index=2) ->
 	dialogues.clear()
 	executeMail()
 	getBike()
-
-menu5 = (letters) -> # ABCDE
-	dialogue = new Dialogue()
-	for letter in letters
-		dialogue.add letter, -> update @title
-	dialogue.clock()
 
 showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
 
