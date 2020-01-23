@@ -2,6 +2,7 @@ VERSION = 1
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this, no bearing. Also distance voice every meter.
+ANGLE = 20 # degrees. Bearing resolution.
 
 DISTLIST = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,30,40,50,60,70,80,90,100,120,140,160,180,200,250,300,400,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000]
 MAIL = 'janchrister.nilsson@gmail.com'
@@ -191,19 +192,16 @@ sayDistance = (a,b) -> # a is newer
 
 sayBearing = (a,b) -> # a is newer
 	# if a border is crossed, tell the new bearing
-	a = Math.round a/10
-	b = Math.round b/10
-	if a != b # 0..35
-		if a == 0 then a = 36
-		tr = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
-		c = tr[a//10]
-		d = tr[a%%10]
-		voiceQueue.push 'bäring ' + c + ' ' + d
-		return
+	a = Math.round a/ANGLE
+	b = Math.round b/ANGLE
+	if a == b then return
+	if a == 0 then a = 36
+	tr = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
+	c = tr[a // tr.length]
+	d = tr[a %% tr.length]
+	voiceQueue.push 'bäring ' + c + ' ' + d
 
 soundIndicator = (p) ->
-
-	# trail.push "#{p.coords.latitude} #{p.coords.longitude} #{stdDateTime new Date()}"
 
 	a = LatLon p.coords.latitude,p.coords.longitude # newest
 	b = LatLon gpsLat, gpsLon
@@ -218,12 +216,11 @@ soundIndicator = (p) ->
 	bearingb = b.bearingTo c
 	if dista >= LIMIT then sayBearing bearinga,bearingb
 
-	if abs(DIST * distance) < 10 
+	if 10 > abs DIST * distance
 		messages[3] = "#{DIST * distance} m/s" # abs dista-distb
 	else
 		messages[3] = ''
 
-	#console.log 'soundIndicator',distance
 	if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = p.coords.latitude
 		gpsLon = p.coords.longitude
