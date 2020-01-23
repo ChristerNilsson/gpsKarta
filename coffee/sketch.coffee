@@ -1,4 +1,4 @@
-VERSION = 3
+VERSION = 4
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this, no bearing. Also distance voice every meter.
@@ -66,7 +66,6 @@ getControls = ->
 		clearControls()
 
 initControls = ->
-	#console.log 'initControls'
 	for key,control of controls
 		[x,y,littera] = control
 		[lat,lon] = gps.bmp2gps x,y
@@ -74,7 +73,6 @@ initControls = ->
 		control[4] = lon
 	if currentControl != null
 		[gpsLat,gpsLon,z99,trgLat,trgLon] = controls[currentControl]
-	#console.log controls[currentControl]
 
 makeTargets = ->
 	targets = []
@@ -96,9 +94,6 @@ TRACKED = 5 # circles shows the player's position
 position = null # gps position (pixels)
 track = [] # five latest GPS positions (pixels)
 
-
-takes = [] # all littera takes
-
 speaker = null
 
 img = null
@@ -116,7 +111,6 @@ currentControl = null
 
 timeout = null
 
-#pastSayings = {} # for preventing sayings every second.
 voiceQueue = []
 lastBearing = ''
 lastDistance = ''
@@ -127,12 +121,10 @@ released = true
 
 sendMail = (subject,body) ->
 	mail.href = encodeURI "mailto:#{MAIL}?subject=#{subject}&body=#{body}"
-	console.log mail.href
 	mail.click()
 
 say = (m) ->
 	if speaker == null then return
-	#console.log 'say',m
 	speechSynthesis.cancel()
 	speaker.text = m
 	speechSynthesis.speak speaker
@@ -143,8 +135,6 @@ myround = (x,dec=6) ->
 	x *= 10**dec
 	x = Math.round x
 	x/10**dec
-
-#show = (prompt,p) -> print prompt,"http://maps.google.com/maps?q=#{p.lat},#{p.lon}"	
 
 vercal = (a,b,y) ->
 	x = map y, a.y,b.y, a.x,b.x
@@ -183,7 +173,6 @@ makeCorners = ->
 	gps = new GPS nw,ne,se,sw,WIDTH,HEIGHT
 
 sayDistance = (a,b) -> # a is newer
-	# anropa say om någon gräns passeras
 	# if a border is crossed, play a sound
 	for d in DISTLIST
 		if (a-d) * (b-d) < 0
@@ -241,7 +230,6 @@ playSound = ->
 
 locationUpdate = (p) ->
 	if gpsLat != 0 then position = gps.gps2bmp gpsLat,gpsLon
-	#console.log 'locationUpdate',p.coords.latitude,p.coords.longitude,gpsLat,gpsLon,position
 
 	soundIndicator p
 
@@ -318,7 +306,6 @@ setup = ->
 	[cx,cy] = [width,height]
 	
 	makeCorners()
-	# setTarget _.keys(controls)[0]
 
 	x = width/2
 	y = height/2
@@ -371,9 +358,6 @@ drawControl = ->
 
 	if trgLat == 0 and trgLon == 0 then return
 
-	#console.log trgLat,trgLon
-	#console.log gpsLat,gpsLon
-
 	latLon2 = LatLon trgLat,trgLon
 	latLon1 = LatLon gpsLat,gpsLon
 
@@ -425,16 +409,12 @@ setTarget = (key) ->
 	soundQueue = 0
 	currentControl = key
 	control = controls[currentControl]
-	#console.log 'setTarget',currentControl,control
 	x = control[0]
 	y = control[1]
 	[trgLat,trgLon] = gps.bmp2gps x,y
-	#console.log 'setTarget',x,y,trgLat,trgLon
 	dialogues.clear()
 
-executeMail = -> # Sends the trail and all the takes
-	#trail.unshift [1000,2000]
-	#trail.unshift [1100,2100]
+executeMail = -> # Sends the trail
 	littera = controls[currentControl][2]
 	arr = ("[#{x},#{y}]" for [x,y] in trail)
 	s = arr.join ",\n"
@@ -449,7 +429,6 @@ getBike = -> setTarget 'bike'
 
 setBike = ->
 	[x,y] = gps.gps2bmp gpsLat,gpsLon
-	#console.log 'setBike',gpsLat,gpsLon,x,y
 	controls.bike = [x,y,'',gpsLat,gpsLon]
 	dialogues.clear()
 
