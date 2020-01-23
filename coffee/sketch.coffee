@@ -1,3 +1,4 @@
+VERSION = 1
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this, no bearing. Also distance voice every meter.
@@ -397,7 +398,10 @@ drawControl = ->
 
 xdraw = ->
 	bg 0,1,0
-	if state==0 then return
+	if state==0 
+		textSize 200
+		text VERSION, width/2,height/2
+		return
 
 	fc()
 	image img, 0,0, width,height, cx-width/SCALE/2, cy-height/SCALE/2, width/SCALE, height/SCALE
@@ -431,22 +435,12 @@ setTarget = (key) ->
 	dialogues.clear()
 
 executeMail = -> # Sends the trail and all the takes
-	#s = takes.join "\n"
-	#s += "\n\n"
 	#trail.unshift [1000,2000]
 	#trail.unshift [1100,2100]
+	littera = controls[currentControl][2]
 	arr = ("[#{x},#{y}]" for [x,y] in trail)
 	s = arr.join ",\n"
-	sendMail "#{currentControl} #{littera} Trail:#{trail.length}", s
-	#takes = []
-	#trail = []
-
-# executeMail = ->
-# 	arr = []
-# 	for key,control of controls
-# 		arr.push "#{key} #{JSON.stringify control}"
-# 	s = arr.join "\n"
-# 	sendMail "controls", s
+	sendMail "#{FILENAME} #{currentControl} #{littera}", s
 
 ##########################
 
@@ -535,8 +529,6 @@ update = (littera,index=2) ->
 	a = LatLon control[3],control[4]
 	b = LatLon gpsLat, gpsLon
 	[x,y] = gps.gps2bmp gpsLat, gpsLon
-	#print x,y
-	#takes.push "[#{x}, #{y},'', #{gpsLat}, #{gpsLon}] #{stdDateTime new Date()} #{currentControl} #{littera} (#{Math.round a.distanceTo b})"
 	controls[currentControl][index] = littera
 	saveControls()
 	dialogues.clear()
@@ -561,8 +553,6 @@ myMousePressed = (mx,my) ->
 
 	if state == 0
 		initSpeaker()
-		#console.log controls[currentControl]
-		#console.log controls
 		state = 1
 
 	if dialogues.length == 1 and dialogues[0].number == 0 then dialogues.pop() # dölj indikatorer
