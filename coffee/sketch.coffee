@@ -241,7 +241,6 @@ playSound = ->
 	if soundQueue==0 then xdraw()
 
 locationUpdate = (p) ->
-	# if gpsLat != 0 then position = gps.gps2bmp gpsLat,gpsLon
 	if gpsLat != 0 then position = w2b.convert gpsLon,gpsLat
 
 	soundIndicator p
