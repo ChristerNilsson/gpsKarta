@@ -1,4 +1,4 @@
-VERSION = 4
+VERSION = 5
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this, no bearing. Also distance voice every meter.
@@ -8,7 +8,10 @@ DISTLIST = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,30,40,50,60,70,80
 MAIL = 'janchrister.nilsson@gmail.com'
 
 trail = [	# insert bitmap points from mail here
-	[-1810,6947], [-1810,6928], [-1801,6936], [-1779,6947], [-1792,6944], [-1806,6941], [-1818,6934], [-1827,6926], [-1838,6918], [-1846,6907], [-1853,6896], [-1858,6881], [-1863,6870], [-1873,6862], [-1886,6855], [-1900,6856], [-1912,6858], [-1920,6843], [-1923,6831], [-1927,6818], [-1925,6803], [-1921,6791], [-1916,6778], [-1908,6766], [-1902,6752], [-1890,6734], [-1885,6722], [-1880,6710], [-1878,6697], [-1864,6688], [-1842,6684], [-1829,6685], [-1815,6689], [-1800,6692], [-1764,6695], [-1731,6703], [-1717,6711], [-1693,6722], [-1676,6734], [-1687,6741], [-1663,6760], [-1646,6766], [-1633,6769], [-1634,6785], [-1634,6802], [-1635,6814], [-1636,6830], [-1644,6840], [-1637,6853], [-1638,6865], [-1643,6877], [-1650,6887], [-1662,6895], [-1676,6914], [-1688,6920], [-1699,6930], [-1711,6936], [-1722,6943], [-1740,6943], [-1752,6942], [-1768,6940], [-1782,6939], [-1795,6940], [-1807,6944] 
+	# 16
+	#[3410,2885], [3415,2898], [3427,2890], [3440,2889], [3453,2887], [3468,2882], [3480,2879], [3495,2876], [3507,2873], [3519,2871], [3533,2868], [3548,2866], [3563,2865], [3575,2864], [3592,2859], [3610,2852], [3621,2842], [3636,2835], [3651,2830], [3664,2822], [3679,2820], [3697,2818], [3716,2818], [3736,2817], [3748,2814], [3768,2812], [3789,2807], [3800,2801], [3812,2793], [3821,2785], [3830,2775], [3841,2761], [3851,2747], [3860,2734], [3866,2720], [3873,2705], [3883,2690], [3895,2679], [3909,2669], [3922,2657], [3936,2640], [3952,2626], [3961,2618], [3972,2605], [3980,2593], [3988,2581], [3995,2591], [4004,2582], [4005,2595], [4012,2606], [4021,2615], [4023,2627], [4033,2636], [4039,2649], [4043,2661], [4041,2674], [4037,2686], [4026,2693], [4034,2702], [4045,2697], [4057,2688]  
+	# 15
+	[4009,2596], [4010,2584], [4043,2576], [4058,2575], [4072,2574], [4089,2567], [4099,2559], [4111,2548], [4124,2539], [4153,2527], [4171,2522], [4182,2513], [4190,2502], [4197,2489], [4204,2478], [4212,2469], [4223,2464], [4240,2458], [4230,2465], [4224,2452], [4225,2440], [4223,2428], [4220,2414], [4212,2402], [4200,2389], [4192,2372], [4191,2357], [4190,2343], [4187,2326], [4183,2306], [4179,2291], [4177,2277], [4177,2263], [4174,2248], [4169,2235], [4165,2221], [4161,2207], [4154,2192], [4148,2176], [4140,2166], [4132,2134], [4127,2115], [4123,2100], [4113,2107], [4102,2112], [4089,2110], [4077,2109], [4064,2106], [4052,2113], [4039,2115], [4026,2118], [4014,2120], [4007,2131], [3986,2126], [3974,2129], [3962,2132], [3956,2143], [3962,2155] 
 ]
 recordingTrail = false
 
@@ -18,10 +21,16 @@ spara = (lat,lon, x,y) -> {lat,lon, x,y}
 
 FILENAME = '2020-Vinter.jpg'
 
-A = spara 59.285624, 18.150709, 338,1491  # Övre bron Ö
-B = spara 59.283048, 18.179902, 4299,1948 # Stora fårhuset
-C = spara 59.270077, 18.150339, 488,5566  # Brotorpsbron Ö
-D = spara 59.269496, 18.168739, 2963,5596 # Bergsätrav/Klisätrav
+# A = spara 59.285624, 18.150709, 338,1491  # Övre bron Ö
+# B = spara 59.283048, 18.179902, 4299,1948 # Stora fårhuset
+# C = spara 59.270077, 18.150339, 488,5566  # Brotorpsbron Ö
+# D = spara 59.269496, 18.168739, 2963,5596 # Bergsätrav/Klisätrav
+
+bmp = [338,1491, 4299,1948, 2963,5596] # x1,y1, x2,y2, x3,y3
+wgs = [18.150709,59.285624, 18.179902,59.283048, 18.168739,59.269496] # lng1,lat1, lng2,lat2, lng3,lat3
+
+b2w = null # new Converter bmp,wgs
+w2b = null # new Converter wgs,bmp
 
 controls = {}
 	#'Brotorp':     59.2705658 18.1480179 2019-05-20 18:32:15 43 B (794)
@@ -68,7 +77,10 @@ getControls = ->
 initControls = ->
 	for key,control of controls
 		[x,y,littera] = control
-		[lat,lon] = gps.bmp2gps x,y
+		
+		# [lat,lon] = gps.bmp2gps x,y
+		[lon,lat] = b2w.convert x,y
+
 		control[3] = lat
 		control[4] = lon
 	if currentControl != null
@@ -136,41 +148,41 @@ myround = (x,dec=6) ->
 	x = Math.round x
 	x/10**dec
 
-vercal = (a,b,y) ->
-	x = map y, a.y,b.y, a.x,b.x
-	lat = map y, a.y,b.y, a.lat,b.lat
-	lon = map y, a.y,b.y, a.lon,b.lon
-	{lat,lon,x,y}
+# vercal = (a,b,y) ->
+# 	x = map y, a.y,b.y, a.x,b.x
+# 	lat = map y, a.y,b.y, a.lat,b.lat
+# 	lon = map y, a.y,b.y, a.lon,b.lon
+# 	{lat,lon,x,y}
 
-hortal = (a,b,x) ->
-	y = map x, a.x,b.x, a.y,b.y
-	lat = map x, a.x,b.x, a.lat,b.lat
-	lon = map x, a.x,b.x, a.lon,b.lon
-	{lat,lon,x,y}
+# hortal = (a,b,x) ->
+# 	y = map x, a.x,b.x, a.y,b.y
+# 	lat = map x, a.x,b.x, a.lat,b.lat
+# 	lon = map x, a.x,b.x, a.lon,b.lon
+# 	{lat,lon,x,y}
 
-corner = (a,b,c,d,x,y)->
-	lat = map y, c.y,d.y, c.lat,d.lat
-	lon = map x, a.x,b.x, a.lon,b.lon
-	{lat,lon,x,y}
+# corner = (a,b,c,d,x,y)->
+# 	lat = map y, c.y,d.y, c.lat,d.lat
+# 	lon = map x, a.x,b.x, a.lon,b.lon
+# 	{lat,lon,x,y}
 
-makeCorners = ->
+# makeCorners = ->
 
-	ac0 = vercal A,C,0  	                  # beräkna x
-	ac1 = vercal A,C,HEIGHT
-	bd0 = vercal B,D,0
-	bd1 = vercal B,D,HEIGHT
+# 	ac0 = vercal A,C,0  	                  # beräkna x
+# 	ac1 = vercal A,C,HEIGHT
+# 	bd0 = vercal B,D,0
+# 	bd1 = vercal B,D,HEIGHT
 
-	ab0 = hortal A,B,0                      # beräkna y
-	ab1 = hortal A,B,WIDTH
-	cd0 = hortal C,D,0
-	cd1 = hortal C,D,WIDTH
+# 	ab0 = hortal A,B,0                      # beräkna y
+# 	ab1 = hortal A,B,WIDTH
+# 	cd0 = hortal C,D,0
+# 	cd1 = hortal C,D,WIDTH
 
-	nw = corner ac0,bd0,ab0,cd0, 0,    0		# beräkna hörnen
-	ne = corner ac0,bd0,ab1,cd1, WIDTH,0
-	se = corner ac1,bd1,ab1,cd1, WIDTH,HEIGHT
-	sw = corner ac1,bd1,ab0,cd0, 0,    HEIGHT
+# 	nw = corner ac0,bd0,ab0,cd0, 0,    0		# beräkna hörnen
+# 	ne = corner ac0,bd0,ab1,cd1, WIDTH,0
+# 	se = corner ac1,bd1,ab1,cd1, WIDTH,HEIGHT
+# 	sw = corner ac1,bd1,ab0,cd0, 0,    HEIGHT
 
-	gps = new GPS nw,ne,se,sw,WIDTH,HEIGHT
+# 	gps = new GPS nw,ne,se,sw,WIDTH,HEIGHT
 
 sayDistance = (a,b) -> # a is newer
 	# if a border is crossed, play a sound
@@ -229,7 +241,8 @@ playSound = ->
 	if soundQueue==0 then xdraw()
 
 locationUpdate = (p) ->
-	if gpsLat != 0 then position = gps.gps2bmp gpsLat,gpsLon
+	# if gpsLat != 0 then position = gps.gps2bmp gpsLat,gpsLon
+	if gpsLat != 0 then position = w2b.convert gpsLon,gpsLat
 
 	soundIndicator p
 
@@ -305,7 +318,9 @@ setup = ->
 	SCALE = 1/2
 	[cx,cy] = [width,height]
 	
-	makeCorners()
+	# makeCorners()
+	b2w = new Converter bmp,wgs
+	w2b = new Converter wgs,bmp
 
 	x = width/2
 	y = height/2
@@ -411,7 +426,10 @@ setTarget = (key) ->
 	control = controls[currentControl]
 	x = control[0]
 	y = control[1]
-	[trgLat,trgLon] = gps.bmp2gps x,y
+
+	# [trgLat,trgLon] = gps.bmp2gps x,y
+	[trgLon,trgLat] = b2w.convert x,y
+
 	dialogues.clear()
 
 executeMail = -> # Sends the trail
@@ -428,7 +446,10 @@ assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
 getBike = -> setTarget 'bike'
 
 setBike = ->
-	[x,y] = gps.gps2bmp gpsLat,gpsLon
+
+	# [x,y] = gps.gps2bmp gpsLat,gpsLon
+	[x,y] = w2b.convert gpsLon,gpsLat
+
 	controls.bike = [x,y,'',gpsLat,gpsLon]
 	dialogues.clear()
 
@@ -526,7 +547,10 @@ update = (littera,index=2) ->
 	control = controls[currentControl]
 	a = LatLon control[3],control[4]
 	b = LatLon gpsLat, gpsLon
-	[x,y] = gps.gps2bmp gpsLat, gpsLon
+
+	# [x,y] = gps.gps2bmp gpsLat, gpsLon
+	[x,y] = w2b.convert gpsLon, gpsLat
+
 	controls[currentControl][index] = littera
 	saveControls()
 	dialogues.clear()
