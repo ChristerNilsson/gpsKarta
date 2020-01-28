@@ -1,4 +1,4 @@
-VERSION = 5
+VERSION = 6
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this, no bearing. Also distance voice every meter.
@@ -142,11 +142,6 @@ say = (m) ->
 	speechSynthesis.speak speaker
 
 preload = -> img = loadImage FILENAME
-
-myround = (x,dec=6) ->
-	x *= 10**dec
-	x = Math.round x
-	x/10**dec
 
 # vercal = (a,b,y) ->
 # 	x = map y, a.y,b.y, a.x,b.x
