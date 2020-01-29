@@ -1,6 +1,6 @@
 myRound = (x,dec=6) -> Math.round(x*10**dec)/10**dec
 
-class Converter # between bmp and wgs
+class Converter # bmp <=> wgs
 	constructor : (inp,outp,@decimals) -> @arr = @solve inp,outp
 
 	convert : (x,y) ->
@@ -18,7 +18,7 @@ class Converter # between bmp and wgs
 		eqns.push [0, 0, 0, e, f, 1]
 		@gauss eqns,outp
 
-	# https://github.com/itsravenous/gaussian-elimination/blob/master/gauss.js
+	# https://github.com/itsravenous/gaussian-elimination
 	gauss : (A, x) ->
 		n = A.length
 		for i in range n
@@ -44,6 +44,11 @@ class Converter # between bmp and wgs
 				A[k][n] -= A[k][i] * res[i]
 
 		res
+
+conv = new Converter [],[],6
+assert [2], conv.gauss [[4]], [8]
+assert [6,4], conv.gauss [[1, 1], [2, 1]], [10, 16]
+assert [1,2,3], conv.gauss [[1, 1, 1], [2, 1, 2], [1, 2, 3]], [6, 10, 14]
 
 bmp = [338,1491, 4299,1948, 2963,5596] # x1,y1, x2,y2, x3,y3
 wgs = [18.150709,59.285624, 18.179902,59.283048, 18.168739,59.269496] # lng1,lat1, lng2,lat2, lng3,lat3
