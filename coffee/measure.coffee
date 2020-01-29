@@ -6,7 +6,7 @@
 img = null 
 index = -1
 
-preload = -> img = loadImage '2020-Vinter.jpg'
+preload = -> img = loadImage 'Solvik.PNG'
 litteras = '1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20'.split ' '
 points = 
 	1: [604,6069]
