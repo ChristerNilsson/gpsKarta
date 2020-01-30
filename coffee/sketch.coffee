@@ -1,4 +1,4 @@
-VERSION = 10
+VERSION = 11
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this, no bearing. Also distance voice every meter.
@@ -174,7 +174,7 @@ playSound = ->
 locationUpdate = (p) ->
 	if gpsLat != 0 
 		position = w2b.convert gpsLon,gpsLat
-		messages[4] = gpsLon + ' ' + gpsLat
+		messages[4] = myRound(gpsLon,6) + ' ' + myRound(gpsLat,6)
 
 	soundIndicator p
 
@@ -321,6 +321,7 @@ xdraw = ->
 	bg 0,1,0
 	if state==0 
 		textSize 200
+		textAlign CENTER,CENTER
 		text VERSION, width/2,height/2
 		return
 
@@ -336,13 +337,14 @@ xdraw = ->
 	drawControl()
 	pop()
 	
-	textSize 100
+	#textSize 100
 	fc 0
 	sc 1,1,0
 	sw 3
 	margin = 25
 	for message,i in messages
 		textAlign [LEFT,CENTER,RIGHT][i%3], [TOP,BOTTOM][i//3]
+		textSize [100,50][i//3]
 		text message, [margin,width/2,width-margin][i%3], [margin,height][i//3] 
 	showDialogue()
 
