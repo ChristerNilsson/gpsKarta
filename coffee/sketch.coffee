@@ -1,11 +1,10 @@
-VERSION = 7
+VERSION = 8
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this, no bearing. Also distance voice every meter.
 ANGLE = 20 # degrees. Bearing resolution.
 
 DISTLIST = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,30,40,50,60,70,80,90,100,120,140,160,180,200,250,300,400,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000]
-MAIL = 'janchrister.nilsson@gmail.com'
 
 trail = [	# insert bitmap points from mail here
 	# 16
@@ -21,49 +20,19 @@ state = 0 # 0=uninitialized 1=initialized
 
 spara = (lat,lon, x,y) -> {lat,lon, x,y}
 
-FILENAME = '2020-Vinter.jpg'
-
-# A = spara 59.285624, 18.150709, 338,1491  # Övre bron Ö
-# B = spara 59.283048, 18.179902, 4299,1948 # Stora fårhuset
-# C = spara 59.270077, 18.150339, 488,5566  # Brotorpsbron Ö
-# D = spara 59.269496, 18.168739, 2963,5596 # Bergsätrav/Klisätrav
-
-bmp = [338,1491,            4299,1948,           2963,5596]           # x1,y1,     x2,y2,     x3,y3
-wgs = [18.150709,59.285624, 18.179902,59.283048, 18.168739,59.269496] # lng1,lat1, lng2,lat2, lng3,lat3
+data = null
+img = null
 
 b2w = null
 w2b = null
 
 controls = {}
-	#'Brotorp':     59.2705658 18.1480179 2019-05-20 18:32:15 43 B (794)
-	#'Skarpnäck T': 59.2662226 18.1331561 2019-05-20 18:37:25 bike S (973)
 clearControls = ->
-	controls =
-		1: [604,6069,'',0,0]
-		2: [1415,6153,'',0,0]
-		3: [918,5525,'',0,0]
-		4: [2157,5841,'',0,0]
-		5: [1872,5261,'',0,0]
-		6: [1430,4485,'',0,0]
-		7: [2460,4629,'',0,0]
-		8: [1828,4044,'',0,0]
-		9: [1130,3042,'',0,0]
-		10: [1371,2479,'',0,0]
-		11: [1088,1656,'',0,0]
-		12: [1669,1684,'',0,0]
-		13: [2461,2092,'',0,0]
-		14: [3503,1675,'',0,0]
-		15: [3965,2167,'',0,0]
-		16: [4064,2716,'',0,0]
-		17: [3539,3097,'',0,0]
-		18: [2724,3108,'',0,0]
-		19: [3282,3697,'',0,0]
-		20: [2676,4189,'',0,0]
+	controls = data.controls
 	[trgLat,trgLon] = [0,0]
 	currentControl = null
 	initControls()
 	saveControls()
-#################
 
 targets = [] # [id, littera, distance]
 platform = null
@@ -96,9 +65,6 @@ makeTargets = ->
 		targets.push [key, littera, round b.distanceTo(c)]
 	targets
 
-DATA = "gpsKarta"
-WIDTH = null
-HEIGHT = null
 [cx,cy] = [0,0] # center (image coordinates)
 SCALE = null
 
@@ -109,7 +75,6 @@ track = [] # five latest GPS positions (pixels)
 
 speaker = null
 
-img = null
 soundUp = null
 soundDown = null
 soundQueue = 0 # neg=minskat avstånd pos=ökat avstånd
@@ -128,12 +93,10 @@ voiceQueue = []
 lastBearing = ''
 lastDistance = ''
 
-w = null
-h = null
 released = true
 
 sendMail = (subject,body) ->
-	mail.href = encodeURI "mailto:#{MAIL}?subject=#{subject}&body=#{body}"
+	mail.href = encodeURI "mailto:#{data.mail}?subject=#{subject}&body=#{body}"
 	mail.click()
 
 say = (m) ->
@@ -142,7 +105,16 @@ say = (m) ->
 	speaker.text = m
 	speechSynthesis.speak speaker
 
-preload = -> img = loadImage FILENAME
+preload = -> 
+	params = getParameters()
+	console.log params
+	loadJSON "#{params.nr}.json", (json) ->
+		data = json
+		for control in data.controls
+			control.push ""
+			control.push 0
+			control.push 0
+		img = loadImage data.map
 
 sayDistance = (a,b) -> # a is newer
 	# if a border is crossed, play a sound
@@ -262,35 +234,26 @@ initSpeaker = (index=5) ->
 
 setup = ->
 
-	canvas = createCanvas innerWidth-0.5, innerHeight-0.5
+	canvas = createCanvas innerWidth-0.0, innerHeight #-0.5
 	canvas.position 0,0 # hides text field used for clipboard copy.
 
 	platform = window.navigator.platform
 
-	w = width/8
-	h = height/4
 	angleMode DEGREES
 
-	WIDTH = img.width
-	HEIGHT = img.height
+	SCALE = data.scale
 
-	SCALE = 1/2
-	[cx,cy] = [width,height]
+	[cx,cy] = [img.width/2,img.height/2]
+
+	console.log width,height
+	console.log img.width,img.height
 	
-	# makeCorners()
-	b2w = new Converter bmp,wgs,6
-	w2b = new Converter wgs,bmp,0
-
-	x = width/2
-	y = height/2
-	x1 = 100
-	x2 = width-100
-	y1 = 100
-	y2 = height-100
+	b2w = new Converter data.bmp,data.wgs,6
+	w2b = new Converter data.wgs,data.bmp,0
 
 	getControls()
 
-	position = [WIDTH/2,HEIGHT/2]
+	position = [img.width/2,img.height/2]
 
 	navigator.geolocation.watchPosition locationUpdate, locationUpdateFail,
 		enableHighAccuracy: true
@@ -307,26 +270,32 @@ setup = ->
 		myMousePressed mx,my
 
 drawTrack = ->
-	push()
 	fc()
 	sw 4
 	sc 0 # BLACK
-	translate width/2, height/2
-	scale SCALE
 	for [x,y],i in track
 		circle x-cx, y-cy, 10 * (track.length-i)
-	pop()
 
 drawTrail = ->
-	push()
 	fc()
 	sw 12
 	sc 1,0,0,0.5 # RED
-	translate width/2, height/2
-	scale SCALE
 	for [x,y] in trail
 		point x-cx, y-cy
-	pop()
+
+drawControls = ->
+	textAlign CENTER,CENTER
+	textSize 16
+	sw 2
+	radius = data.radius
+	for key,control of data.controls
+		[x,y] = control
+		sc 0
+		fc()
+		circle x-cx,y-cy,data.radius
+		sc()
+		fc 0
+		text key,x-cx+data.radius,y-cy+data.radius
 
 drawControl = ->
 
@@ -344,13 +313,11 @@ drawControl = ->
 	x = control[0]
 	y = control[1]
 
-	push()
 	sc()
 	fc 0,0,0,0.25
-	translate width/2, height/2
-	scale SCALE
-	circle x-cx, y-cy, 75
-	pop()
+	circle x-cx, y-cy, data.radius
+
+draw = -> xdraw()
 
 xdraw = ->
 	bg 0,1,0
@@ -360,10 +327,17 @@ xdraw = ->
 		return
 
 	fc()
-	image img, 0,0, width,height, cx-width/SCALE/2, cy-height/SCALE/2, width/SCALE, height/SCALE
+
+	push()
+	translate width/2, height/2
+	scale SCALE
+	image img, -cx,-cy
 	drawTrail()
 	drawTrack()
+	if data.drawControls then drawControls()
 	drawControl()
+	pop()
+	
 	textSize 100
 	fc 0
 	sc 1,1,0
@@ -394,9 +368,7 @@ executeMail = -> # Sends the trail
 	littera = controls[currentControl][2]
 	arr = ("[#{x},#{y}]" for [x,y] in trail)
 	s = arr.join ",\n"
-	sendMail "#{FILENAME} #{currentControl} #{littera}", s
-
-##########################
+	sendMail "#{data.map} #{currentControl} #{littera}", s
 
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
@@ -428,13 +400,13 @@ menu1 = -> # Main Menu
 
 menu2 = -> # Pan Zoom
 	dialogue = new Dialogue()
-	dialogue.add 'Up', -> cy -= 0.33*height/SCALE
+	dialogue.add 'Up', -> cy -= height/SCALE/3
 	dialogue.add ' ', -> # Not Used
-	dialogue.add 'Right', -> cx += 0.33*width/SCALE
-	dialogue.add 'Out', -> if SCALE > 0.5 then SCALE /= 1.5
-	dialogue.add 'Down', -> cy += 0.33*height/SCALE
+	dialogue.add 'Right', -> cx += width/SCALE/3
+	dialogue.add 'Out', -> if SCALE > data.scale then SCALE /= 1.5
+	dialogue.add 'Down', -> cy += height/SCALE/3
 	dialogue.add 'In', -> SCALE *= 1.5
-	dialogue.add 'Left', -> cx -= 0.33*width/SCALE
+	dialogue.add 'Left', -> cx -= width/SCALE/3
 	dialogue.add ' ', -> # Not used
 	dialogue.clock()
 
