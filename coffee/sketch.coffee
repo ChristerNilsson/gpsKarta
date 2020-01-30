@@ -1,8 +1,9 @@
-VERSION = 8
+VERSION = 10
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this, no bearing. Also distance voice every meter.
 ANGLE = 20 # degrees. Bearing resolution.
+NR = null # json file
 
 DISTLIST = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,30,40,50,60,70,80,90,100,120,140,160,180,200,250,300,400,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000]
 
@@ -37,20 +38,18 @@ clearControls = ->
 targets = [] # [id, littera, distance]
 platform = null
 
-saveControls = -> localStorage.gpsKarta = JSON.stringify controls
+saveControls = -> localStorage['gpsKarta'+NR] = JSON.stringify controls
 
 getControls = ->
 	try
-		controls = JSON.parse localStorage.gpsKarta
+		controls = JSON.parse localStorage['gpsKarta'+NR]
 	catch
 		clearControls()
 
 initControls = ->
 	for key,control of controls
 		[x,y,littera] = control
-		
 		[lon,lat] = b2w.convert x,y
-
 		control[3] = lat
 		control[4] = lon
 	if currentControl != null
@@ -105,12 +104,12 @@ say = (m) ->
 	speaker.text = m
 	speechSynthesis.speak speaker
 
-preload = -> 
+preload = ->
 	params = getParameters()
-	console.log params
-	loadJSON "#{params.nr}.json", (json) ->
+	NR = params.nr
+	loadJSON "#{NR}.json", (json) ->
 		data = json
-		for control in data.controls
+		for key,control of data.controls
 			control.push ""
 			control.push 0
 			control.push 0
@@ -150,10 +149,10 @@ soundIndicator = (p) ->
 	bearingb = b.bearingTo c
 	if dista >= LIMIT then sayBearing bearinga,bearingb
 
-	if 10 > abs DIST * distance
-		messages[3] = "#{DIST * distance} m/s" # abs dista-distb
-	else
-		messages[3] = ''
+	# if 10 > abs DIST * distance
+	# 	messages[3] = "#{DIST * distance} m/s" # abs dista-distb
+	# else
+	# 	messages[3] = ''
 
 	if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = p.coords.latitude
@@ -169,11 +168,13 @@ playSound = ->
 	else if soundQueue > 0 and soundUp != null
 		soundQueue--
 		soundUp.play()
-	messages[4]	= soundQueue
+	#messages[4]	= soundQueue
 	if soundQueue==0 then xdraw()
 
 locationUpdate = (p) ->
-	if gpsLat != 0 then position = w2b.convert gpsLon,gpsLat
+	if gpsLat != 0 
+		position = w2b.convert gpsLon,gpsLat
+		messages[4] = gpsLon + ' ' + gpsLat
 
 	soundIndicator p
 
@@ -244,9 +245,6 @@ setup = ->
 	SCALE = data.scale
 
 	[cx,cy] = [img.width/2,img.height/2]
-
-	console.log width,height
-	console.log img.width,img.height
 	
 	b2w = new Converter data.bmp,data.wgs,6
 	w2b = new Converter data.wgs,data.bmp,0
@@ -509,3 +507,6 @@ myMousePressed = (mx,my) ->
 mousePressed = ->
 	if platform == 'Win32' then myMousePressed mouseX,mouseY
 	false
+
+mouseMoved = ->
+	messages[3] = myRound(mouseX/SCALE) + ' ' + myRound(mouseY/SCALE)
