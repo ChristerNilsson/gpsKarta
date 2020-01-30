@@ -1,4 +1,4 @@
-VERSION = 11
+VERSION = 13
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this, no bearing. Also distance voice every meter.
@@ -148,11 +148,6 @@ soundIndicator = (p) ->
 	bearinga = a.bearingTo c
 	bearingb = b.bearingTo c
 	if dista >= LIMIT then sayBearing bearinga,bearingb
-
-	# if 10 > abs DIST * distance
-	# 	messages[3] = "#{DIST * distance} m/s" # abs dista-distb
-	# else
-	# 	messages[3] = ''
 
 	if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = p.coords.latitude
@@ -325,7 +320,7 @@ xdraw = ->
 		text VERSION, width/2,height/2
 		return
 
-	fc()
+	#fc()
 
 	push()
 	translate width/2, height/2
@@ -337,12 +332,12 @@ xdraw = ->
 	drawControl()
 	pop()
 	
-	#textSize 100
 	fc 0
 	sc 1,1,0
 	sw 3
 	margin = 25
 	for message,i in messages
+		#if platform != 'Win32' and i==3 then continue
 		textAlign [LEFT,CENTER,RIGHT][i%3], [TOP,BOTTOM][i//3]
 		textSize [100,50][i//3]
 		text message, [margin,width/2,width-margin][i%3], [margin,height][i//3] 
@@ -510,5 +505,5 @@ mousePressed = ->
 	if platform == 'Win32' then myMousePressed mouseX,mouseY
 	false
 
-mouseMoved = ->
-	messages[3] = myRound(mouseX/SCALE) + ' ' + myRound(mouseY/SCALE)
+# mouseMoved = ->
+# 	messages[3] = myRound(mouseX/SCALE) + ' ' + myRound(mouseY/SCALE)
