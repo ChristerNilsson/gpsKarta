@@ -1,42 +1,31 @@
-# Denna fil användes istället för sketch.coffee när man ska kalibrera en ny karta
-# Klicka på tydliga referenspunkter i de tre hörnen
-# T ex vägskäl, hus, broar, kraftledningar, osv
-# Avläs koordinaterna med tangent F12
+# Detta program användes när man ska
+#   1) kalibrera en ny karta och behöver tre koordinater
+#   2) placera ut kontroller
+# Avläs koordinaterna med F12
 
 img = null
-index = -1
+points = []
+R = 50
 
 preload = -> img = loadImage 'alviksskolan.png'
-litteras = '1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20'.split ' '
-points = []
 
 setup = ->
 	createCanvas img.width, img.height
-	image img, 0,0, width,height
-	print img
 	fc()
-	textSize 100
-	#textAlign CENTER,CENTER
-	nextIndex()
+	sc 0
+	sw 2
+	textSize R
+	textAlign LEFT,TOP
 
-draw = ->	
-	image img, 0,0, width,height
-	fc()
-	circle mouseX,mouseY,100
-	if index of litteras
-		fc 0
-		text litteras[index],mouseX,mouseY
-
-nextIndex = ->
-	#while index==-1 or (index<litteras.length and points[litteras[index]])
-	index++
+draw = ->
+	image img, 0,0
+	circle mouseX,mouseY,R
+	sc 1
+	point mouseX,mouseY
+	sc 0
+	text points.length+1,mouseX+0.7*R,mouseY+0.7*R
 
 mousePressed = ->
-	x = round mouseX
-	y = round mouseY
-	console.log x,y,index,litteras[index]
-	#if x < width and y < height
-	points[litteras[index]] = [x, y]
-	arr = ("\t\"#{key}\": [#{value}]," for key,value of points)
-	print "\n" + arr.join "\n"
-	nextIndex()
+	points.push [round(mouseX), round(mouseY)]
+	arr = points.map (value,i) -> "\t\"#{i+1}\": [#{value}],"
+	console.log "\n" + arr.join "\n"

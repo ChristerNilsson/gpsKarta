@@ -5,6 +5,10 @@ LIMIT = 20 # meter. Under this, no bearing. Also distance voice every meter.
 ANGLE = 20 # degrees. Bearing resolution.
 NR = null # json file
 
+# http://www.bvsok.se/Kartor/Skolkartor/
+# Högupplösta orienteringskartor: https://www.omaps.net
+# https://omaps.blob.core.windows.net/map-excerpts/1fdc587ffdea489dbd69e29b10b48395.jpeg Nackareservatet utan kontroller.
+
 DISTLIST = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,30,40,50,60,70,80,90,100,120,140,160,180,200,250,300,400,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000]
 
 trail = [	# insert bitmap points from mail here
