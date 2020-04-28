@@ -5,9 +5,10 @@
 
 img = null
 points = []
-R = 50
+R = 40
 
-preload = -> img = loadImage 'alviksskolan.png'
+#preload = -> img = loadImage '18A.png' # R=30
+preload = -> img = loadImage '18C.png' # R=40
 
 setup = ->
 	createCanvas img.width, img.height
