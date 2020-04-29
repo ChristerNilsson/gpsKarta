@@ -51,7 +51,6 @@ getControls = ->
 		controls = JSON.parse localStorage['gpsKarta'+NR]
 	catch
 		clearControls()
-	console.log controls
 
 initControls = ->
 	for key,control of controls
@@ -120,7 +119,6 @@ preload = ->
 			control.push ""
 			control.push 0
 			control.push 0
-		console.log data.controls
 		img = loadImage data.map
 
 sayDistance = (a,b) -> # a is newer
