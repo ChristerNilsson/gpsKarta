@@ -1,4 +1,4 @@
-VERSION = 14
+VERSION = 15
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this, no bearing. Also distance voice every meter.
@@ -113,13 +113,13 @@ say = (m) ->
 preload = ->
 	params = getParameters()
 	NR = params.nr
-	loadJSON "#{NR}.json", (json) ->
+	loadJSON "data/#{NR}.json", (json) ->
 		data = json
 		for key,control of data.controls
 			control.push ""
 			control.push 0
 			control.push 0
-		img = loadImage data.map
+		img = loadImage "data/" + data.map
 
 sayDistance = (a,b) -> # a is newer
 	# if a border is crossed, play a sound
