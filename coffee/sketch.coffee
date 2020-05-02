@@ -111,7 +111,7 @@ say = (m) ->
 
 preload = ->
 	params = getParameters()
-	NR = params.nr || 5
+	NR = params.nr || '19A'
 	loadJSON "data/#{NR}.json", (json) ->
 		data = json
 		for key,control of data.controls
