@@ -106,8 +106,8 @@ sendMail = (subject,body) ->
 say = (m) ->
 	if speaker == null then return
 	speechSynthesis.cancel()
-	m = m.replace 'bäring ', ''
-	m = m.replace 'distans ', ''
+	#m = m.replace 'bäring ', ''
+	#m = m.replace 'distans ', ''
 	speaker.text = m
 	speechSynthesis.speak speaker
 
