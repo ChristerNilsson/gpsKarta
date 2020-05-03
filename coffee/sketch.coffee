@@ -2,14 +2,14 @@ VERSION = 15
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this, no bearing. Also distance voice every meter.
-ANGLE = 20 # degrees. Bearing resolution.
+ANGLE = 10 # degrees. Bearing resolution.
 NR = null # json file
 
 # http://www.bvsok.se/Kartor/Skolkartor/
 # Högupplösta orienteringskartor: https://www.omaps.net
 # https://omaps.blob.core.windows.net/map-excerpts/1fdc587ffdea489dbd69e29b10b48395.jpeg Nackareservatet utan kontroller.
 
-DISTLIST = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,30,40,50,60,70,80,90,100,120,140,160,180,200,250,300,400,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000]
+DISTLIST = [2,4,6,8,10,12,14,16,18,20,30,40,50,60,70,80,90,100,120,140,160,180,200,250,300,400,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000]
 
 trail = [	# insert bitmap points from mail here
 	# [840,957], [842,943], [844,931], [855,925], [851,913], [842,903], [834,893], [828,882], [832,870], [833,858], [827,847], [818,839], [807,832], [800,822], [794,811], [787,801], [779,792], [767,787], [767,774], [767,760], [762,747], [754,738], [754,725], [754,711], [757,699], [756,687], [754,674], [754,661], [759,650], [757,638], [753,626], [746,615], [741,604], [741,591], [739,578], [738,566], [737,554], [734,542], [724,533], [714,525], [703,520], [691,516], [684,506], [684,493], [675,485], [672,473], [676,461], [680,449], [683,437], [686,425], [691,413], [692,401], [693,389], # A
@@ -111,7 +111,7 @@ say = (m) ->
 
 preload = ->
 	params = getParameters()
-	NR = params.nr || '19A'
+	NR = params.nr || '18A'
 	loadJSON "data/#{NR}.json", (json) ->
 		data = json
 		for key,control of data.controls
@@ -124,7 +124,8 @@ sayDistance = (a,b) -> # a is newer
 	# if a border is crossed, play a sound
 	for d in DISTLIST
 		if (a-d) * (b-d) < 0
-			voiceQueue.push 'distans ' + d
+			# voiceQueue.push 'distans ' + d
+			voiceQueue.push d
 			return
 
 sayBearing = (a,b) -> # a is newer
@@ -137,7 +138,8 @@ sayBearing = (a,b) -> # a is newer
 	tr = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
 	c = tr[a // tr.length]
 	d = tr[a %% tr.length]
-	voiceQueue.push 'bäring ' + c + ' ' + d
+	#voiceQueue.push 'bäring ' + c + ' ' + d
+	voiceQueue.push c + ' ' + d
 
 soundIndicator = (p) ->
 
@@ -174,6 +176,7 @@ playSound = ->
 locationUpdate = (p) ->
 	if gpsLat != 0 
 		position = w2b.convert gpsLon,gpsLat
+		console.log position
 		messages[4] = myRound(gpsLon,6) + ' ' + myRound(gpsLat,6)
 
 	soundIndicator p
@@ -186,7 +189,8 @@ locationUpdate = (p) ->
 
 		msg = voiceQueue.shift()
 
-		if 0 == msg.indexOf 'bearing'
+		#if 0 == msg.indexOf 'bearing'
+		if 0 == msg.indexOf ' '
 			if msg != lastBearing
 				lastBearing = msg
 				say msg
@@ -275,7 +279,6 @@ drawTrack = ->
 		circle x-cx, y-cy, 10 * (track.length-i)
 
 drawTrail = ->
-	console.log trail.length
 	fc()
 	sw 12
 	sc 1,0,0,0.5 # RED
