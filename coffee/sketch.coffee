@@ -1,7 +1,7 @@
 VERSION = 17
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
-LIMIT = 20 # meter. Under this, no bearing. Also distance voice every meter.
+LIMIT = 20 # meter. Under this, no bearing. Also distance voice every second meter.
 ANGLE = 10 # degrees. Bearing resolution.
 NR = null # json file
 
