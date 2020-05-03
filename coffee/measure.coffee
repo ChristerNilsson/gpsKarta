@@ -8,7 +8,7 @@ points = []
 
 #############################
 R = 30
-preload = -> img = loadImage 'data/Nackareservatet.png'
+preload = -> img = loadImage 'data/skarpnäck.png'
 #############################
 
 setup = ->
