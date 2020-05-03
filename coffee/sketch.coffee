@@ -1,4 +1,4 @@
-VERSION = 15
+VERSION = 16
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this, no bearing. Also distance voice every meter.
@@ -176,7 +176,7 @@ playSound = ->
 locationUpdate = (p) ->
 	if gpsLat != 0 
 		position = w2b.convert gpsLon,gpsLat
-		console.log position
+		# console.log position
 		messages[4] = myRound(gpsLon,6) + ' ' + myRound(gpsLat,6)
 
 	soundIndicator p
