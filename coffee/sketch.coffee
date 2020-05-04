@@ -1,4 +1,4 @@
-VERSION = 'version 19'
+VERSION = 'version 20'
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -112,7 +112,7 @@ say = (m) ->
 
 preload = ->
 	params = getParameters()
-	NR = params.nr || '19B'
+	NR = params.nr || 'skarpnäck'
 	loadJSON "data/#{NR}.json", (json) ->
 		data = json
 		for key,control of data.controls
@@ -318,13 +318,12 @@ drawReferencePoints = ->
 	textAlign CENTER,CENTER
 	textSize 20
 	for i in range 3
-		position = w2b.convert data.wgs[2*i], data.wgs[2*i+1]
+		p = w2b.convert data.wgs[2*i], data.wgs[2*i+1]
 		sw 1
 		fc()
 		sc 0
-		circle position[0]-cx, position[1]-cy, 5
-		circle data.bmp[2*i]-cx,data.bmp[2*i+1]-cy,10
-		#console.log position
+		circle data.bmp[2*i]-cx,data.bmp[2*i+1]-cy,9
+		circle p[0]-cx, p[1]-cy, 12
 		sw 2
 		fc 0
 		sc()
