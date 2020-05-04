@@ -27,7 +27,8 @@ class Converter # bmp <=> wgs
 		for i in range n
 			index = i
 			for k in range i+1, n
-				if Math.abs A[index][i] < Math.abs A[k][i] then index = k
+				# OBS: Math.abs A[index][i] < Math.abs A[k][i] funkar inte!
+				if Math.abs(A[index][i]) < Math.abs(A[k][i]) then index = k
 
 			for k in range i,n+1
 				[A[index][k], A[i][k]] = [A[i][k], A[index][k]]
@@ -59,6 +60,21 @@ assert [wgs[2], wgs[3]], b2w.convert bmp[2],bmp[3]
 assert [wgs[4], wgs[5]], b2w.convert bmp[4],bmp[5]
 
 w2b = new Converter wgs,bmp,0
+assert [bmp[0], bmp[1]], w2b.convert wgs[0],wgs[1]
+assert [bmp[2], bmp[3]], w2b.convert wgs[2],wgs[3]
+assert [bmp[4], bmp[5]], w2b.convert wgs[4],wgs[5]
+
+bmp = [185,1626, 927,1013, 1132,1667]
+wgs = [18.147726, 59.270494, 18.164806, 59.277144, 18.168736, 59.269495]
+
+b2w = new Converter bmp,wgs,6
+console.dir b2w
+assert [wgs[0], wgs[1]], b2w.convert bmp[0],bmp[1]
+assert [wgs[2], wgs[3]], b2w.convert bmp[2],bmp[3]
+assert [wgs[4], wgs[5]], b2w.convert bmp[4],bmp[5]
+
+w2b = new Converter wgs,bmp,0
+console.dir w2b
 assert [bmp[0], bmp[1]], w2b.convert wgs[0],wgs[1]
 assert [bmp[2], bmp[3]], w2b.convert wgs[2],wgs[3]
 assert [bmp[4], bmp[5]], w2b.convert wgs[4],wgs[5]
