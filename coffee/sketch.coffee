@@ -1,8 +1,8 @@
-VERSION = 17
+VERSION = 18
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
-LIMIT = 20 # meter. Under this, no bearing. Also distance voice every second meter.
-ANGLE = 10 # degrees. Bearing resolution.
+LIMIT = 20 # meter. Under this value is no bearing given.
+SECTOR = 10 # Bearing resolution in degrees
 NR = null # json file
 
 # http://www.bvsok.se/Kartor/Skolkartor/
@@ -110,6 +110,7 @@ say = (m) ->
 	#m = m.replace 'distans ', ''
 	speaker.text = m
 	speechSynthesis.speak speaker
+	m
 
 preload = ->
 	params = getParameters()
@@ -122,26 +123,24 @@ preload = ->
 			control.push 0
 		img = loadImage "data/" + data.map
 
-sayDistance = (a,b) -> # a is newer
+sayDistance = (a,b) -> # a is newer (meter)
 	# if a border is crossed, play a sound
 	for d in DISTLIST
-		if (a-d) * (b-d) < 0
-			voiceQueue.push 'distans ' + d
-			# voiceQueue.push d
+		if (a-d) * (b-d) <= 0
+			voiceQueue.push "distans #{d}"
 			return
 
-sayBearing = (a,b) -> # a is newer
-	# if a border is crossed, tell the new bearing
-	a = ANGLE * Math.round a/ANGLE
-	b = ANGLE * Math.round b/ANGLE
-	if a == b then return
-	if a == 0 then a = 360
+sayBearing = (a,b) -> # a is newer (degrees)
+	# if a sector limit is crossed, tell the new bearing
+	a = SECTOR * Math.round a/SECTOR
+	b = SECTOR * Math.round b/SECTOR
+	if a == b then return # samma sektor
 	a = Math.round a / 10
+	if a == 0 then a = 36 # 01..36
 	tr = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
 	c = tr[a // tr.length]
 	d = tr[a %% tr.length]
-	voiceQueue.push 'bäring ' + c + ' ' + d
-	#voiceQueue.push c + ' ' + d
+	voiceQueue.push "bäring #{c} #{d}"
 
 soundIndicator = (p) ->
 
@@ -190,18 +189,14 @@ locationUpdate = (p) ->
 	if voiceQueue.length > 0
 
 		msg = voiceQueue.shift()
+		arr = msg.split ' ' 
 
-		if 0 == msg.indexOf 'bäring'
-		#if 0 == msg.indexOf ' '
-			if msg != lastBearing
-				lastBearing = msg
-				say msg
-		else
-			arr = msg.split ' '
-			if LIMIT > parseInt arr[1] then msg = arr[1]
-			if msg != lastDistance
-				lastDistance = msg
-				say msg
+		if arr[0] == 'bäring'
+			msg = arr[1] + ' ' + arr[2] # skippa ordet. t ex 'bäring etta tvåa'
+			if msg != lastBearing then lastBearing = say msg # Upprepa aldrig
+		if arr[0] == 'distans'
+			msg = arr[1]                # skippa ordet. t ex 'distans 30'
+			if msg != lastDistance then lastDistance = say msg # Upprepa aldrig
 
 	if recordingTrail
 		if trail.length == 0
@@ -438,24 +433,24 @@ menu5 = (letters) -> # ABCDE
 menu6 = -> # More
 	dialogue = new Dialogue()
 	dialogue.add 'Mail', -> executeMail()
-	dialogue.add 'Angle', -> menu7()
+	dialogue.add 'Sector', -> menu7()
 	dialogue.add 'Clear', ->
 		clearControls()
 		dialogues.clear()
 	dialogue.clock()
 
-menu7 = -> # Angle
+menu7 = -> # Sector
 	dialogue = new Dialogue()
-	dialogue.add '10', -> setAngle 10
-	dialogue.add '20', -> setAngle 20
-	dialogue.add '30', -> setAngle 30
-	dialogue.add '45', -> setAngle 45
-	dialogue.add '60', -> setAngle 60
-	dialogue.add '90', -> setAngle 90
+	dialogue.add '10', -> SetSector 10 # 36
+	dialogue.add '20', -> SetSector 20 # 18
+	dialogue.add '30', -> SetSector 30 # 12
+	dialogue.add '45', -> SetSector 45 # 8
+	dialogue.add '60', -> SetSector 60 # 6
+	dialogue.add '90', -> SetSector 90 # 4
 	dialogue.clock()
 
-setAngle = (angle) ->
-	ANGLE = angle
+SetSector = (sector) ->
+	SECTOR = sector
 	dialogues.clear()
 
 addZero = (n) -> if n <= 9 then "0" + n else n
