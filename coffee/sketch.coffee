@@ -3,7 +3,7 @@ DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
 SECTOR = 10 # Bearing resolution in degrees
-NR = null # json file
+MAP = null # json file
 
 # http://www.bvsok.se/Kartor/Skolkartor/
 # Högupplösta orienteringskartor: https://www.omaps.net
@@ -43,11 +43,11 @@ clearControls = ->
 targets = [] # [id, littera, distance]
 platform = null
 
-saveControls = -> localStorage['gpsKarta'+NR] = JSON.stringify controls
+saveControls = -> localStorage['gpsKarta'+MAP] = JSON.stringify controls
 
 getControls = ->
 	try
-		controls = JSON.parse localStorage['gpsKarta'+NR]
+		controls = JSON.parse localStorage['gpsKarta'+MAP]
 	catch
 		clearControls()
 
@@ -107,13 +107,14 @@ say = (m) ->
 	if speaker == null then return
 	speechSynthesis.cancel()
 	speaker.text = m
+	console.log 'say',m, JSON.stringify voiceQueue
 	speechSynthesis.speak speaker
 	m
 
 preload = ->
 	params = getParameters()
-	NR = params.nr || 'skarpnäck'
-	loadJSON "data/#{NR}.json", (json) ->
+	MAP = params.map || 'skarpnäck'
+	loadJSON "data/#{MAP}.json", (json) ->
 		data = json
 		for key,control of data.controls
 			control.push ""
@@ -150,10 +151,11 @@ soundIndicator = (p) ->
 	distb = Math.round b.distanceTo c
 	distance = Math.round (dista - distb)/DIST
 
-	sayDistance dista,distb
-	bearinga = a.bearingTo c
-	bearingb = b.bearingTo c
-	if dista >= LIMIT then sayBearing bearinga,bearingb
+	if trgLat != 0
+		sayDistance dista,distb
+		bearinga = a.bearingTo c
+		bearingb = b.bearingTo c
+		if dista >= LIMIT then sayBearing bearinga,bearingb
 
 	if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = p.coords.latitude
@@ -173,15 +175,18 @@ playSound = ->
 	if soundQueue==0 then xdraw()
 
 locationUpdate = (p) ->
-	if gpsLat != 0 
+	if gpsLat != 0
 		position = w2b.convert gpsLon,gpsLat
-		# console.log position
+		track.push position
+		if track.length > TRACKED then track.shift()
+		console.log JSON.stringify track
 		messages[4] = myRound(gpsLon,6) + ' ' + myRound(gpsLat,6)
 
 	soundIndicator p
 
 	gpsCount++
 	messages[5] = gpsCount
+
 	if currentControl == null then return
 
 	if voiceQueue.length > 0
@@ -204,10 +209,8 @@ locationUpdate = (p) ->
 			[x2,y2] = position
 			if 12 < dist x1,y1,x2,y2 then trail.push position
 
-	track.push position
-	if track.length > TRACKED then track.shift()
-	xdraw()
-	position
+	#xdraw()
+	#position
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['Check location permissions']
 
@@ -231,6 +234,7 @@ initSpeaker = (index=5) ->
 	speaker.lang = 'sv-SE'
 	dialogues.clear()
 	say "Välkommen!"
+	track = []
 
 setup = ->
 
@@ -269,7 +273,7 @@ setup = ->
 drawTrack = ->
 	fc()
 	sw 4
-	sc 0 # BLACK
+	sc 0
 	for [x,y],i in track
 		circle x-cx, y-cy, 10 * (track.length-i)
 
@@ -337,7 +341,7 @@ xdraw = ->
 	if state==0 
 		textSize 200
 		textAlign CENTER,CENTER
-		text NR, width/2,height/2-200
+		text MAP, width/2,height/2-200
 		text VERSION, width/2,height/2
 		return
 
