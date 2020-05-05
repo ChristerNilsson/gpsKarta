@@ -1,4 +1,4 @@
-VERSION = 'version 21'
+VERSION = 'version 23'
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -107,7 +107,7 @@ say = (m) ->
 	if speaker == null then return
 	speechSynthesis.cancel()
 	speaker.text = m
-	console.log 'say',m, JSON.stringify voiceQueue
+	#console.log 'say',m, JSON.stringify voiceQueue
 	speechSynthesis.speak speaker
 	m
 
@@ -124,10 +124,15 @@ preload = ->
 
 sayDistance = (a,b) -> # a is newer (meter)
 	# if a border is crossed, produce speech
-	for d in DISTLIST
-		if (a-d) * (b-d) <= 0
-			voiceQueue.push "distans #{d}"
-			return
+	#console.log 'sayDistance', a,b
+	if b == -1
+		voiceQueue.push "distans #{a}"
+		#console.log JSON.stringify voiceQueue
+	else
+		for d in DISTLIST
+			if (a-d) * (b-d) <= 0
+				voiceQueue.push "distans #{d}"
+				return
 
 sayBearing = (a,b) -> # a is newer (degrees)
 	# if a sector limit is crossed, tell the new bearing
@@ -140,6 +145,7 @@ sayBearing = (a,b) -> # a is newer (degrees)
 	c = tr[a // tr.length]
 	d = tr[a %% tr.length]
 	voiceQueue.push "bäring #{c} #{d}"
+	#console.log JSON.stringify voiceQueue
 
 soundIndicator = (p) ->
 
@@ -152,14 +158,40 @@ soundIndicator = (p) ->
 	distance = Math.round (dista - distb)/DIST
 
 	if trgLat != 0
-		sayDistance dista,distb
 		bearinga = a.bearingTo c
 		bearingb = b.bearingTo c
 		if dista >= LIMIT then sayBearing bearinga,bearingb
+		sayDistance dista,distb
 
 	if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = p.coords.latitude
 		gpsLon = p.coords.longitude
+
+	if abs(distance) < 10 then soundQueue = distance # ett antal DIST
+
+firstInfo = ->
+
+	#console.log 'firstInfo',trgLat,trgLon,gpsLat,gpsLon
+	#a = LatLon p.coords.latitude,p.coords.longitude # newest
+
+	b = LatLon gpsLat, gpsLon
+	c = LatLon trgLat, trgLon # target
+
+	#	dista = Math.round a.distanceTo c
+	distb = Math.round b.distanceTo c
+	distance = Math.round (distb)/DIST
+
+	#console.log b,c,distb,distance
+
+	if trgLat != 0
+		bearingb = b.bearingTo c
+		if distb >= LIMIT then sayBearing bearingb,-1
+		sayDistance distb,-1
+		#bearinga = a.bearingTo c
+
+	#if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
+	#	gpsLat = p.coords.latitude
+	#	gpsLon = p.coords.longitude
 
 	if abs(distance) < 10 then soundQueue = distance # ett antal DIST
 
@@ -373,13 +405,14 @@ setTarget = (key) ->
 	if controls[currentControl] == null then return
 	trail = []
 	recordingTrail = true
-	say 'target: ' + key
 	soundQueue = 0
 	currentControl = key
 	control = controls[currentControl]
 	x = control[0]
 	y = control[1]
 	[trgLon,trgLat] = b2w.convert x,y
+	say 'target: ' + key
+	firstInfo()
 	dialogues.clear()
 
 executeMail = -> # Sends the trail
