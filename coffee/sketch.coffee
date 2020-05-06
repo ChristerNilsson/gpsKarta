@@ -1,4 +1,4 @@
-VERSION = 39
+VERSION = 40
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -152,7 +152,7 @@ sayBearing = (a0,b0) -> # a is newer (degrees)
 	#console.log JSON.stringify voiceQueue
 
 soundIndicator = (p) ->
-	dump "soundIndicator #{p.coords}"
+	dump "soundIndicator #{p.coords.latitude} #{p.coords.longitude}"
 	a = LatLon p.coords.latitude,p.coords.longitude # newest
 	b = LatLon gpsLat, gpsLon
 	c = LatLon trgLat, trgLon # target
@@ -218,7 +218,7 @@ playSound = ->
 	if soundQueue==0 then xdraw()
 
 locationUpdate = (p) ->
-	dump "locationUpdate #{JSON.stringify p}"
+	dump "locationUpdate #{p.coords.latitude} #{p.coords.longitude}"
 	if gpsLat != 0
 		position = w2b.convert gpsLon,gpsLat
 		track.push position
