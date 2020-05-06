@@ -1,4 +1,4 @@
-VERSION = 28
+VERSION = 31
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -37,7 +37,9 @@ w2b = null
 controls = {}
 
 mailDump = []
-dump = (msg) -> mailDump.push msg
+dump = (msg) -> 
+	console.log msg
+	mailDump.push msg
 
 clearControls = ->
 	controls = data.controls
@@ -113,7 +115,7 @@ say = (m) ->
 	if speaker == null then return
 	speechSynthesis.cancel()
 	speaker.text = m
-	dump console.log 'say',m, JSON.stringify voiceQueue
+	dump "say #{m} #{JSON.stringify voiceQueue}"
 	speechSynthesis.speak speaker
 	m
 
@@ -185,16 +187,14 @@ firstInfo = ->
 
 	if trgLat != 0
 		bearingb = b.bearingTo c
-		dump [gpsLat,gpsLon]
-		dump [trgLat,trgLon]
-		dump currentControl
+		dump "gps #{[gpsLat,gpsLon]}" 
+		dump "trg #{[trgLat,trgLon]}"
+		dump "target #{currentControl}"
 		voiceQueue.push "bäringDistans #{sayBearing bearingb,-1}. #{sayDistance distb,-1}"
 
 		#bearinga = a.bearingTo c
-		console.log voiceQueue
+		dump "voiceQueue #{voiceQueue}"
 	
-	dump JSON.stringify voiceQueue
-
 	#if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
 	#	gpsLat = p.coords.latitude
 	#	gpsLon = p.coords.longitude
@@ -217,7 +217,7 @@ locationUpdate = (p) ->
 		position = w2b.convert gpsLon,gpsLat
 		track.push position
 		if track.length > TRACKED then track.shift()
-		console.log JSON.stringify track
+		dump "track #{JSON.stringify track}"
 		messages[4] = myRound(gpsLon,6) + ' ' + myRound(gpsLat,6)
 
 	soundIndicator p
@@ -257,6 +257,7 @@ locationUpdate = (p) ->
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['Check location permissions']
 
 initSpeaker = (index=5) ->
+	dump "initSpeaker in #{index}"
 	soundUp = loadSound 'soundUp.wav'
 	soundDown = loadSound 'soundDown.wav'
 	soundUp.setVolume 0.1
@@ -277,6 +278,7 @@ initSpeaker = (index=5) ->
 	dialogues.clear()
 	say "Välkommen!"
 	track = []
+	dump "initSpeaker out"
 
 setup = ->
 
