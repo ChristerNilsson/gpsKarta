@@ -1,4 +1,4 @@
-VERSION = 43
+VERSION = 44
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -195,10 +195,10 @@ firstInfo = (key) ->
 
 	if trgLat != 0
 		bearingb = b.bearingTo c
-		dump "gps #{[gpsLat,gpsLon]}" 
+		dump "gps #{[gpsLat,gpsLon]}"
 		dump "trg #{[trgLat,trgLon]}"
 		dump "target #{currentControl}"
-		voiceQueue.push "target #{key}. #{sayBearing bearingb,-1}. #{sayDistance distb,-1}"
+		voiceQueue.push "target #{key}. Bäring #{sayBearing bearingb,-1}. Distans #{sayDistance distb,-1}"
 
 		#bearinga = a.bearingTo c
 		dump "voiceQueue #{voiceQueue}"
