@@ -1,4 +1,4 @@
-VERSION = 41
+VERSION = 42
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -197,8 +197,7 @@ firstInfo = (key) ->
 		dump "gps #{[gpsLat,gpsLon]}" 
 		dump "trg #{[trgLat,trgLon]}"
 		dump "target #{currentControl}"
-		voiceQueue.push "target #{key}"
-		voiceQueue.push "bäringDistans #{sayBearing bearingb,-1}. #{sayDistance distb,-1}"
+		voiceQueue.push "target #{key}. #{sayBearing bearingb,-1}. #{sayDistance distb,-1}"
 
 		#bearinga = a.bearingTo c
 		dump "voiceQueue #{voiceQueue}"
@@ -247,10 +246,8 @@ locationUpdate = (p) ->
 		if arr[0] == 'distans'
 			msg = arr[1]                # skippa ordet. t ex 'distans 30'
 			if msg != lastDistance then lastDistance = say msg # Upprepa aldrig
-		if arr[0] == 'bäringDistans'
-			msg = arr[1] + ' ' + arr[2] + ' ' + arr[3] # skippa ordet. t ex 'bäringDistans etta tvåa tvåhundra'
 		if arr[0] == 'target'
-			msg = arr[0] + ' ' + arr[1] 
+			msg = arr[0] + ' ' + arr[1] + ' ' + arr[2] + ' ' + arr[3] # skippa ordet. t ex 'target 11. etta tvåa. tvåhundra'
 		say msg 
 
 	if recordingTrail
