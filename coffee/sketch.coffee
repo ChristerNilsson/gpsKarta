@@ -1,4 +1,4 @@
-VERSION = 57
+VERSION = 58
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -23,7 +23,7 @@ trail = [	# insert bitmap points from mail here
 ]
 recordingTrail = false
 
-
+lastSaid = ""
 state = 0 # 0=uninitialized 1=initialized
 
 spara = (lat,lon, x,y) -> {lat,lon, x,y}
@@ -113,12 +113,13 @@ sendMail = (subject,body) ->
 	mail.click()
 
 say = (m) ->
+	if lastSaid == m then return 
+	lastSaid = m
 	if speaker == null then return
 	speechSynthesis.cancel()
 	speaker.text = m
 	dump "say #{m} #{JSON.stringify voiceQueue}"
 	speechSynthesis.speak speaker
-	m
 
 preload = ->
 	params = getParameters()
@@ -234,15 +235,10 @@ locationUpdate = (p) ->
 
 		if arr[0] == 'bäring'
 			msg = arr[1] + ' ' + arr[2] # skippa ordet. t ex 'bäring etta tvåa'
-			if msg != lastBearing then lastBearing = say msg # Upprepa aldrig
-
 		else if arr[0] == 'distans'
 			msg = arr[1]                # skippa ordet. t ex 'distans 30'
-			if msg != lastDistance then lastDistance = say msg # Upprepa aldrig
-
 		else if arr[0] == 'target'
 			msg = arr.join ' ' # 'target 11. etta tvåa. tvåhundra meter'
-
 		else 
 			msg = "What? " + arr.join ' '
 
