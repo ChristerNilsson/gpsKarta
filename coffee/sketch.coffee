@@ -1,4 +1,4 @@
-VERSION = 49
+VERSION = 50
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -137,13 +137,14 @@ sayDistance = (a,b) -> # a is newer (meter)
 	if b == -1 then return a
 	for d in DISTLIST
 		if (a-d) * (b-d) <= 0 then return d
+	""
 
 sayBearing = (a0,b0) -> # a is newer (degrees)
 	dump "sayBearing #{a0} #{b0}"
 	# if a sector limit is crossed, tell the new bearing
 	a = SECTOR * round(a0/SECTOR)
 	b = SECTOR * round(b0/SECTOR)
-	if a == b and b0 != -1 then return # samma sektor
+	if a == b and b0 != -1 then return "" # samma sektor
 	a = round a / 10
 	if a == 0 then a = 36 # 01..36
 	tiotal = DIGITS[a // 10]
@@ -166,9 +167,9 @@ soundIndicator = (p) ->
 		bearingb = round b.bearingTo c
 		if dista >= LIMIT 
 			sBearing = sayBearing bearinga,bearingb
-			if sBearing then voiceQueue.push "bäring #{sBearing}" 
+			if sBearing != "" then voiceQueue.push "bäring #{sBearing}" 
 		sDistance = sayDistance dista,distb
-		if sDistance then voiceQueue.push "distans #{sDistance}" 
+		if sDistance != "" then voiceQueue.push "distans #{sDistance}" 
 
 	if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = p.coords.latitude
@@ -234,13 +235,17 @@ locationUpdate = (p) ->
 		if arr[0] == 'bäring'
 			msg = arr[1] + ' ' + arr[2] # skippa ordet. t ex 'bäring etta tvåa'
 			if msg != lastBearing then lastBearing = say msg # Upprepa aldrig
+
 		else if arr[0] == 'distans'
 			msg = arr[1]                # skippa ordet. t ex 'distans 30'
 			if msg != lastDistance then lastDistance = say msg # Upprepa aldrig
+
 		else if arr[0] == 'target'
 			msg = arr.join ' ' # 'target 11. etta tvåa. tvåhundra meter'
+
 		else 
 			msg = "What? " + arr.join ' '
+
 		say msg 
 
 	if recordingTrail
