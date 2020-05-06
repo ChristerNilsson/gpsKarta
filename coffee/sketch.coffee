@@ -1,4 +1,4 @@
-VERSION = 31
+VERSION = 33
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -109,7 +109,8 @@ released = true
 
 sendMail = (subject,body) ->
 	mail.href = encodeURI "mailto:#{data.mail}?subject=#{subject}&body=#{body}"
-	mail.click()
+	console.log mail.href
+	#mail.click()
 
 say = (m) ->
 	if speaker == null then return
@@ -150,7 +151,7 @@ sayBearing = (a0,b0) -> # a is newer (degrees)
 	#console.log JSON.stringify voiceQueue
 
 soundIndicator = (p) ->
-
+	dump "soundIndicator #{p}"
 	a = LatLon p.coords.latitude,p.coords.longitude # newest
 	b = LatLon gpsLat, gpsLon
 	c = LatLon trgLat, trgLon # target
@@ -434,7 +435,7 @@ executeMail = -> # Sends the trail
 		s = arr.join ",\n"
 	else
 		s = ""
-	r = mailDump.join "\n"
+	r = mailDump.join "\n\r"
 	mailDump = []
 	sendMail "#{data.map} #{currentControl} #{littera}", r + s
 
