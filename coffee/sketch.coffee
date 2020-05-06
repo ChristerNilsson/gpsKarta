@@ -1,4 +1,4 @@
-VERSION = 60
+VERSION = 61
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -10,7 +10,7 @@ DIGITS = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
 # Högupplösta orienteringskartor: https://www.omaps.net
 # https://omaps.blob.core.windows.net/map-excerpts/1fdc587ffdea489dbd69e29b10b48395.jpeg Nackareservatet utan kontroller.
 
-DISTLIST = [0,2,4,6,8,10,12,14,16,18,20,30,40,50,60,70,80,90,100, 102,104,106,108,110,112,114,116,118, 120,140,160,180,200,250,300,350,400,450,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000]
+DISTLIST = [0,2,4,6,8,10,12,14,16,18,20,30,40,50,60,70,80,90,100,120,140,160,180,200,250,300,350,400,450,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000]
 
 trail = [	# insert bitmap points from mail here
 	# [840,957], [842,943], [844,931], [855,925], [851,913], [842,903], [834,893], [828,882], [832,870], [833,858], [827,847], [818,839], [807,832], [800,822], [794,811], [787,801], [779,792], [767,787], [767,774], [767,760], [762,747], [754,738], [754,725], [754,711], [757,699], [756,687], [754,674], [754,661], [759,650], [757,638], [753,626], [746,615], [741,604], [741,591], [739,578], [738,566], [737,554], [734,542], [724,533], [714,525], [703,520], [691,516], [684,506], [684,493], [675,485], [672,473], [676,461], [680,449], [683,437], [686,425], [691,413], [692,401], [693,389], # A
@@ -37,8 +37,8 @@ controls = {}
 
 mailDump = []
 dump = (msg) ->
-	console.log msg
-	mailDump.push msg
+#	console.log msg
+#	mailDump.push msg
 
 clearControls = ->
 	controls = data.controls
@@ -177,25 +177,18 @@ soundIndicator = (p) ->
 	if abs(distance) < 10 then soundQueue = distance # ett antal DIST
 
 firstInfo = (key) ->
-	#console.log 'firstInfo',trgLat,trgLon,gpsLat,gpsLon
-	#a = LatLon p.coords.latitude,p.coords.longitude # newest
-
 	b = LatLon gpsLat, gpsLon
 	c = LatLon trgLat, trgLon # target
 
-	#	dista = round a.distanceTo c
 	distb = round b.distanceTo c
 	distance = round (distb)/DIST
 
-	#console.log b,c,distb,distance
-
-	if trgLat != 0
-		bearingb = b.bearingTo c
-		voiceQueue.push "target #{key}. Bäring #{sayBearing bearingb,-1}. Distans #{sayDistance distb,-1} meter"
-		dump "gps #{[gpsLat,gpsLon]}"
-		dump "trg #{[trgLat,trgLon]}"
-		dump "target #{currentControl}"
-		dump "voiceQueue #{voiceQueue}"
+	bearingb = b.bearingTo c
+	voiceQueue.push "target #{key}. Bäring #{sayBearing bearingb,-1}. Distans #{sayDistance distb,-1} meter"
+	dump "gps #{[gpsLat,gpsLon]}"
+	dump "trg #{[trgLat,trgLon]}"
+	dump "target #{currentControl}"
+	dump "voiceQueue #{voiceQueue}"
 	
 	if abs(distance) < 10 then soundQueue = distance # ett antal DIST
 
@@ -253,9 +246,6 @@ locationUpdate = (p) ->
 			[x1,y1] = _.last trail
 			[x2,y2] = position
 			if 12 < dist x1,y1,x2,y2 then trail.push position
-
-	#xdraw()
-	#position
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['Check location permissions']
 
