@@ -1,4 +1,4 @@
-VERSION = 53
+VERSION = 54
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -158,8 +158,8 @@ soundIndicator = (p) ->
 	b = LatLon gpsLat, gpsLon
 	c = LatLon trgLat, trgLon # target
 
-	dista = round a.distanceTo c
-	distb = round b.distanceTo c
+	dista = a.distanceTo c
+	distb = b.distanceTo c
 	distance = round (dista - distb)/DIST
 
 	if trgLat != 0
