@@ -1,4 +1,4 @@
-VERSION = 34
+VERSION = 36
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -133,12 +133,13 @@ preload = ->
 
 sayDistance = (a,b) -> # a is newer (meter)
 	# if a border is crossed, produce speech
-	#console.log 'sayDistance', a,b
+	dump "sayDistance #{a} #{b}"
 	if b == -1 then return a
 	for d in DISTLIST
 		if (a-d) * (b-d) <= 0 then return d
 
 sayBearing = (a0,b0) -> # a is newer (degrees)
+	dump "sayBearing #{a0} #{b0}"
 	# if a sector limit is crossed, tell the new bearing
 	a = SECTOR * Math.round a0/SECTOR
 	b = SECTOR * Math.round b0/SECTOR
@@ -151,7 +152,7 @@ sayBearing = (a0,b0) -> # a is newer (degrees)
 	#console.log JSON.stringify voiceQueue
 
 soundIndicator = (p) ->
-	dump "soundIndicator #{p}"
+	dump "soundIndicator #{JSON.stringifyp}"
 	a = LatLon p.coords.latitude,p.coords.longitude # newest
 	b = LatLon gpsLat, gpsLon
 	c = LatLon trgLat, trgLon # target
@@ -435,7 +436,7 @@ executeMail = -> # Sends the trail
 		s = arr.join ",\n"
 	else
 		s = ""
-	r = mailDump.join "\n\r"
+	r = mailDump.join "xxx"
 	mailDump = []
 	sendMail "#{data.map} #{currentControl} #{littera}", r + s
 
