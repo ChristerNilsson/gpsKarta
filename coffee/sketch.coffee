@@ -1,4 +1,4 @@
-VERSION = 37
+VERSION = 38
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -167,7 +167,8 @@ soundIndicator = (p) ->
 		if dista >= LIMIT 
 			sBearing = sayBearing bearinga,bearingb
 			if sBearing then voiceQueue.push "bäring #{sBearing}" 
-		voiceQueue.push "distans #{sayDistance dista,distb}" 
+		sDistance = sayDistance dista,distb
+		if sDistance then voiceQueue.push "distans #{sDistance}" 
 
 	if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = p.coords.latitude
@@ -217,6 +218,7 @@ playSound = ->
 	if soundQueue==0 then xdraw()
 
 locationUpdate = (p) ->
+	dump "locationUpdate #{JSON.stringify p}"
 	if gpsLat != 0
 		position = w2b.convert gpsLon,gpsLat
 		track.push position
