@@ -1,9 +1,10 @@
-VERSION = 'version 23'
+VERSION = 'version 26'
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
 SECTOR = 10 # Bearing resolution in degrees
 MAP = null # json file
+DIGITS = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
 
 # http://www.bvsok.se/Kartor/Skolkartor/
 # Högupplösta orienteringskartor: https://www.omaps.net
@@ -125,26 +126,20 @@ preload = ->
 sayDistance = (a,b) -> # a is newer (meter)
 	# if a border is crossed, produce speech
 	#console.log 'sayDistance', a,b
-	if b == -1
-		voiceQueue.push "distans #{a}"
-		#console.log JSON.stringify voiceQueue
-	else
-		for d in DISTLIST
-			if (a-d) * (b-d) <= 0
-				voiceQueue.push "distans #{d}"
-				return
+	if b == -1 then return a
+	for d in DISTLIST
+		if (a-d) * (b-d) <= 0 then return d
 
-sayBearing = (a,b) -> # a is newer (degrees)
+sayBearing = (a0,b0) -> # a is newer (degrees)
 	# if a sector limit is crossed, tell the new bearing
-	a = SECTOR * Math.round a/SECTOR
-	b = SECTOR * Math.round b/SECTOR
-	if a == b then return # samma sektor
+	a = SECTOR * Math.round a0/SECTOR
+	b = SECTOR * Math.round b0/SECTOR
+	if a == b and b0 != -1 then return # samma sektor
 	a = Math.round a / 10
 	if a == 0 then a = 36 # 01..36
-	tr = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
-	c = tr[a // tr.length]
-	d = tr[a %% tr.length]
-	voiceQueue.push "bäring #{c} #{d}"
+	tiotal = DIGITS[a // 10]
+	ental = DIGITS[a %% 10]
+	"#{tiotal} #{ental}"
 	#console.log JSON.stringify voiceQueue
 
 soundIndicator = (p) ->
@@ -160,8 +155,8 @@ soundIndicator = (p) ->
 	if trgLat != 0
 		bearinga = a.bearingTo c
 		bearingb = b.bearingTo c
-		if dista >= LIMIT then sayBearing bearinga,bearingb
-		sayDistance dista,distb
+		if dista >= LIMIT then voiceQueue.push "bäring #{sayBearing bearinga,bearingb}" 
+		voiceQueue.push "distans #{sayDistance dista,distb}" 
 
 	if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = p.coords.latitude
@@ -185,9 +180,9 @@ firstInfo = ->
 
 	if trgLat != 0
 		bearingb = b.bearingTo c
-		if distb >= LIMIT then sayBearing bearingb,-1
-		sayDistance distb,-1
+		voiceQueue.push "bäringDistans #{sayBearing bearingb,-1} #{sayDistance distb,-1}"				
 		#bearinga = a.bearingTo c
+		console.log voiceQueue
 
 	#if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
 	#	gpsLat = p.coords.latitude
@@ -232,6 +227,10 @@ locationUpdate = (p) ->
 		if arr[0] == 'distans'
 			msg = arr[1]                # skippa ordet. t ex 'distans 30'
 			if msg != lastDistance then lastDistance = say msg # Upprepa aldrig
+		if arr[0] == 'bäringDistans'
+			msg = arr[1] + ' ' + arr[2] + ' ' + arr[3] # skippa ordet. t ex 'bäringDistans etta tvåa tvåhundra'
+			# if msg != lastBearing then lastBearing = say msg 
+			say msg 
 
 	if recordingTrail
 		if trail.length == 0
