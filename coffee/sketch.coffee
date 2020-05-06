@@ -1,4 +1,4 @@
-VERSION = 33
+VERSION = 34
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -109,8 +109,8 @@ released = true
 
 sendMail = (subject,body) ->
 	mail.href = encodeURI "mailto:#{data.mail}?subject=#{subject}&body=#{body}"
-	console.log mail.href
-	#mail.click()
+	#console.log mail.href
+	mail.click()
 
 say = (m) ->
 	if speaker == null then return
