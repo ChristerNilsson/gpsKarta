@@ -1,4 +1,4 @@
-VERSION = 48
+VERSION = 49
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -141,10 +141,10 @@ sayDistance = (a,b) -> # a is newer (meter)
 sayBearing = (a0,b0) -> # a is newer (degrees)
 	dump "sayBearing #{a0} #{b0}"
 	# if a sector limit is crossed, tell the new bearing
-	a = SECTOR * Math.round a0/SECTOR
-	b = SECTOR * Math.round b0/SECTOR
+	a = SECTOR * round(a0/SECTOR)
+	b = SECTOR * round(b0/SECTOR)
 	if a == b and b0 != -1 then return # samma sektor
-	a = Math.round a / 10
+	a = round a / 10
 	if a == 0 then a = 36 # 01..36
 	tiotal = DIGITS[a // 10]
 	ental = DIGITS[a %% 10]
@@ -157,13 +157,13 @@ soundIndicator = (p) ->
 	b = LatLon gpsLat, gpsLon
 	c = LatLon trgLat, trgLon # target
 
-	dista = Math.round a.distanceTo c
-	distb = Math.round b.distanceTo c
-	distance = Math.round (dista - distb)/DIST
+	dista = round a.distanceTo c
+	distb = round b.distanceTo c
+	distance = round (dista - distb)/DIST
 
 	if trgLat != 0
-		bearinga = a.bearingTo c
-		bearingb = b.bearingTo c
+		bearinga = round a.bearingTo c
+		bearingb = round b.bearingTo c
 		if dista >= LIMIT 
 			sBearing = sayBearing bearinga,bearingb
 			if sBearing then voiceQueue.push "bäring #{sBearing}" 
@@ -183,26 +183,20 @@ firstInfo = (key) ->
 	b = LatLon gpsLat, gpsLon
 	c = LatLon trgLat, trgLon # target
 
-	#	dista = Math.round a.distanceTo c
-	distb = Math.round b.distanceTo c
-	distance = Math.round (distb)/DIST
+	#	dista = round a.distanceTo c
+	distb = round b.distanceTo c
+	distance = round (distb)/DIST
 
 	#console.log b,c,distb,distance
 
 	if trgLat != 0
 		bearingb = b.bearingTo c
+		voiceQueue.push "target #{key}. Bäring #{sayBearing bearingb,-1}. Distans #{sayDistance distb,-1} meter"
 		dump "gps #{[gpsLat,gpsLon]}"
 		dump "trg #{[trgLat,trgLon]}"
 		dump "target #{currentControl}"
-		voiceQueue.push "target #{key}. Bäring #{sayBearing bearingb,-1}. Distans #{sayDistance distb,-1} meter"
-
-		#bearinga = a.bearingTo c
 		dump "voiceQueue #{voiceQueue}"
 	
-	#if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
-	#	gpsLat = p.coords.latitude
-	#	gpsLon = p.coords.longitude
-
 	if abs(distance) < 10 then soundQueue = distance # ett antal DIST
 
 playSound = ->
@@ -357,7 +351,7 @@ drawControl = ->
 	bearing = latLon1.bearingTo latLon2
 	messages[0] = "#{int bearing}º"
 	messages[1] = currentControl
-	messages[2] = "#{Math.round(latLon1.distanceTo latLon2)} m"
+	messages[2] = "#{round(latLon1.distanceTo latLon2)} m"
 
 	control = controls[currentControl]
 	x = control[0]
