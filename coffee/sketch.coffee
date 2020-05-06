@@ -1,4 +1,4 @@
-VERSION = 40
+VERSION = 41
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -176,7 +176,9 @@ soundIndicator = (p) ->
 
 	if abs(distance) < 10 then soundQueue = distance # ett antal DIST
 
-firstInfo = ->
+firstInfo = (key) ->
+
+
 
 	#console.log 'firstInfo',trgLat,trgLon,gpsLat,gpsLon
 	#a = LatLon p.coords.latitude,p.coords.longitude # newest
@@ -195,6 +197,7 @@ firstInfo = ->
 		dump "gps #{[gpsLat,gpsLon]}" 
 		dump "trg #{[trgLat,trgLon]}"
 		dump "target #{currentControl}"
+		voiceQueue.push "target #{key}"
 		voiceQueue.push "bäringDistans #{sayBearing bearingb,-1}. #{sayDistance distb,-1}"
 
 		#bearinga = a.bearingTo c
@@ -246,8 +249,9 @@ locationUpdate = (p) ->
 			if msg != lastDistance then lastDistance = say msg # Upprepa aldrig
 		if arr[0] == 'bäringDistans'
 			msg = arr[1] + ' ' + arr[2] + ' ' + arr[3] # skippa ordet. t ex 'bäringDistans etta tvåa tvåhundra'
-			# if msg != lastBearing then lastBearing = say msg 
-			say msg 
+		if arr[0] == 'target'
+			msg = arr[0] + ' ' + arr[1] 
+		say msg 
 
 	if recordingTrail
 		if trail.length == 0
@@ -429,8 +433,7 @@ setTarget = (key) ->
 	x = control[0]
 	y = control[1]
 	[trgLon,trgLat] = b2w.convert x,y
-	say 'target: ' + key
-	firstInfo()
+	firstInfo key
 	dialogues.clear()
 
 executeMail = -> # Sends the trail
