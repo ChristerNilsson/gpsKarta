@@ -1,4 +1,4 @@
-VERSION = 45
+VERSION = 46
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -177,9 +177,6 @@ soundIndicator = (p) ->
 	if abs(distance) < 10 then soundQueue = distance # ett antal DIST
 
 firstInfo = (key) ->
-
-
-
 	#console.log 'firstInfo',trgLat,trgLon,gpsLat,gpsLon
 	#a = LatLon p.coords.latitude,p.coords.longitude # newest
 
@@ -197,7 +194,7 @@ firstInfo = (key) ->
 		dump "gps #{[gpsLat,gpsLon]}"
 		dump "trg #{[trgLat,trgLon]}"
 		dump "target #{currentControl}"
-		voiceQueue.push "target #{key}. Bäring #{sayBearing bearingb,-1}. Distans #{sayDistance distb,-1}"
+		voiceQueue.push "target #{key}. Bäring #{sayBearing bearingb,-1}. Distans #{sayDistance distb,-1} meter"
 
 		#bearinga = a.bearingTo c
 		dump "voiceQueue #{voiceQueue}"
@@ -247,7 +244,7 @@ locationUpdate = (p) ->
 			msg = arr[1]                # skippa ordet. t ex 'distans 30'
 			if msg != lastDistance then lastDistance = say msg # Upprepa aldrig
 		if arr[0] == 'target'
-			msg = arr.join ' ' # 'target 11. etta tvåa. tvåhundra'
+			msg = arr.join ' ' # 'target 11. etta tvåa. tvåhundra meter'
 		say msg 
 
 	if recordingTrail
