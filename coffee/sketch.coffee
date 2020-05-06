@@ -1,4 +1,4 @@
-VERSION = 36
+VERSION = 37
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -152,7 +152,7 @@ sayBearing = (a0,b0) -> # a is newer (degrees)
 	#console.log JSON.stringify voiceQueue
 
 soundIndicator = (p) ->
-	dump "soundIndicator #{JSON.stringifyp}"
+	dump "soundIndicator #{JSON.stringify p}"
 	a = LatLon p.coords.latitude,p.coords.longitude # newest
 	b = LatLon gpsLat, gpsLon
 	c = LatLon trgLat, trgLon # target
@@ -164,7 +164,9 @@ soundIndicator = (p) ->
 	if trgLat != 0
 		bearinga = a.bearingTo c
 		bearingb = b.bearingTo c
-		if dista >= LIMIT then voiceQueue.push "bäring #{sayBearing bearinga,bearingb}" 
+		if dista >= LIMIT 
+			sBearing = sayBearing bearinga,bearingb
+			if sBearing then voiceQueue.push "bäring #{sBearing}" 
 		voiceQueue.push "distans #{sayDistance dista,distb}" 
 
 	if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
