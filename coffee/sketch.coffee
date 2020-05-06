@@ -1,4 +1,4 @@
-VERSION = 51
+VERSION = 52
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -136,7 +136,7 @@ sayDistance = (a,b) -> # a is newer (meter)
 	dump "sayDistance #{a} #{b}"
 	if b == -1 then return a
 	for d in DISTLIST
-		if (a-d) * (b-d) <= 0 then return d
+		if (a-d) * (b-d) < 0 then return d
 	""
 
 sayBearing = (a0,b0) -> # a is newer (degrees)
