@@ -1,4 +1,4 @@
-VERSION = 'version 27'
+VERSION = 28
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -113,7 +113,7 @@ say = (m) ->
 	if speaker == null then return
 	speechSynthesis.cancel()
 	speaker.text = m
-	#console.log 'say',m, JSON.stringify voiceQueue
+	dump console.log 'say',m, JSON.stringify voiceQueue
 	speechSynthesis.speak speaker
 	m
 
