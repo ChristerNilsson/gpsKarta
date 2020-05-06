@@ -1,4 +1,4 @@
-VERSION = 59
+VERSION = 60
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -134,6 +134,7 @@ sayDistance = (a,b) -> # a is newer (meter)
 	dump "sayDistance #{a} #{b}"
 	if b == -1 then return a
 	for d in DISTLIST
+		if a == d and b != d then return d
 		if (a-d) * (b-d) < 0 then return d
 	""
 
@@ -156,8 +157,8 @@ soundIndicator = (p) ->
 	b = LatLon gpsLat, gpsLon
 	c = LatLon trgLat, trgLon # target
 
-	dista = a.distanceTo c
-	distb = b.distanceTo c
+	dista = round a.distanceTo c
+	distb = round b.distanceTo c
 	distance = round (dista - distb)/DIST
 
 	if trgLat != 0
