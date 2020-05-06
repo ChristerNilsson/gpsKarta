@@ -1,4 +1,4 @@
-VERSION = 'version 26'
+VERSION = 'version 27'
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -23,6 +23,7 @@ trail = [	# insert bitmap points from mail here
 ]
 recordingTrail = false
 
+
 state = 0 # 0=uninitialized 1=initialized
 
 spara = (lat,lon, x,y) -> {lat,lon, x,y}
@@ -34,6 +35,10 @@ b2w = null
 w2b = null
 
 controls = {}
+
+mailDump = []
+dump = (msg) -> mailDump.push msg
+
 clearControls = ->
 	controls = data.controls
 	[trgLat,trgLon] = [0,0]
@@ -180,9 +185,15 @@ firstInfo = ->
 
 	if trgLat != 0
 		bearingb = b.bearingTo c
-		voiceQueue.push "bäringDistans #{sayBearing bearingb,-1} #{sayDistance distb,-1}"				
+		dump [gpsLat,gpsLon]
+		dump [trgLat,trgLon]
+		dump currentControl
+		voiceQueue.push "bäringDistans #{sayBearing bearingb,-1}. #{sayDistance distb,-1}"
+
 		#bearinga = a.bearingTo c
 		console.log voiceQueue
+	
+	dump JSON.stringify voiceQueue
 
 	#if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
 	#	gpsLat = p.coords.latitude
@@ -415,10 +426,15 @@ setTarget = (key) ->
 	dialogues.clear()
 
 executeMail = -> # Sends the trail
-	littera = controls[currentControl][2]
-	arr = ("[#{x},#{y}]" for [x,y] in trail)
-	s = arr.join ",\n"
-	sendMail "#{data.map} #{currentControl} #{littera}", s
+	if currentControl 
+		littera = controls[currentControl][2]
+		arr = ("[#{x},#{y}]" for [x,y] in trail)
+		s = arr.join ",\n"
+	else
+		s = ""
+	r = mailDump.join "\n"
+	mailDump = []
+	sendMail "#{data.map} #{currentControl} #{littera}", r + s
 
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
