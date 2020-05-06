@@ -1,4 +1,4 @@
-VERSION = 46
+VERSION = 48
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -37,9 +37,9 @@ w2b = null
 controls = {}
 
 mailDump = []
-dump = (msg) -> 
-	#console.log msg
-	#mailDump.push msg
+dump = (msg) ->
+	console.log msg
+	mailDump.push msg
 
 clearControls = ->
 	controls = data.controls
@@ -240,11 +240,13 @@ locationUpdate = (p) ->
 		if arr[0] == 'bäring'
 			msg = arr[1] + ' ' + arr[2] # skippa ordet. t ex 'bäring etta tvåa'
 			if msg != lastBearing then lastBearing = say msg # Upprepa aldrig
-		if arr[0] == 'distans'
+		else if arr[0] == 'distans'
 			msg = arr[1]                # skippa ordet. t ex 'distans 30'
 			if msg != lastDistance then lastDistance = say msg # Upprepa aldrig
-		if arr[0] == 'target'
+		else if arr[0] == 'target'
 			msg = arr.join ' ' # 'target 11. etta tvåa. tvåhundra meter'
+		else 
+			msg = "What? " + arr.join ' '
 		say msg 
 
 	if recordingTrail
@@ -461,7 +463,7 @@ menu1 = -> # Main Menu
 		[cx,cy] = position
 		dialogues.clear()
 		xdraw()
-	#dialogue.add 'Init', -> initSpeaker jcnindex++
+	dialogue.add 'Init', -> initSpeaker jcnindex++
 	dialogue.add 'Target', -> menu3()
 	dialogue.add 'Store Bike', -> setBike()
 	dialogue.clock ' ',true
