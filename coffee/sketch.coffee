@@ -1,4 +1,4 @@
-VERSION = 54
+VERSION = 55
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -160,7 +160,7 @@ soundIndicator = (p) ->
 
 	dista = a.distanceTo c
 	distb = b.distanceTo c
-	distance = round (dista - distb)/DIST
+	#distance = round (dista - distb)/DIST
 
 	if trgLat != 0
 		bearinga = round a.bearingTo c
@@ -171,9 +171,9 @@ soundIndicator = (p) ->
 		sDistance = sayDistance dista,distb
 		if sDistance != "" then voiceQueue.push "distans #{sDistance}" 
 
-	if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
-		gpsLat = p.coords.latitude
-		gpsLon = p.coords.longitude
+	# if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
+	gpsLat = p.coords.latitude
+	gpsLon = p.coords.longitude
 
 	if abs(distance) < 10 then soundQueue = distance # ett antal DIST
 
