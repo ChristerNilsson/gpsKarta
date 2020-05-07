@@ -1,4 +1,4 @@
-VERSION = 65
+VERSION = 66
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -45,7 +45,7 @@ class Dump
 			console.log msg
 			@data.push msg
 	get : ->
-		result = @data.join "\n"
+		result = @data.join "<br>"
 		@data = []
 		result
 dump = new Dump()
