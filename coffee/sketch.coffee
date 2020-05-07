@@ -1,4 +1,4 @@
-VERSION = 62
+VERSION = 63
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -21,6 +21,7 @@ trail = [	# insert bitmap points from mail here
 	# [1845,1072], [1844,1085], [1842,1097], [1830,1103], [1820,1110], [1809,1117], [1798,1123], [1786,1125], [1774,1126], [1762,1125], [1750,1129], [1738,1134], [1726,1133], [1723,1145], [1712,1150], [1702,1158], [1692,1166], [1686,1177], [1675,1183], [1666,1192], [1654,1195], [1665,1201], [1660,1213], [1664,1225], [1668,1237], [1670,1249], [1660,1256], [1647,1256], [1635,1259], [1623,1263], [1611,1267], [1601,1274], [1588,1276], [1576,1273], [1565,1278], [1554,1283], [1542,1281] , # F
 	# [1533,1269], [1521,1272], [1513,1282], [1508,1294], [1508,1310], [1499,1318], [1488,1323], [1477,1329], [1466,1334], [1456,1342], [1449,1353], [1441,1363], [1429,1365], [1420,1373], [1407,1374], [1395,1377], [1382,1380], [1370,1374], [1361,1382], [1349,1385], [1336,1384], [1324,1389], [1312,1391], [1300,1393], [1288,1394], [1276,1393], [1267,1402], [1255,1398], [1247,1407], [1235,1412], [1229,1423], [1223,1435], [1222,1447], [1216,1458], [1211,1469], [1203,1479], [1205,1491], [1200,1502], [1192,1511], [1182,1519], [1171,1524], [1159,1519], [1149,1511], [1145,1498], [1138,1487], [1126,1483], [1114,1480], [1105,1472], [1094,1477], [1082,1481], [1074,1490] # G
 ]
+params = null
 recordingTrail = false
 
 state = 0 # 0=uninitialized 1=initialized
@@ -35,12 +36,14 @@ w2b = null
 
 controls = {}
 
-class Dump 
+class Dump
 	constructor : ->
 		@data = []
+		@active = false
 	store : (msg) ->
-		#console.log msg
-		#@data.push msg
+		if @active
+			console.log msg
+			@data.push msg
 	get : ->
 		result = @data.join "\n"
 		@data = []
@@ -84,7 +87,7 @@ makeTargets = ->
 	targets
 
 [cx,cy] = [0,0] # center (image coordinates)
-SCALE = null
+SCALE = 1
 
 gps = null
 TRACKED = 5 # circles shows the player's position
@@ -127,6 +130,7 @@ say = (m) ->
 
 preload = ->
 	params = getParameters()
+	if params.debug then dump.active = params.debug == '1'
 	MAP = params.map || 'skarpnäck'
 	loadJSON "data/#{MAP}.json", (json) ->
 		data = json
@@ -281,7 +285,7 @@ initSpeaker = (index=5) ->
 	dump.store "initSpeaker out"
 
 setup = ->
-
+	screen.orientation.lock "portrait"
 	canvas = createCanvas innerWidth-0.0, innerHeight #-0.5
 	canvas.position 0,0 # hides text field used for clipboard copy.
 
@@ -316,10 +320,10 @@ setup = ->
 
 drawTrack = ->
 	fc()
-	sw 4
+	sw 1/SCALE
 	sc 0
 	for [x,y],i in track
-		circle x-cx, y-cy, 10 * (track.length-i)
+		circle x-cx, y-cy, 5 * (track.length-i)
 
 drawTrail = ->
 	fc()
@@ -387,6 +391,7 @@ xdraw = ->
 		textAlign CENTER,CENTER
 		text MAP, width/2,height/2-200
 		text VERSION, width/2,height/2
+		if dump.active then text 'debug',width/2,height/2+200
 		return
 
 	#fc()
