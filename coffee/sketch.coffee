@@ -1,4 +1,4 @@
-VERSION = 67
+VERSION = 68
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -47,7 +47,7 @@ class Dump
 	get : ->
 		result = @data.join "<br>"
 		@data = []
-		result
+		result + "<br><br>"
 dump = new Dump()
 
 clearControls = ->
@@ -321,19 +321,22 @@ setup = ->
 		my = touch.pageY
 		myMousePressed mx,my
 
+info = () ->
+	result = []
+	result.push "MAP #{MAP}"
+	result.push "VERSION #{VERSION}"
+	result.push "dump.active #{dump.active}"  
+	result.push "dump.data.length #{dump.data.length}"
+	result.push "trail.length #{trail.length}"
+	result.push "gpsCount #{gpsCount}"
+	result.push "SECTOR #{SECTOR}"
+	result.push "cx #{cx} cy #{cy}"
+	result.push "SCALE #{SCALE}"
+	result
+
 drawInfo = ->
-	ms = []
-	ms.push "MAP #{MAP}"
-	ms.push "VERSION #{VERSION}"
-	ms.push "dump.active #{dump.active}"  
-	ms.push "dump.data.length #{dump.data.length}"
-	ms.push "trail.length #{trail.length}"
-	ms.push "gpsCount #{gpsCount}"
-	ms.push "SECTOR #{SECTOR}"
-	ms.push "cx #{cx} cy #{cy}"
-	ms.push "SCALE #{SCALE}"
 	textAlign LEFT,CENTER
-	for m,i in ms
+	for m,i in info()
 		text m,20,100*(i+1)
 
 drawTrack = ->
@@ -454,13 +457,14 @@ setTarget = (key) ->
 	dialogues.clear()
 
 executeMail = -> # Sends the trail
+	r = info().join '<br>'
 	if currentControl 
 		littera = controls[currentControl][2]
 		arr = ("[#{x},#{y}]" for [x,y] in trail)
-		s = arr.join ",\n"
+		s = arr.join ","
 	else
 		s = ""
-	sendMail "#{data.map} #{currentControl} #{littera}", dump.get() + s
+	sendMail "#{data.map} #{currentControl} #{littera}", r + dump.get() + s
 
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
