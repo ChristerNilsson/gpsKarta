@@ -1,4 +1,4 @@
-VERSION = 61
+VERSION = 62
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -25,7 +25,7 @@ recordingTrail = false
 
 state = 0 # 0=uninitialized 1=initialized
 
-spara = (lat,lon, x,y) -> {lat,lon, x,y}
+# spara = (lat,lon, x,y) -> {lat,lon, x,y}
 
 data = null
 img = null
@@ -35,10 +35,17 @@ w2b = null
 
 controls = {}
 
-mailDump = []
-dump = (msg) ->
-#	console.log msg
-#	mailDump.push msg
+class Dump 
+	constructor : ->
+		@data = []
+	store : (msg) ->
+		console.log msg
+		@data.push msg
+	get : ->
+		result = @data.join "xxx"
+		@data = []
+		result
+dump = new Dump()
 
 clearControls = ->
 	controls = data.controls
@@ -115,7 +122,7 @@ say = (m) ->
 	if speaker == null then return
 	speechSynthesis.cancel()
 	speaker.text = m
-	dump "say #{m} #{JSON.stringify voiceQueue}"
+	dump.store "say #{m} #{JSON.stringify voiceQueue}"
 	speechSynthesis.speak speaker
 
 preload = ->
@@ -131,7 +138,7 @@ preload = ->
 
 sayDistance = (a,b) -> # a is newer (meter)
 	# if a border is crossed, produce speech
-	dump "sayDistance #{a} #{b}"
+	dump.store "sayDistance #{a} #{b}"
 	if b == -1 then return a
 	for d in DISTLIST
 		if a == d and b != d then return d
@@ -139,7 +146,7 @@ sayDistance = (a,b) -> # a is newer (meter)
 	""
 
 sayBearing = (a0,b0) -> # a is newer (degrees)
-	dump "sayBearing #{a0} #{b0}"
+	dump.store "sayBearing #{a0} #{b0}"
 	# if a sector limit is crossed, tell the new bearing
 	a = SECTOR * round(a0/SECTOR)
 	b = SECTOR * round(b0/SECTOR)
@@ -152,7 +159,7 @@ sayBearing = (a0,b0) -> # a is newer (degrees)
 	#console.log JSON.stringify voiceQueue
 
 soundIndicator = (p) ->
-	dump "soundIndicator #{p.coords.latitude} #{p.coords.longitude}"
+	dump.store "soundIndicator #{p.coords.latitude} #{p.coords.longitude}"
 	a = LatLon p.coords.latitude,p.coords.longitude # newest
 	b = LatLon gpsLat, gpsLon
 	c = LatLon trgLat, trgLon # target
@@ -185,10 +192,10 @@ firstInfo = (key) ->
 
 	bearingb = b.bearingTo c
 	voiceQueue.push "target #{key}. Bäring #{sayBearing bearingb,-1}. Distans #{sayDistance distb,-1} meter"
-	dump "gps #{[gpsLat,gpsLon]}"
-	dump "trg #{[trgLat,trgLon]}"
-	dump "target #{currentControl}"
-	dump "voiceQueue #{voiceQueue}"
+	dump.store "gps #{[gpsLat,gpsLon]}"
+	dump.store "trg #{[trgLat,trgLon]}"
+	dump.store "target #{currentControl}"
+	dump.store "voiceQueue #{voiceQueue}"
 	
 	if abs(distance) < 10 then soundQueue = distance # ett antal DIST
 
@@ -204,12 +211,12 @@ playSound = ->
 	if soundQueue==0 then xdraw()
 
 locationUpdate = (p) ->
-	dump "locationUpdate #{p.coords.latitude} #{p.coords.longitude}"
+	dump.store "locationUpdate #{p.coords.latitude} #{p.coords.longitude}"
 	if gpsLat != 0
 		position = w2b.convert gpsLon,gpsLat
 		track.push position
 		if track.length > TRACKED then track.shift()
-		dump "track #{JSON.stringify track}"
+		dump.store "track #{JSON.stringify track}"
 		messages[4] = myRound(gpsLon,6) + ' ' + myRound(gpsLat,6)
 
 	soundIndicator p
@@ -250,7 +257,7 @@ locationUpdate = (p) ->
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['Check location permissions']
 
 initSpeaker = (index=5) ->
-	dump "initSpeaker in #{index}"
+	dump.store "initSpeaker in #{index}"
 	soundUp = loadSound 'soundUp.wav'
 	soundDown = loadSound 'soundDown.wav'
 	soundUp.setVolume 0.1
@@ -271,7 +278,7 @@ initSpeaker = (index=5) ->
 	dialogues.clear()
 	say "Välkommen!"
 	track = []
-	dump "initSpeaker out"
+	dump.store "initSpeaker out"
 
 setup = ->
 
@@ -426,9 +433,7 @@ executeMail = -> # Sends the trail
 		s = arr.join ",\n"
 	else
 		s = ""
-	r = mailDump.join "xxx"
-	mailDump = []
-	sendMail "#{data.map} #{currentControl} #{littera}", r + s
+	sendMail "#{data.map} #{currentControl} #{littera}", dump.get() + s
 
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
