@@ -39,10 +39,10 @@ class Dump
 	constructor : ->
 		@data = []
 	store : (msg) ->
-		console.log msg
-		@data.push msg
+		#console.log msg
+		#@data.push msg
 	get : ->
-		result = @data.join "xxx"
+		result = @data.join "\n"
 		@data = []
 		result
 dump = new Dump()
