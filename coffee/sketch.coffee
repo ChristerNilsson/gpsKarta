@@ -1,4 +1,4 @@
-VERSION = 68
+VERSION = 70
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -178,11 +178,11 @@ soundIndicator = (p) ->
 	if trgLat != 0
 		bearinga = a.bearingTo c
 		bearingb = b.bearingTo c
-		if dista >= LIMIT 
+		if dista >= LIMIT
 			sBearing = sayBearing bearinga,bearingb
-			if sBearing != "" then voiceQueue.push "bäring #{sBearing}" 
+			if sBearing != "" then voiceQueue.push "bäring #{sBearing}"
 		sDistance = sayDistance dista,distb
-		if sDistance != "" then voiceQueue.push "distans #{sDistance}" 
+		if sDistance != "" then voiceQueue.push "distans #{sDistance}"
 
 	if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = p.coords.latitude
@@ -198,7 +198,7 @@ firstInfo = (key) ->
 	distance = round (distb)/DIST
 
 	bearingb = b.bearingTo c
-	voiceQueue.push "target #{key}. Bäring #{sayBearing bearingb,-1}. Distans #{sayDistance distb,-1} meter"
+	voiceQueue.push "target #{key} #{sayBearing bearingb,-1} #{sayDistance distb,-1}"
 	dump.store "gps #{[gpsLat,gpsLon]}"
 	dump.store "trg #{[trgLat,trgLon]}"
 	dump.store "target #{currentControl}"
@@ -248,7 +248,8 @@ locationUpdate = (p) ->
 			if distanceSaid != msg then say msg
 			distanceSaid = msg
 		else if arr[0] == 'target'
-			msg = arr.join ' ' # 'target 11. etta tvåa. 250 meter'
+			# 'target 11. bäring etta tvåa. distans 250 meter'
+			msg = "#{arr[0]} #{arr[1]}. bäring #{arr[2]} #{arr[3]}. distans #{arr[4]} meter"
 			bearingSaid = arr[2] + ' ' + arr[3]
 			distanceSaid = arr[4]
 			say msg
@@ -464,7 +465,7 @@ executeMail = -> # Sends the trail
 		s = arr.join ","
 	else
 		s = ""
-	sendMail "#{data.map} #{currentControl} #{littera}", r + dump.get() + s
+	sendMail "#{data.map} #{currentControl} #{littera}", r + "<br>" + dump.get() + s
 
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
