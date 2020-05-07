@@ -1,4 +1,4 @@
-VERSION = 70
+VERSION = 71
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -144,7 +144,7 @@ preload = ->
 
 sayDistance = (a,b) -> # a is newer (meter)
 	# if a border is crossed, produce speech
-	dump.store "sayDistance #{a} #{b}"
+	dump.store "D #{myRound a,1} #{myRound b,1}"
 	a = round a
 	b = round b
 	if b == -1 then return a
@@ -154,7 +154,7 @@ sayDistance = (a,b) -> # a is newer (meter)
 	""
 
 sayBearing = (a0,b0) -> # a is newer (degrees)
-	dump.store "sayBearing #{a0} #{b0}"
+	dump.store "B #{myRound a0,1} #{myRound b0,1}"
 	# if a sector limit is crossed, tell the new bearing
 	a = SECTOR * round(a0/SECTOR)
 	b = SECTOR * round(b0/SECTOR)
@@ -167,7 +167,7 @@ sayBearing = (a0,b0) -> # a is newer (degrees)
 	#console.log JSON.stringify voiceQueue
 
 soundIndicator = (p) ->
-	dump.store "soundIndicator #{p.coords.latitude} #{p.coords.longitude}"
+	#dump.store "soundIndicator #{p.coords.latitude} #{p.coords.longitude}"
 	a = LatLon p.coords.latitude,p.coords.longitude # newest
 	b = LatLon gpsLat, gpsLon
 	c = LatLon trgLat, trgLon # target
@@ -220,12 +220,12 @@ playSound = ->
 
 locationUpdate = (p) ->
 	dump.store ""
-	dump.store "locationUpdate #{p.coords.latitude} #{p.coords.longitude}"
+	dump.store "LU #{p.timestamp} #{myRound p.coords.latitude,6} #{myRound p.coords.longitude,6}"
 	if gpsLat != 0
 		position = w2b.convert gpsLon,gpsLat
 		track.push position
 		if track.length > TRACKED then track.shift()
-		dump.store "track #{JSON.stringify _.last track}"
+		dump.store "T #{JSON.stringify _.last track}"
 		messages[4] = myRound(gpsLon,6) + ' ' + myRound(gpsLat,6)
 
 	soundIndicator p
