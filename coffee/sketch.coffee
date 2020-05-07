@@ -1,4 +1,4 @@
-VERSION = 66
+VERSION = 67
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -125,6 +125,7 @@ say = (m) ->
 	if speaker == null then return
 	speechSynthesis.cancel()
 	speaker.text = m
+	dump.store ""
 	dump.store "say #{m} #{JSON.stringify voiceQueue}"
 	speechSynthesis.speak speaker
 
@@ -143,6 +144,8 @@ preload = ->
 sayDistance = (a,b) -> # a is newer (meter)
 	# if a border is crossed, produce speech
 	dump.store "sayDistance #{a} #{b}"
+	a = round a
+	b = round b
 	if b == -1 then return a
 	for d in DISTLIST
 		if a == d and b != d then return d
@@ -168,13 +171,13 @@ soundIndicator = (p) ->
 	b = LatLon gpsLat, gpsLon
 	c = LatLon trgLat, trgLon # target
 
-	dista = round a.distanceTo c
-	distb = round b.distanceTo c
+	dista = a.distanceTo c
+	distb = b.distanceTo c
 	distance = round (dista - distb)/DIST
 
 	if trgLat != 0
-		bearinga = round a.bearingTo c
-		bearingb = round b.bearingTo c
+		bearinga = a.bearingTo c
+		bearingb = b.bearingTo c
 		if dista >= LIMIT 
 			sBearing = sayBearing bearinga,bearingb
 			if sBearing != "" then voiceQueue.push "bäring #{sBearing}" 
@@ -215,12 +218,13 @@ playSound = ->
 	if soundQueue==0 then xdraw()
 
 locationUpdate = (p) ->
+	dump.store ""
 	dump.store "locationUpdate #{p.coords.latitude} #{p.coords.longitude}"
 	if gpsLat != 0
 		position = w2b.convert gpsLon,gpsLat
 		track.push position
 		if track.length > TRACKED then track.shift()
-		dump.store "track #{JSON.stringify track}"
+		dump.store "track #{JSON.stringify _.last track}"
 		messages[4] = myRound(gpsLon,6) + ' ' + myRound(gpsLat,6)
 
 	soundIndicator p
@@ -237,18 +241,17 @@ locationUpdate = (p) ->
 
 		if arr[0] == 'bäring'
 			msg = arr[1] + ' ' + arr[2] # skippa ordet. t ex 'bäring etta tvåa'
+			if bearingSaid != msg then say msg
 			bearingSaid = msg
 		else if arr[0] == 'distans'
 			msg = arr[1]                # skippa ordet. t ex 'distans 30'
+			if distanceSaid != msg then say msg
 			distanceSaid = msg
 		else if arr[0] == 'target'
 			msg = arr.join ' ' # 'target 11. etta tvåa. 250 meter'
 			bearingSaid = arr[2] + ' ' + arr[3]
 			distanceSaid = arr[4]
-		else 
-			msg = "What? " + arr.join ' '
-
-		say msg 
+			say msg
 
 	if recordingTrail
 		if trail.length == 0
