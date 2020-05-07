@@ -5,6 +5,7 @@ LIMIT = 20 # meter. Under this value is no bearing given.
 SECTOR = 10 # Bearing resolution in degrees
 MAP = null # json file
 DIGITS = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
+BR = '<br>'
 
 # http://www.bvsok.se/Kartor/Skolkartor/
 # Högupplösta orienteringskartor: https://www.omaps.net
@@ -45,9 +46,9 @@ class Dump
 			console.log msg
 			@data.push msg
 	get : ->
-		result = @data.join "<br>"
+		result = @data.join BR
 		@data = []
-		result + "<br><br>"
+		result + BR + BR
 dump = new Dump()
 
 clearControls = ->
@@ -458,14 +459,14 @@ setTarget = (key) ->
 	dialogues.clear()
 
 executeMail = -> # Sends the trail
-	r = info().join '<br>'
+	r = info().join BR
 	if currentControl 
 		littera = controls[currentControl][2]
 		arr = ("[#{x},#{y}]" for [x,y] in trail)
 		s = arr.join ","
 	else
 		s = ""
-	sendMail "#{data.map} #{currentControl} #{littera}", r + "<br>" + dump.get() + s
+	sendMail "#{data.map} #{currentControl} #{littera}", r + BR + dump.get() + s
 
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
