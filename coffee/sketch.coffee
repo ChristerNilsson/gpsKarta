@@ -1,4 +1,4 @@
-VERSION = 72
+VERSION = 73
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -219,6 +219,7 @@ playSound = ->
 	if soundQueue==0 then xdraw()
 
 locationUpdate = (p) ->
+	if gpsLat == p.coords.latitude and gpsLon == p.coords.longitude then return
 	d = new Date()
 	d.setTime p.timestamp
 	dump.store ""
@@ -227,7 +228,8 @@ locationUpdate = (p) ->
 		position = w2b.convert gpsLon,gpsLat
 		track.push position
 		if track.length > TRACKED then track.shift()
-		dump.store "T #{JSON.stringify _.last track}"
+		t = _.last track
+		dump.store "T #{t[0]} #{t[1]}"
 		messages[4] = myRound(gpsLon,6) + ' ' + myRound(gpsLat,6)
 
 	soundIndicator p
