@@ -1,4 +1,4 @@
-VERSION = 74
+VERSION = 75
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -184,8 +184,8 @@ soundIndicator = (p) ->
 		if sDistance != "" then voiceQueue.push "distans #{sDistance}"
 
 	if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
-		gpsLat = p.coords.latitude
-		gpsLon = p.coords.longitude
+		gpsLat = myRound p.coords.latitude,6
+		gpsLon = myRound p.coords.longitude,6
 
 	if abs(distance) < 10 then soundQueue = distance # ett antal DIST
 
@@ -198,9 +198,10 @@ firstInfo = (key) ->
 
 	bearingb = b.bearingTo c
 	voiceQueue.push "target #{key} #{sayBearing bearingb,-1} #{sayDistance distb,-1}"
+	dump.store ""
+	dump.store "target #{currentControl}"
 	dump.store "gps #{[gpsLat,gpsLon]}"
 	dump.store "trg #{[trgLat,trgLon]}"
-	dump.store "target #{currentControl}"
 	dump.store "voiceQueue #{voiceQueue}"
 	
 	if abs(distance) < 10 then soundQueue = distance # ett antal DIST
@@ -217,11 +218,13 @@ playSound = ->
 	if soundQueue==0 then xdraw()
 
 locationUpdate = (p) ->
-	if gpsLat == p.coords.latitude and gpsLon == p.coords.longitude then return
+	pLat = myRound p.coords.latitude,6
+	pLon = myRound p.coords.longitude,6
+	if gpsLat == pLat and gpsLon == pLon then return
 	d = new Date()
 	d.setTime p.timestamp
 	dump.store ""
-	dump.store "LU #{d.toLocaleString 'SWE'} #{myRound p.coords.latitude,6} #{myRound p.coords.longitude,6}"
+	dump.store "LU #{d.toLocaleString 'SWE'} #{pLat} #{pLon}"
 	if gpsLat != 0
 		position = w2b.convert gpsLon,gpsLat
 		track.push position
