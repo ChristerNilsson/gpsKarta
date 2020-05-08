@@ -1,11 +1,11 @@
-VERSION = 81
+VERSION = 82
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
 SECTOR = 10 # Bearing resolution in degrees
 MAP = null # json file
 DIGITS = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
-BR = '<br>'
+BR = '<br>'   
 
 # http://www.bvsok.se/Kartor/Skolkartor/
 # Högupplösta orienteringskartor: https://www.omaps.net
@@ -302,7 +302,7 @@ initSpeaker = (index=5) ->
 	dump.store "initSpeaker out"
 
 setup = ->
-	screen.orientation.lock "portrait"
+	#screen.orientation.lock "portrait"
 	canvas = createCanvas innerWidth-0.0, innerHeight #-0.5
 	canvas.position 0,0 # hides text field used for clipboard copy.
 
@@ -592,13 +592,37 @@ update = (littera,index=2) ->
 
 showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
 
-mouseReleased = ->
-	released = true
+# mouseReleased = ->
+# 	released = true
+# 	false
+
+# myMousePressed = (mx,my) ->
+# 	if not released then return false
+# 	released = false
+
+
+# 	xdraw()
+# 	false
+
+# mousePressed = ->
+# 	if platform == 'Win32' then myMousePressed mouseX,mouseY
+# 	false
+
+###################################
+
+startX = 0
+startY = 0
+
+touchStarted = (event) ->
+	event.preventDefault()
+	console.log 'started',mouseX,mouseY
+	startX = mouseX
+	startY = mouseY
 	false
 
-myMousePressed = (mx,my) ->
-	if not released then return false
-	released = false
+touchEnded = (event) ->
+	event.preventDefault()
+	console.log 'ended',mouseX,mouseY
 
 	if state == 0
 		initSpeaker()
@@ -606,20 +630,16 @@ myMousePressed = (mx,my) ->
 	else if state == 2
 		state = 1
 
-	if dialogues.length == 1 and dialogues[0].number == 0 then dialogues.pop() # dölj indikatorer
-
-	dialogue = _.last dialogues
-	if dialogues.length == 0 or not dialogue.execute mx,my
-		if dialogues.length == 0 then menu1() else dialogues.pop()
-		xdraw()
-		return false
-
-	xdraw()
+	#for button in buttons
+	#	if button.inside mouseX,mouseY then return button.click()
+	if startX == mouseX and startY == mouseY
+		if dialogues.length == 1 and dialogues[0].number == 0 then dialogues.pop() # dölj indikatorer
+		dialogue = _.last dialogues
+		if dialogues.length == 0 or not dialogue.execute mouseX,mouseY
+			if dialogues.length == 0 then menu1() else dialogues.pop()
+	else
+		cx += startX - mouseX
+		cy += startY - mouseY
+		startX = 0
+		startY = 0
 	false
-
-mousePressed = ->
-	if platform == 'Win32' then myMousePressed mouseX,mouseY
-	false
-
-# mouseMoved = ->
-# 	messages[3] = myRound(mouseX/SCALE) + ' ' + myRound(mouseY/SCALE)
