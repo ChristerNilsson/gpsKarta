@@ -1,4 +1,4 @@
-VERSION = 78
+VERSION = 79
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -103,9 +103,11 @@ jcnindex = 0
 messages = ['','','','','','']
 gpsCount = 0
 
-[gpsLat,gpsLon] = [0,0]
-[trgLat,trgLon] = [0,0]
+[gpsLat,gpsLon] = [0,0] # avgör om muntlig information ska ges
+[trgLat,trgLon] = [0,0] # koordinater för valt target
+
 currentControl = null
+lastLocation = '' # används för att skippa lika koordinater
 
 timeout = null
 
@@ -220,10 +222,12 @@ playSound = ->
 locationUpdate = (p) ->
 	pLat = myRound p.coords.latitude,6
 	pLon = myRound p.coords.longitude,6
-	dump.store "#{gpsLat} #{pLat} #{gpsLon} #{pLon} #{gpsLat == pLat and gpsLon == pLon}"
-	if gpsLat == pLat and gpsLon == pLon then return
-	gpsLat = pLat
-	gpsLon = pLon
+	nextLocation = "#{pLat} #{pLon}"
+	dump.store "#{nextLocation} #{lastLocation} #{nextLocation == lastLocation}"
+	if nextLocation == lastLocation then return
+	lastLocation = nextLocation
+	# gpsLat = pLat
+	# gpsLon = pLon
 
 	d = new Date()
 	d.setTime p.timestamp
