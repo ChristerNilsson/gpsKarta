@@ -1,4 +1,4 @@
-VERSION = 75
+VERSION = 76
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -226,12 +226,12 @@ locationUpdate = (p) ->
 	dump.store ""
 	dump.store "LU #{d.toLocaleString 'SWE'} #{pLat} #{pLon}"
 	if gpsLat != 0
-		position = w2b.convert gpsLon,gpsLat
+		position = w2b.convert pLon,pLat
 		track.push position
 		if track.length > TRACKED then track.shift()
 		t = _.last track
 		dump.store "T #{t[0]} #{t[1]}"
-		messages[4] = myRound(gpsLon,6) + ' ' + myRound(gpsLat,6)
+		messages[4] = pLat + ' ' + pLon
 
 	soundIndicator p
 
