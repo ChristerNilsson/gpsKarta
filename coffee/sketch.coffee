@@ -1,4 +1,4 @@
-VERSION = 83
+VERSION = 84
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -581,54 +581,35 @@ update = (littera,index=2) ->
 
 showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
 
-# mouseReleased = ->
-# 	released = true
-# 	false
-
-# myMousePressed = (mx,my) ->
-# 	if not released then return false
-# 	released = false
-
-
-# 	xdraw()
-# 	false
-
-# mousePressed = ->
-# 	if platform == 'Win32' then myMousePressed mouseX,mouseY
-# 	false
-
-###################################
-
 startX = 0
 startY = 0
 
 touchStarted = (event) ->
 	event.preventDefault()
-	console.log 'started',mouseX,mouseY
+	startX = mouseX
+	startY = mouseY
+	if state == 0 then initSpeaker()
+	state = 1
+	false
+
+touchMoved = (event) ->
+	event.preventDefault()
+
+	cx += startX - mouseX
+	cy += startY - mouseY
 	startX = mouseX
 	startY = mouseY
 	false
 
 touchEnded = (event) ->
+	console.log 'Ended'
 	event.preventDefault()
-	console.log 'ended',mouseX,mouseY
-
-	if state == 0
-		initSpeaker()
-		state = 1
-	else if state == 2
-		state = 1
-
-	#for button in buttons
-	#	if button.inside mouseX,mouseY then return button.click()
+	console.log startX,mouseX,startY, mouseY
 	if startX == mouseX and startY == mouseY
 		if dialogues.length == 1 and dialogues[0].number == 0 then dialogues.pop() # dölj indikatorer
 		dialogue = _.last dialogues
 		if dialogues.length == 0 or not dialogue.execute mouseX,mouseY
 			if dialogues.length == 0 then menu1() else dialogues.pop()
-	else
-		cx += startX - mouseX
-		cy += startY - mouseY
-		startX = 0
-		startY = 0
+	# startX = 0
+	# startY = 0
 	false

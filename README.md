@@ -13,25 +13,25 @@ Buy the paper map [here](http://www.skogsluffarna.se/Arrangemang/Naturpasset)
 You see the map, controls and position all the time.
 The size of the controls are roughly 100 meter.
 
-* Speaker (Starts the speaker)
 * Center (centers your position)
-* Pan Zoom
-	* Left (Move your position left)
-	* Right (Move your position right)
-	* Up (Move your position up)
-	* Down (Move your position down)
-	* Out (Zooms out)
-	* In (Zooms in)
-* Store Bike (stores starting position)
-* Goto Bike (sets target to starting position)
-* Target (choose target)
+* Out (Zooms out)
 * Take (marks a target with littera)
 	* ABCDE
 	* FGHIJ
 	* KLMNO
 	* PQRST
 	* UVWXYZ
-* Mail (sends data in a mail)
+* Goto Bike (sets target to starting position)
+* More	
+	* Init (initializes speaker)
+	* Mail (sends data in a mail)
+	* Sector
+		* Selects size of sector. 10-90 degrees.
+	* Clear
+	* Info
+* Store Bike (stores starting position)
+* Target (choose target)
+* In (Zooms in)
 
 Accuracy : Approx ten meters
 
