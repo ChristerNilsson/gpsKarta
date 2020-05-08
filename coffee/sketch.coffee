@@ -1,4 +1,4 @@
-VERSION = 82
+VERSION = 83
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -492,31 +492,19 @@ setBike = ->
 
 menu1 = -> # Main Menu
 	dialogue = new Dialogue()
-	dialogue.add 'Pan Zoom', -> menu2()
-	dialogue.add 'Goto Bike', -> setTarget 'bike'
-	dialogue.add 'Take', -> menu4()
-	dialogue.add 'More', -> menu6()
 	dialogue.add 'Center', ->
 		[cx,cy] = position
 		dialogues.clear()
 		xdraw()
-	dialogue.add 'Init', -> initSpeaker jcnindex++
-	dialogue.add 'Target', -> menu3()
+	dialogue.add 'Out', -> if SCALE > data.scale then SCALE /= 1.5
+	dialogue.add 'Take', -> menu4()
+	dialogue.add 'Goto Bike', -> setTarget 'bike'
+	dialogue.add 'More', -> menu6()
 	dialogue.add 'Store Bike', -> setBike()
+	dialogue.add 'Target', -> menu3()
+	dialogue.add 'In', -> SCALE *= 1.5
 	dialogue.clock ' ',true
 	dialogue.textSize *= 1.5
-
-menu2 = -> # Pan Zoom
-	dialogue = new Dialogue()
-	dialogue.add 'Up', -> cy -= height/SCALE/3
-	dialogue.add ' ', -> # Not Used
-	dialogue.add 'Right', -> cx += width/SCALE/3
-	dialogue.add 'Out', -> if SCALE > data.scale then SCALE /= 1.5
-	dialogue.add 'Down', -> cy += height/SCALE/3
-	dialogue.add 'In', -> SCALE *= 1.5
-	dialogue.add 'Left', -> cx -= width/SCALE/3
-	dialogue.add ' ', -> # Not used
-	dialogue.clock()
 
 menu3 = -> # Target
 	dialogue = new Dialogue 0,0
@@ -545,6 +533,7 @@ menu5 = (letters) -> # ABCDE
 
 menu6 = -> # More
 	dialogue = new Dialogue()
+	dialogue.add 'Init', -> initSpeaker jcnindex++
 	dialogue.add 'Mail', ->
 		executeMail()
 		dialogues.clear()
