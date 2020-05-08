@@ -1,4 +1,4 @@
-VERSION = 73
+VERSION = 74
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -26,8 +26,6 @@ params = null
 recordingTrail = false
 
 state = 0 # 0=uninitialized 1=initialized
-
-# spara = (lat,lon, x,y) -> {lat,lon, x,y}
 
 data = null
 img = null
@@ -537,7 +535,9 @@ menu5 = (letters) -> # ABCDE
 
 menu6 = -> # More
 	dialogue = new Dialogue()
-	dialogue.add 'Mail', -> executeMail()
+	dialogue.add 'Mail', ->
+		executeMail()
+		dialogues.clear()
 	dialogue.add 'Sector', -> menu7()
 	dialogue.add 'Clear', ->
 		clearControls()
