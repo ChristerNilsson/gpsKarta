@@ -1,4 +1,4 @@
-VERSION = 80
+VERSION = 81
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -166,7 +166,7 @@ sayBearing = (a0,b0) -> # a is newer (degrees)
 	"#{tiotal} #{ental}"
 	#console.log JSON.stringify voiceQueue
 
-soundIndicator = (p) ->
+increaseQueue = (p) ->
 	#dump.store "soundIndicator #{p.coords.latitude} #{p.coords.longitude}"
 	a = LatLon p.coords.latitude,p.coords.longitude # newest
 	b = LatLon gpsLat, gpsLon
@@ -219,18 +219,43 @@ playSound = ->
 	#messages[4]	= soundQueue
 	if soundQueue==0 then xdraw()
 
+decreaseQueue = ->
+	if voiceQueue.length == 0 then return
+	msg = voiceQueue.shift()
+	arr = msg.split ' ' 
+
+	if arr[0] == 'bäring'
+		msg = arr[1] + ' ' + arr[2] # skippa ordet. t ex 'bäring etta tvåa'
+		if bearingSaid != msg then say msg
+		bearingSaid = msg
+	else if arr[0] == 'distans'
+		msg = arr[1]                # skippa ordet. t ex 'distans 30'
+		if distanceSaid != msg then say msg
+		distanceSaid = msg
+	else if arr[0] == 'target'
+		# 'target 11. bäring etta tvåa. distans 250 meter'
+		msg = "#{arr[0]} #{arr[1]}. bäring #{arr[2]} #{arr[3]}. distans #{arr[4]} meter"
+		bearingSaid = arr[2] + ' ' + arr[3]
+		distanceSaid = arr[4]
+		say msg
+
 locationUpdate = (p) ->
 	pLat = myRound p.coords.latitude,6
 	pLon = myRound p.coords.longitude,6
 	nextLocation = "#{pLat} #{pLon}"
-	# dump.store "#{nextLocation} #{lastLocation} #{nextLocation == lastLocation}"
+	gpsCount++
+	messages[5] = gpsCount
+	decreaseQueue()
 	if nextLocation == lastLocation then return
 	lastLocation = nextLocation
-	# gpsLat = pLat
-	# gpsLon = pLon
+	updateTrack p.timestamp, pLat, pLon
+	increaseQueue p
+	#if currentControl == null then return
+	updateTrail()
 
+updateTrack = (timestamp, pLat, pLon) ->
 	d = new Date()
-	d.setTime p.timestamp
+	d.setTime timestamp
 	dump.store ""
 	dump.store "LU #{d.toLocaleString 'SWE'} #{pLat} #{pLon}"
 	if gpsLat != 0
@@ -241,33 +266,7 @@ locationUpdate = (p) ->
 		dump.store "T #{t[0]} #{t[1]}"
 		messages[4] = pLat + ' ' + pLon
 
-	soundIndicator p
-
-	gpsCount++
-	messages[5] = gpsCount
-
-	if currentControl == null then return
-
-	if voiceQueue.length > 0
-
-		msg = voiceQueue.shift()
-		arr = msg.split ' ' 
-
-		if arr[0] == 'bäring'
-			msg = arr[1] + ' ' + arr[2] # skippa ordet. t ex 'bäring etta tvåa'
-			if bearingSaid != msg then say msg
-			bearingSaid = msg
-		else if arr[0] == 'distans'
-			msg = arr[1]                # skippa ordet. t ex 'distans 30'
-			if distanceSaid != msg then say msg
-			distanceSaid = msg
-		else if arr[0] == 'target'
-			# 'target 11. bäring etta tvåa. distans 250 meter'
-			msg = "#{arr[0]} #{arr[1]}. bäring #{arr[2]} #{arr[3]}. distans #{arr[4]} meter"
-			bearingSaid = arr[2] + ' ' + arr[3]
-			distanceSaid = arr[4]
-			say msg
-
+updateTrail = ->
 	if recordingTrail
 		if trail.length == 0
 			trail.push position
