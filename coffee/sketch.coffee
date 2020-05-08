@@ -1,4 +1,4 @@
-VERSION = 76
+VERSION = 77
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -220,6 +220,7 @@ playSound = ->
 locationUpdate = (p) ->
 	pLat = myRound p.coords.latitude,6
 	pLon = myRound p.coords.longitude,6
+	dump.store "#{gpsLat} #{pLat} #{gpsLon} #{pLon} #{gpsLat == pLat and gpsLon == pLon}"
 	if gpsLat == pLat and gpsLon == pLon then return
 	d = new Date()
 	d.setTime p.timestamp
