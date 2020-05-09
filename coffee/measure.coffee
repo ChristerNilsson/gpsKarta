@@ -7,8 +7,8 @@ img = null
 points = []
 
 #############################
-R = 40
-preload = -> img = loadImage 'data/19A.png'
+R = 50
+preload = -> img = loadImage 'data/20B.png'
 #############################
 
 setup = ->
