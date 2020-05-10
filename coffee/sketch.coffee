@@ -305,12 +305,12 @@ initSpeaker = (index=5) ->
 
 fraction = (x) -> x - int x 
 getMeters = (w,skala) ->
-	return [425,200]
 	[lon0,lat0] = b2w.convert 0,height
 	[lon1,lat1] = b2w.convert w,height
 	p0 = LatLon lat0, lon0
 	p1 = LatLon lat1, lon1
 	distans = p0.distanceTo(p1) / skala
+	return [425,200]
 	d = Math.log10 distans
 	fract = fraction d
 	for i in [1,2,5]
