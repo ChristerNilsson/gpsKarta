@@ -1,4 +1,4 @@
-VERSION = 91
+VERSION = 92
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -305,6 +305,7 @@ initSpeaker = (index=5) ->
 
 fraction = (x) -> x - int x 
 getMeters = (w,skala) ->
+	return [425,200]
 	[lon0,lat0] = b2w.convert 0,height
 	[lon1,lat1] = b2w.convert w,height
 	p0 = LatLon lat0, lon0
