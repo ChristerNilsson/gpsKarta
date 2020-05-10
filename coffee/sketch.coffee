@@ -1,4 +1,4 @@
-VERSION = 85
+VERSION = 86
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -327,7 +327,7 @@ setup = ->
 		maximumAge: 30000
 		timeout: 27000
 
-	menuButton = new MenuButton width-90
+	menuButton = new MenuButton width-160
 
 	addEventListener 'touchstart', (evt) ->
 		touches = evt.changedTouches
