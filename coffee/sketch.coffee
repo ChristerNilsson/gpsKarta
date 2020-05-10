@@ -303,6 +303,26 @@ initSpeaker = (index=5) ->
 	track = []
 	dump.store "initSpeaker out"
 
+fraction = (x) -> x - int x 
+getMeters = (w,skala) ->
+	[lon0,lat0] = b2w.convert 0,height
+	[lon1,lat1] = b2w.convert w,height
+	p0 = LatLon lat0, lon0
+	p1 = LatLon lat1, lon1
+	distans = p0.distanceTo(p1) / skala
+	d = Math.log10 distans
+	fract = fraction d
+	for i in [1,2,5]
+		if 10**fract > i then n = i
+	[round(distans), n * 10**int d]
+
+test = ->
+	assert [1434,1000], getMeters 1920,1
+	assert [956,500], getMeters 1920,1.5
+	assert [638,500], getMeters 1920,1.5*1.5
+	assert [425,200], getMeters 1920,1.5*1.5*1.5
+	console.log "Ready!"
+
 setup = ->
 	canvas = createCanvas innerWidth-0.0, innerHeight #-0.5
 	canvas.position 0,0 # hides text field used for clipboard copy.
@@ -317,6 +337,8 @@ setup = ->
 	
 	b2w = new Converter data.bmp,data.wgs,6
 	w2b = new Converter data.wgs,data.bmp,0
+
+	test()
 
 	getControls()
 
@@ -335,6 +357,7 @@ setup = ->
 		mx = touch.pageX
 		my = touch.pageY
 		myMousePressed mx,my
+
 
 info = () ->
 	result = []
@@ -420,6 +443,22 @@ drawReferencePoints = ->
 		text i, data.bmp[2*i]-cx,1.5+data.bmp[2*i+1]-cy
 	pop()
 
+drawScale = ->
+	[w1,w0] = getMeters width, SCALE
+	d = (w1-w0)/2/w1 * width
+	x = d
+	y = height * 0.9
+	w = w0/w1 * width
+	h = 10
+	sc 0
+	sw 2
+	line x,y,x+w,y
+	textAlign CENTER,CENTER
+	sc()
+	fc 0
+	text 0,d,y-20
+	text w0,width-d,y-20
+
 draw = ->
 	bg 0,1,0
 	if state == 0 
@@ -452,6 +491,7 @@ draw = ->
 			text message, [margin,width/2,width-margin][i%3], [margin,height][i//3] 
 		showDialogue()
 		menuButton.draw()
+		drawScale()
 		return
 
 	if state == 2
@@ -612,3 +652,4 @@ touchEnded = (event) ->
 		if not dialogue.execute mouseX,mouseY then dialogues.pop()
 
 	false
+
