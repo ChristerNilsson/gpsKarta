@@ -1,4 +1,4 @@
-VERSION = 94
+VERSION = 95
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -296,7 +296,7 @@ initSpeaker = (index=5) ->
 	speaker.volume = 1
 	speaker.rate = 0.8
 	speaker.pitch = 0.8
-	speaker.text = ''
+	speaker.text = '' 
 	speaker.lang = 'sv-SE'
 	dialogues.clear()
 	say "Välkommen!"
@@ -312,9 +312,9 @@ getMeters = (w,skala) ->
 	distans = p0.distanceTo(p1) / skala
 	d = Math.log10 distans
 	fract = fraction d
-	return [425,200]
 	for i in [1,2,5]
 		if 10**fract > i then n = i
+	return [425,200]
 	[round(distans), n * 10**int d]
 
 test = ->
