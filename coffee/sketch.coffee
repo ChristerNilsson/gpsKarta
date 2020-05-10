@@ -1,4 +1,4 @@
-VERSION = 86
+VERSION = 87
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -594,25 +594,21 @@ touchStarted = (event) ->
 touchMoved = (event) ->
 	event.preventDefault()
 	if dialogues.length == 0 and state == 1
-		cx += startX - mouseX
-		cy += startY - mouseY
+		cx += (startX - mouseX)/SCALE
+		cy += (startY - mouseY)/SCALE
 		startX = mouseX
 		startY = mouseY
 	false
 
 touchEnded = (event) ->
-	if state == 0 
-		initSpeaker()
-		state = 1
-		return 
-	if state == 2 
-		dialogues.clear()
-		state = 1
-		return
 	event.preventDefault()
+	if state == 0 then initSpeaker()
+	if state == 2 then dialogues.clear()
+	if state in [0,2] then return state = 1
 	if menuButton.inside mouseX,mouseY then return menuButton.click()
-	if startX == mouseX and startY == mouseY
+
+	if dialogues.length > 0
 		dialogue = _.last dialogues
-		if dialogues.length == 0 or not dialogue.execute mouseX,mouseY
-			if dialogues.length > 0 then dialogues.pop()
+		if not dialogue.execute mouseX,mouseY then dialogues.pop()
+
 	false
