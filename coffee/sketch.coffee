@@ -338,7 +338,7 @@ setup = ->
 	b2w = new Converter data.bmp,data.wgs,6
 	w2b = new Converter data.wgs,data.bmp,0
 
-	test()
+	#test()
 
 	getControls()
 
@@ -491,7 +491,7 @@ draw = ->
 			text message, [margin,width/2,width-margin][i%3], [margin,height][i//3] 
 		showDialogue()
 		menuButton.draw()
-		#drawScale()
+		drawScale()
 		return
 
 	if state == 2
