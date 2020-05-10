@@ -317,11 +317,11 @@ getMeters = (w,skala) ->
 	#return [425,200]
 	[round(distans), n * 10**int d]
 
-myTest = ->
-	getMeters 1920,1 # Smäller här
-	getMeters 1920,1.5 # eller här. Android
-	getMeters 1920,1.5*1.5
-	getMeters 1920,1.5*1.5*1.5
+# myTest = ->
+# 	getMeters 1920,1 # Smäller här
+# 	getMeters 1920,1.5 # eller här. Android
+# 	getMeters 1920,1.5*1.5
+# 	getMeters 1920,1.5*1.5*1.5
 	# assert [1434,1000], getMeters 1920,1 # Smäller här
 	# assert [956,500], getMeters 1920,1.5 # eller här. Android
 	# assert [638,500], getMeters 1920,1.5*1.5
@@ -343,7 +343,7 @@ setup = ->
 	b2w = new Converter data.bmp,data.wgs,6
 	w2b = new Converter data.wgs,data.bmp,0
 
-	myTest()
+	# myTest() Do not execute! Very dependent on .json file.
 
 	getControls()
 
