@@ -1,4 +1,4 @@
-VERSION = 84
+VERSION = 85
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -25,7 +25,7 @@ trail = [	# insert bitmap points from mail here
 params = null
 recordingTrail = false
 
-state = 0 # 0=uninitialized 1=initialized
+state = 0 # 0=uninitialized 1=normal 2=info
 
 data = null
 img = null
@@ -33,7 +33,12 @@ img = null
 b2w = null
 w2b = null
 
+startX = 0
+startY = 0
+
 controls = {}
+
+menuButton = null 
 
 class Dump
 	constructor : ->
@@ -164,7 +169,6 @@ sayBearing = (a0,b0) -> # a is newer (degrees)
 	tiotal = DIGITS[a // 10]
 	ental = DIGITS[a %% 10]
 	"#{tiotal} #{ental}"
-	#console.log JSON.stringify voiceQueue
 
 increaseQueue = (p) ->
 	#dump.store "soundIndicator #{p.coords.latitude} #{p.coords.longitude}"
@@ -216,8 +220,6 @@ playSound = ->
 	else if soundQueue > 0 and soundUp != null
 		soundQueue--
 		soundUp.play()
-	#messages[4]	= soundQueue
-	if soundQueue==0 then xdraw()
 
 decreaseQueue = ->
 	if voiceQueue.length == 0 then return
@@ -302,7 +304,6 @@ initSpeaker = (index=5) ->
 	dump.store "initSpeaker out"
 
 setup = ->
-	#screen.orientation.lock "portrait"
 	canvas = createCanvas innerWidth-0.0, innerHeight #-0.5
 	canvas.position 0,0 # hides text field used for clipboard copy.
 
@@ -326,7 +327,7 @@ setup = ->
 		maximumAge: 30000
 		timeout: 27000
 
-	xdraw()
+	menuButton = new MenuButton width-90
 
 	addEventListener 'touchstart', (evt) ->
 		touches = evt.changedTouches
@@ -350,6 +351,8 @@ info = () ->
 
 drawInfo = ->
 	textAlign LEFT,CENTER
+	sc()
+	fc 0
 	for m,i in info()
 		text m,20,100*(i+1)
 
@@ -417,9 +420,7 @@ drawReferencePoints = ->
 		text i, data.bmp[2*i]-cx,1.5+data.bmp[2*i+1]-cy
 	pop()
 
-draw = -> xdraw()
-
-xdraw = ->
+draw = ->
 	bg 0,1,0
 	if state == 0 
 		textSize 200
@@ -450,6 +451,7 @@ xdraw = ->
 			textSize [100,50][i//3]
 			text message, [margin,width/2,width-margin][i%3], [margin,height][i//3] 
 		showDialogue()
+		menuButton.draw()
 		return
 
 	if state == 2
@@ -495,7 +497,6 @@ menu1 = -> # Main Menu
 	dialogue.add 'Center', ->
 		[cx,cy] = position
 		dialogues.clear()
-		xdraw()
 	dialogue.add 'Out', -> if SCALE > data.scale then SCALE /= 1.5
 	dialogue.add 'Take', -> menu4()
 	dialogue.add 'Goto Bike', -> setTarget 'bike'
@@ -541,7 +542,9 @@ menu6 = -> # More
 	dialogue.add 'Clear', ->
 		clearControls()
 		dialogues.clear()
-	dialogue.add 'Info', -> state = 2
+	dialogue.add 'Info', -> 
+		state = 2
+		dialogues.clear()
 	dialogue.clock()
 
 menu7 = -> # Sector
@@ -581,35 +584,35 @@ update = (littera,index=2) ->
 
 showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
 
-startX = 0
-startY = 0
-
 touchStarted = (event) ->
 	event.preventDefault()
 	startX = mouseX
 	startY = mouseY
-	if state == 0 then initSpeaker()
 	state = 1
 	false
 
 touchMoved = (event) ->
 	event.preventDefault()
-
-	cx += startX - mouseX
-	cy += startY - mouseY
-	startX = mouseX
-	startY = mouseY
+	if dialogues.length == 0 and state == 1
+		cx += startX - mouseX
+		cy += startY - mouseY
+		startX = mouseX
+		startY = mouseY
 	false
 
 touchEnded = (event) ->
-	console.log 'Ended'
+	if state == 0 
+		initSpeaker()
+		state = 1
+		return 
+	if state == 2 
+		dialogues.clear()
+		state = 1
+		return
 	event.preventDefault()
-	console.log startX,mouseX,startY, mouseY
+	if menuButton.inside mouseX,mouseY then return menuButton.click()
 	if startX == mouseX and startY == mouseY
-		if dialogues.length == 1 and dialogues[0].number == 0 then dialogues.pop() # dölj indikatorer
 		dialogue = _.last dialogues
 		if dialogues.length == 0 or not dialogue.execute mouseX,mouseY
-			if dialogues.length == 0 then menu1() else dialogues.pop()
-	# startX = 0
-	# startY = 0
+			if dialogues.length > 0 then dialogues.pop()
 	false

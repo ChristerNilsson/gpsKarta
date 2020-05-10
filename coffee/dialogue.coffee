@@ -132,3 +132,16 @@ class RectButton
 
 	inside : (mx,my) ->  @x < mx < @x+@w and @y < my < @y+@h
 	execute : -> if @active then @event()
+
+class MenuButton
+	constructor : (@x=20, @y=20, @w=70, @h=70) ->		
+	draw : ->
+		fill "#fff8"
+		sc 0
+		rect @x,@y,@w,@h
+		fill "#fff8"
+		rect @x+10,@y+10,@w-20,10
+		rect @x+10,@y+30,@w-20,10
+		rect @x+10,@y+50,@w-20,10
+	inside : (mx,my) -> @x < mx < @x+@w and @y < my < @y+@h
+	click : -> if dialogues.length == 0 then menu1() else dialogues.clear()
