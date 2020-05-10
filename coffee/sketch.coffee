@@ -1,4 +1,4 @@
-VERSION  = 99
+VERSION = 100
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -318,12 +318,15 @@ getMeters = (w,skala) ->
 	[round(distans), n * 10**int d]
 
 myTest = ->
-	assert [1434,1000], getMeters 1920,1
-	assert [956,500], getMeters 1920,1.5
-	return
-	assert [638,500], getMeters 1920,1.5*1.5
-	assert [425,200], getMeters 1920,1.5*1.5*1.5
-	console.log "Ready!"
+	getMeters 1920,1 # Smäller här
+	getMeters 1920,1.5 # eller här. Android
+	getMeters 1920,1.5*1.5
+	getMeters 1920,1.5*1.5*1.5
+	# assert [1434,1000], getMeters 1920,1 # Smäller här
+	# assert [956,500], getMeters 1920,1.5 # eller här. Android
+	# assert [638,500], getMeters 1920,1.5*1.5
+	# assert [425,200], getMeters 1920,1.5*1.5*1.5
+	#console.log "Ready!"
 
 setup = ->
 	canvas = createCanvas innerWidth-0.0, innerHeight #-0.5
