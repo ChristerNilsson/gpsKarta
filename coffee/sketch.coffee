@@ -1,4 +1,4 @@
-VERSION = 97
+VERSION = 98
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -339,7 +339,7 @@ setup = ->
 	b2w = new Converter data.bmp,data.wgs,6
 	w2b = new Converter data.wgs,data.bmp,0
 
-	#test()
+	test()
 
 	getControls()
 
