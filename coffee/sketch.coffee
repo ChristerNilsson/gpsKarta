@@ -1,4 +1,4 @@
-VERSION = 96 
+VERSION = 97
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -314,7 +314,7 @@ getMeters = (w,skala) ->
 	fract = fraction d
 	for i in [1,2,5]
 		if 10**fract > i then n = i
-	return [425,200]
+	#return [425,200]
 	[round(distans), n * 10**int d]
 
 test = ->
