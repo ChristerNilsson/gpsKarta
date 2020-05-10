@@ -1,4 +1,4 @@
-VERSION = 98
+VERSION  = 99
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -317,9 +317,10 @@ getMeters = (w,skala) ->
 	#return [425,200]
 	[round(distans), n * 10**int d]
 
-test = ->
+myTest = ->
 	assert [1434,1000], getMeters 1920,1
 	assert [956,500], getMeters 1920,1.5
+	return
 	assert [638,500], getMeters 1920,1.5*1.5
 	assert [425,200], getMeters 1920,1.5*1.5*1.5
 	console.log "Ready!"
@@ -339,7 +340,7 @@ setup = ->
 	b2w = new Converter data.bmp,data.wgs,6
 	w2b = new Converter data.wgs,data.bmp,0
 
-	test()
+	myTest()
 
 	getControls()
 
