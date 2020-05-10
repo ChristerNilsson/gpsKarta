@@ -498,11 +498,11 @@ menu1 = -> # Main Menu
 		[cx,cy] = position
 		dialogues.clear()
 	dialogue.add 'Out', -> if SCALE > data.scale then SCALE /= 1.5
-	dialogue.add 'Take', -> menu4()
+	dialogue.add 'Take...', -> menu4()
 	dialogue.add 'Goto Bike', -> setTarget 'bike'
-	dialogue.add 'More', -> menu6()
+	dialogue.add 'More...', -> menu6()
 	dialogue.add 'Store Bike', -> setBike()
-	dialogue.add 'Target', -> menu3()
+	dialogue.add 'Target...', -> menu3()
 	dialogue.add 'In', -> SCALE *= 1.5
 	dialogue.clock ' ',true
 	dialogue.textSize *= 1.5
