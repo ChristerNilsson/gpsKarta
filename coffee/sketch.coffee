@@ -61,7 +61,7 @@ clearControls = ->
 	initControls()
 	saveControls()
 
-targets = [] # [id, littera, distance]
+# targets = [] # [id, littera, distance]
 platform = null
 
 saveControls = -> localStorage['gpsKarta'+MAP] = JSON.stringify controls
@@ -81,14 +81,14 @@ initControls = ->
 	if currentControl != null
 		[gpsLat,gpsLon,z99,trgLat,trgLon] = controls[currentControl]
 
-makeTargets = ->
-	targets = []
-	c = LatLon gpsLat, gpsLon
-	for key,control of controls
-		[x,y,littera,lat,lon] = control
-		b = LatLon lat, lon
-		targets.push [key, littera, round b.distanceTo(c)]
-	targets
+# makeTargets = ->
+# 	targets = []
+# 	c = LatLon gpsLat, gpsLon
+# 	for key,control of controls
+# 		[x,y,littera,lat,lon] = control
+# 		b = LatLon lat, lon
+# 		targets.push [key, littera, round b.distanceTo(c)]
+# 	targets
 
 [cx,cy] = [0,0] # center (image coordinates)
 SCALE = 1
@@ -339,6 +339,7 @@ setup = ->
 	SCALE = data.scale
 
 	[cx,cy] = [img.width/2,img.height/2]
+	console.log 'cx,cy', [cx,cy]
 	
 	b2w = new Converter data.bmp,data.wgs,6
 	w2b = new Converter data.wgs,data.bmp,0
@@ -533,11 +534,21 @@ executeMail = -> # Sends the trail
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
 
-getBike = -> setTarget 'bike'
+#getBike = -> setTarget 'bike'
 
-setBike = ->
+# setBike = ->
+# 	[x,y] = w2b.convert gpsLon,gpsLat
+# 	controls.bike = [x,y,'',gpsLat,gpsLon]
+# 	dialogues.clear()
+
+savePosition = ->
 	[x,y] = w2b.convert gpsLon,gpsLat
-	controls.bike = [x,y,'',gpsLat,gpsLon]
+	date = new Date()
+	h = addZero date.getHours()
+	M = addZero date.getMinutes()
+	key = "#{h}:#{M}"
+	controls[key] = [x,y,'',gpsLat,gpsLon]
+	console.log controls
 	dialogues.clear()
 
 menu1 = -> # Main Menu
@@ -548,19 +559,20 @@ menu1 = -> # Main Menu
 	dialogue.add 'Out', -> if SCALE > data.scale then SCALE /= 1.5
 	dialogue.add 'Take...', -> menu4()
 	dialogue.add 'More...', -> menu6()
-	dialogue.add 'Target...', -> menu3()
+	#dialogue.add 'Target...', -> menu3()
+	dialogue.add 'Save', -> savePosition()
 	dialogue.add 'In', -> SCALE *= 1.5
 	dialogue.clock ' ',true
 	dialogue.textSize *= 1.5
 
-menu3 = -> # Target
-	dialogue = new Dialogue 0,0
-	targets = makeTargets()
-	lst = targets.slice()
-	lst = lst.sort (a,b) -> a[2] - b[2]
-	dialogue.list lst, 8, false, (arr) ->
-		if arr.length > 0 then setTarget arr[0]
-		dialogues.clear()
+# menu3 = -> # Target
+# 	dialogue = new Dialogue 0,0
+# 	targets = makeTargets()
+# 	lst = targets.slice()
+# 	lst = lst.sort (a,b) -> a[2] - b[2]
+# 	dialogue.list lst, 8, false, (arr) ->
+# 		if arr.length > 0 then setTarget arr[0]
+# 		dialogues.clear()
 
 menu4 = -> # Take
 	dialogue = new Dialogue()
@@ -581,7 +593,6 @@ menu5 = (letters) -> # ABCDE
 menu6 = -> # More
 	dialogue = new Dialogue()
 	dialogue.add 'Init', -> initSpeaker jcnindex++
-	dialogue.add 'Store Bike', -> setBike()
 	dialogue.add 'Mail...', ->
 		executeMail()
 		dialogues.clear()
@@ -592,7 +603,7 @@ menu6 = -> # More
 	dialogue.add 'Info...', -> 
 		state = 2
 		dialogues.clear()
-	dialogue.add 'Goto Bike', -> setTarget 'bike'
+	#dialogue.add 'Goto Bike', -> setTarget 'bike'
 	dialogue.clock()
 	dialogue.textSize *= 1.5
 
@@ -629,15 +640,30 @@ update = (littera,index=2) ->
 	saveControls()
 	dialogues.clear()
 	executeMail()
-	getBike()
+	# getBike()
 
 showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
+
+positionClicked = (xc,yc) -> # canvaskoordinater
+
+	# Fungerar! imagekoordinater
+	xi = cx + (xc - width/2) / SCALE
+	yi = cy + (yc - height/2) / SCALE
+
+	for key,control of controls
+		[x,y,z99,gpsLat,gpsLon] = control
+		console.log key,x,y, dist xi,yi,x,y  
+		if data.radius > dist xi,yi,x,y 
+			console.log 'setTarget',key
+			setTarget key 
+			return true
+	false 
 
 touchStarted = (event) ->
 	event.preventDefault()
 	startX = mouseX
 	startY = mouseY
-	state = 1
+	#state = 1
 	false
 
 touchMoved = (event) ->
@@ -653,12 +679,17 @@ touchEnded = (event) ->
 	event.preventDefault()
 	if state == 0 then initSpeaker()
 	if state == 2 then dialogues.clear()
-	if state in [0,2] then return state = 1
-	if menuButton.inside mouseX,mouseY then return menuButton.click()
+	if state in [0,2]
+		state = 1
+		return false
+	if menuButton.inside mouseX,mouseY
+		menuButton.click()
+		return false
 
 	if dialogues.length > 0
 		dialogue = _.last dialogues
 		if not dialogue.execute mouseX,mouseY then dialogues.pop()
+	else if state == 1 and startX == mouseX and startY == mouseY
+		positionClicked mouseX,mouseY
 
 	false
-
