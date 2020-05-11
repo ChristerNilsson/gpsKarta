@@ -1,11 +1,11 @@
-VERSION = 102
+VERSION = 102 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
 SECTOR = 10 # Bearing resolution in degrees
 MAP = null # json file
 DIGITS = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
-BR = '<br>'   
+BR = '<br>'
 
 # http://www.bvsok.se/Kartor/Skolkartor/
 # Högupplösta orienteringskartor: https://www.omaps.net
@@ -38,7 +38,7 @@ startY = 0
 
 controls = {}
 
-menuButton = null 
+menuButton = null
 
 class Dump
 	constructor : ->
