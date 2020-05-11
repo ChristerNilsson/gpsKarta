@@ -14,6 +14,7 @@ You see the map, controls and position all the time.
 The size of the controls are roughly 100 meter.
 
 * Center (centers your position)
+* In (Zooms in)
 * Out (Zooms out)
 * Take (marks a target with littera)
 	* ABCDE
@@ -21,7 +22,6 @@ The size of the controls are roughly 100 meter.
 	* KLMNO
 	* PQRST
 	* UVWXYZ
-* Goto Bike (sets target to starting position)
 * More	
 	* Init (initializes speaker)
 	* Mail (sends data in a mail)
@@ -29,9 +29,7 @@ The size of the controls are roughly 100 meter.
 		* Selects size of sector. 10-90 degrees.
 	* Clear
 	* Info
-* Store Bike (stores starting position)
-* Target (choose target)
-* In (Zooms in)
+* Save (stores one or many current positions with names hh:mm)
 
 Accuracy : Approx ten meters
 
@@ -49,22 +47,24 @@ Allow the app to work even if your phone is turned off
 * Unrestricted data access
 * Chrome On
 
+Reference points are stored under the names A,B and C. They are used for mapping between WGS and bitmap coordinates.
+
 ## How To
 
 * Connect your headphones.
-* Click on Speaker
-* Set Bike
-* Choose Target
+* Click on More... | Init
+* Save (saves starting position, e.g. a bike or a car)
+* Click on Target control
 * If you have a compass
 	* When the Bearing changes, turn your analog Compass house.
 	* "Bearing Two Seven" => 270 degrees = West
 	* Start walking in that direction.
-* Distances are read now and then as "Distance One Hundred" (meter)
+* Distances are read now and then as "One Hundred" (meter)
 * Every meter closer to the target can be heard as a coin drop.
 * Every meter lost to the target can be heard as a small explosion.
-* When distance is less than twenty meter, no Bearing is given. The Bearing is changing very often, when you are so close to the Target.
-* Click on take when you have found your target
-* Goto Bike
+* When distance is less than twenty meter, no Bearing is given. The Bearing is changing very often, when you are close to the Target.
+* Click on Take... when you have found your target
+* Click on the starting position to find your bike or car.
 
 ## Methods
 

@@ -1,4 +1,4 @@
-VERSION = 102 
+VERSION = 103
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -341,8 +341,12 @@ setup = ->
 	[cx,cy] = [img.width/2,img.height/2]
 	console.log 'cx,cy', [cx,cy]
 	
-	b2w = new Converter data.bmp,data.wgs,6
-	w2b = new Converter data.wgs,data.bmp,0
+	dcs = data.controls
+	bmp = [dcs.A[0], dcs.A[1], dcs.B[0], dcs.B[1], dcs.C[0],dcs.C[1]]
+	console.log 'bmp',bmp
+
+	b2w = new Converter bmp,data.wgs,6
+	w2b = new Converter data.wgs,bmp,0
 
 	# myTest() Do not execute! Very dependent on .json file.
 
@@ -432,22 +436,22 @@ drawControl = ->
 	fc 0,0,0,0.25
 	circle x-cx, y-cy, data.radius
 
-drawReferencePoints = ->
-	push()
-	textAlign CENTER,CENTER
-	textSize 20
-	for i in range 3
-		p = w2b.convert data.wgs[2*i], data.wgs[2*i+1]
-		sw 1
-		fc()
-		sc 0
-		circle data.bmp[2*i]-cx,data.bmp[2*i+1]-cy,9
-		circle p[0]-cx, p[1]-cy, 12
-		sw 2
-		fc 0
-		sc()
-		text i, data.bmp[2*i]-cx,1.5+data.bmp[2*i+1]-cy
-	pop()
+# drawReferencePoints = ->
+# 	push()
+# 	textAlign CENTER,CENTER
+# 	textSize 20
+# 	for i in range 3
+# 		p = w2b.convert data.wgs[2*i], data.wgs[2*i+1]
+# 		sw 1
+# 		fc()
+# 		sc 0
+# 		circle data.bmp[2*i]-cx,data.bmp[2*i+1]-cy,9
+# 		circle p[0]-cx, p[1]-cy, 12
+# 		sw 2
+# 		fc 0
+# 		sc()
+# 		text i, data.bmp[2*i]-cx,1.5+data.bmp[2*i+1]-cy
+# 	pop()
 
 drawScale = ->
 	[w1,w0] = getMeters width, SCALE
@@ -483,7 +487,7 @@ draw = ->
 		translate width/2, height/2
 		scale SCALE
 		image img, -cx,-cy
-		drawReferencePoints()
+		#drawReferencePoints()
 		drawTrail()
 		drawTrack()
 		if data.drawControls then drawControls()
