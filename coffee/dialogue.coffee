@@ -143,6 +143,7 @@ class MenuButton
 	draw : ->
 		fill "#fff8"
 		sc 0
+		sw 1
 		rect @x,@y,@w,@h
 		fill "#0008"
 		rect @x+@d,@y+1*@d,@w-2*@d,@d

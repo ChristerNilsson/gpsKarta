@@ -1,4 +1,4 @@
-VERSION = 101
+VERSION = 102
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -458,11 +458,14 @@ drawScale = ->
 	sc 0
 	sw 2
 	line x,y,x+w,y
+	line x,y,x,y-10
+	line x+w,y,x+w,y-10
+	textSize height/30
 	textAlign CENTER,CENTER
 	sc()
 	fc 0
-	text 0,d,y-20
-	text w0,width-d,y-20
+	#text 0,d,y-20
+	text w0+"m",width/2,y-20
 
 draw = ->
 	bg 0,1,0
@@ -544,9 +547,7 @@ menu1 = -> # Main Menu
 		dialogues.clear()
 	dialogue.add 'Out', -> if SCALE > data.scale then SCALE /= 1.5
 	dialogue.add 'Take...', -> menu4()
-	dialogue.add 'Goto Bike', -> setTarget 'bike'
 	dialogue.add 'More...', -> menu6()
-	dialogue.add 'Store Bike', -> setBike()
 	dialogue.add 'Target...', -> menu3()
 	dialogue.add 'In', -> SCALE *= 1.5
 	dialogue.clock ' ',true
@@ -580,17 +581,20 @@ menu5 = (letters) -> # ABCDE
 menu6 = -> # More
 	dialogue = new Dialogue()
 	dialogue.add 'Init', -> initSpeaker jcnindex++
-	dialogue.add 'Mail', ->
+	dialogue.add 'Store Bike', -> setBike()
+	dialogue.add 'Mail...', ->
 		executeMail()
 		dialogues.clear()
-	dialogue.add 'Sector', -> menu7()
+	dialogue.add 'Sector...', -> menu7()
 	dialogue.add 'Clear', ->
 		clearControls()
 		dialogues.clear()
-	dialogue.add 'Info', -> 
+	dialogue.add 'Info...', -> 
 		state = 2
 		dialogues.clear()
+	dialogue.add 'Goto Bike', -> setTarget 'bike'
 	dialogue.clock()
+	dialogue.textSize *= 1.5
 
 menu7 = -> # Sector
 	dialogue = new Dialogue()
