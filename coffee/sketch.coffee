@@ -3,9 +3,8 @@ DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
 SECTOR = 10 # Bearing resolution in degrees
-#MAP = null # json file
 DIGITS = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
-BR = '<br>'
+BR = '<br>' 
 
 # http://www.bvsok.se/Kartor/Skolkartor/
 # Högupplösta orienteringskartor: https://www.omaps.net
@@ -39,14 +38,7 @@ class Storage
 				obj = JSON.parse localStorage[key]
 				@controls = obj.controls
 				@trail = obj.trail
-				#@mapName = obj.mapName
-				console.log 'controls read from localStorage'
-			catch
-				@clear()
-		else
-			@clear()
-			console.log 'controls read from json file'
-		console.log 'Storage',@
+		@clear()
 
 	save : -> localStorage['gpsKarta' + @mapName] = JSON.stringify @
 
@@ -57,7 +49,6 @@ class Storage
 		[trgLat,trgLon] = [0,0]
 		currentControl = null
 		@save()
-		console.log 'clear',@
 
 	init : ->
 		for key,control of @controls
@@ -490,9 +481,7 @@ draw = ->
 		sc 1,1,0
 		sw 3
 		margin = 25
-		#console.log messages
 		for message,i in messages
-			#console.log message,i
 			textAlign [LEFT,CENTER,RIGHT][i%3], [TOP,BOTTOM][i//3]
 			textSize [100,50][i//3]
 			text message, [margin,width/2,width-margin][i%3], [margin,height][i//3] 
@@ -635,17 +624,13 @@ showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
 
 positionClicked = (xc,yc) -> # canvas koordinater
 
-	# image koordinater
-	xi = cx + (xc - width/2) / SCALE
+	xi = cx + (xc - width/2) / SCALE  	# image koordinater
 	yi = cy + (yc - height/2) / SCALE
-
-	console.log storage.controls
 
 	for key,control of storage.controls
 		if control == null then continue
 		[x,y,z99,z99,z99] = control
 		if data.radius > dist xi,yi,x,y 
-			console.log key
 			setTarget key 
 			return true
 	false 
@@ -654,7 +639,6 @@ touchStarted = (event) ->
 	event.preventDefault()
 	startX = mouseX
 	startY = mouseY
-	#state = 1
 	false
 
 touchMoved = (event) ->
