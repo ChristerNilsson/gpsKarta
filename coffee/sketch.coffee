@@ -1,4 +1,4 @@
-VERSION = 110
+VERSION = 111
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -74,6 +74,8 @@ class Storage
 			delete @controls[currentControl]
 			@save()
 			currentControl = null
+		else
+			voiceQueue.push "computer says no"
 
 storage = null
 
