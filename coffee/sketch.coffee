@@ -1,4 +1,4 @@
-VERSION = 108 
+VERSION = 109
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -70,8 +70,18 @@ class Storage
 				[z99,z99,z99,trgLat,trgLon] = @controls[currentControl]
 
 	deleteControl : ->
-		console.log 'deleteControl',currentControl
-		@controls[currentControl] = null
+		console.log 'currentControl',currentControl
+		#@controls = (control for key,control of @controls when key != currentControl)
+		delete @controls[currentControl]
+		#@controls = _.omit @controls, currentControl
+
+		# result = {}
+		# for key,control of @controls
+		# 	if key!=currentControl then result[key] = control
+		# @controls = result
+
+		for key,control of @controls
+			console.log 'deleteControl',key,control
 		@save()
 		currentControl = null
 
@@ -264,13 +274,13 @@ updateTrack = (timestamp, pLat, pLon) ->
 	d.setTime timestamp
 	dump.store ""
 	dump.store "LU #{d.toLocaleString 'SWE'} #{pLat} #{pLon}"
-	if gpsLat != 0
-		position = w2b.convert pLon,pLat
-		track.push position
-		if track.length > TRACKED then track.shift()
-		t = _.last track
-		dump.store "T #{t[0]} #{t[1]}"
-		messages[4] = pLat + ' ' + pLon
+	#if gpsLat != 0
+	position = w2b.convert pLon,pLat
+	track.push position
+	if track.length > TRACKED then track.shift()
+	t = _.last track
+	dump.store "T #{t[0]} #{t[1]}"
+	messages[4] = pLat + ' ' + pLon
 
 updateTrail = ->
 	if storage.trail.length == 0
@@ -280,7 +290,7 @@ updateTrail = ->
 		[x2,y2] = position
 		if 12 < dist x1,y1,x2,y2 then storage.trail.push position
 
-locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['Check location permissions']
+locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
 
 initSpeaker = (index=5) ->
 	dump.store "initSpeaker in #{index}"
@@ -432,7 +442,7 @@ drawControl = ->
 
 	bearing = latLon1.bearingTo latLon2
 	messages[0] = "#{int bearing}º"
-	messages[1] = currentControl
+	messages[1] = currentControl || ""
 	messages[2] = "#{round(latLon1.distanceTo latLon2)} m"
 
 	if currentControl 
@@ -489,7 +499,9 @@ draw = ->
 		sc 1,1,0
 		sw 3
 		margin = 25
+		#console.log messages
 		for message,i in messages
+			#console.log message,i
 			textAlign [LEFT,CENTER,RIGHT][i%3], [TOP,BOTTOM][i//3]
 			textSize [100,50][i//3]
 			text message, [margin,width/2,width-margin][i%3], [margin,height][i//3] 
@@ -579,7 +591,9 @@ menu6 = -> # More
 		executeMail()
 		dialogues.clear()
 	dialogue.add 'Sector...', -> menu7()
-	dialogue.add 'Delete', -> storage.deleteControl()
+	dialogue.add 'Delete', ->
+		storage.deleteControl()
+		dialogues.clear()
 	dialogue.add 'Clear', ->
 		storage.clear()
 		dialogues.clear()
