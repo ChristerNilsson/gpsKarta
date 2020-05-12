@@ -1,4 +1,4 @@
-VERSION = 107
+VERSION = 108 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -34,13 +34,12 @@ currentControl = null
 class Storage 
 	constructor : (@mapName) ->
 		key = 'gpsKarta' + @mapName
-		@trail = []
 		if localStorage[key]
 			try
 				obj = JSON.parse localStorage[key]
 				@controls = obj.controls
 				@trail = obj.trail
-				@mapName = obj.mapName
+				#@mapName = obj.mapName
 				console.log 'controls read from localStorage'
 			catch
 				@clear()
