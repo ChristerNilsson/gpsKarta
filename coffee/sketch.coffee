@@ -1,4 +1,4 @@
-VERSION = 111
+VERSION = 112
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -233,9 +233,8 @@ decreaseQueue = ->
 		bearingSaid = arr[2] + ' ' + arr[3]
 		distanceSaid = arr[4]
 		say msg
-	else if arr[0] == 'sparade'
+	else 
 		say msg
-
 
 locationUpdate = (p) ->
 	pLat = myRound p.coords.latitude,6
