@@ -1,4 +1,4 @@
-VERSION = 103
+VERSION = 104
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -240,6 +240,9 @@ decreaseQueue = ->
 		bearingSaid = arr[2] + ' ' + arr[3]
 		distanceSaid = arr[4]
 		say msg
+	else if arr[0] == 'saved'
+		say msg
+
 
 locationUpdate = (p) ->
 	pLat = myRound p.coords.latitude,6
@@ -339,11 +342,9 @@ setup = ->
 	SCALE = data.scale
 
 	[cx,cy] = [img.width/2,img.height/2]
-	console.log 'cx,cy', [cx,cy]
 	
 	dcs = data.controls
-	bmp = [dcs.A[0], dcs.A[1], dcs.B[0], dcs.B[1], dcs.C[0],dcs.C[1]]
-	console.log 'bmp',bmp
+	bmp = [dcs.A[0], dcs.A[1], dcs.B[0], dcs.B[1], dcs.C[0], dcs.C[1]]
 
 	b2w = new Converter bmp,data.wgs,6
 	w2b = new Converter data.wgs,bmp,0
@@ -552,7 +553,7 @@ savePosition = ->
 	M = addZero date.getMinutes()
 	key = "#{h}:#{M}"
 	controls[key] = [x,y,'',gpsLat,gpsLon]
-	console.log controls
+	voiceQueue.push "saved #{key}"
 	dialogues.clear()
 
 menu1 = -> # Main Menu
@@ -656,9 +657,7 @@ positionClicked = (xc,yc) -> # canvaskoordinater
 
 	for key,control of controls
 		[x,y,z99,gpsLat,gpsLon] = control
-		console.log key,x,y, dist xi,yi,x,y  
 		if data.radius > dist xi,yi,x,y 
-			console.log 'setTarget',key
 			setTarget key 
 			return true
 	false 
