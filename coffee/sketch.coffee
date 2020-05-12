@@ -1,4 +1,4 @@
-VERSION = 109
+VERSION = 110
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -70,21 +70,10 @@ class Storage
 				[z99,z99,z99,trgLat,trgLon] = @controls[currentControl]
 
 	deleteControl : ->
-		console.log 'currentControl',currentControl
-		#@controls = (control for key,control of @controls when key != currentControl)
-		delete @controls[currentControl]
-		#@controls = _.omit @controls, currentControl
-
-		# result = {}
-		# for key,control of @controls
-		# 	if key!=currentControl then result[key] = control
-		# @controls = result
-
-		for key,control of @controls
-			console.log 'deleteControl',key,control
-		@save()
-		currentControl = null
-
+		if ':' in currentControl
+			delete @controls[currentControl]
+			@save()
+			currentControl = null
 
 storage = null
 
@@ -515,18 +504,22 @@ draw = ->
 		return
 
 setTarget = (key) ->
-	console.log 'setTarget',key
-	if key not of storage.controls then return
-	if storage.controls[currentControl] == null then return
-	storage.trail = []
-	soundQueue = 0
-	currentControl = key
-	control = storage.controls[currentControl]
-	x = control[0]
-	y = control[1]
-	[trgLon,trgLat] = b2w.convert x,y
-	console.log trgLon,trgLat
-	firstInfo key
+	if key == currentControl 
+		currentControl = null
+		messages[0] = ""
+		messages[1] = ""
+		messages[2] = ""
+		[trgLon,trgLat] = [0,0]
+	else
+		if key not of storage.controls then return
+		if storage.controls[currentControl] == null then return
+		soundQueue = 0
+		currentControl = key
+		control = storage.controls[currentControl]
+		x = control[0]
+		y = control[1]
+		[trgLon,trgLat] = b2w.convert x,y
+		firstInfo key
 	storage.save()
 	dialogues.clear()
 
