@@ -1,4 +1,4 @@
-VERSION = 104
+VERSION = 105
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -28,17 +28,55 @@ recordingTrail = false
 state = 0 # 0=uninitialized 1=normal 2=info
 
 data = null
+
 img = null
 
 b2w = null
 w2b = null
 
-startX = 0
+startX = 0 
 startY = 0
 
-controls = {}
-
 menuButton = null
+
+class Storage 
+	constructor : (@map) ->
+		@key = 'gpsKarta' + @map
+		if localStorage[@key]
+			@controls = JSON.parse localStorage[@key]
+			console.log 'controls read from localStorage'
+		else
+			@clear()
+			console.log 'controls read from json file'
+		console.log 'Storage',@controls
+
+	save : -> localStorage[@key] = JSON.stringify @controls
+
+	# get : ->
+	# 	try
+	# 		@controls = JSON.parse localStorage[@key]
+	# 	catch
+	# 		@clear()
+
+	clear : ->
+		@controls = data.controls
+		@init()
+		[trgLat,trgLon] = [0,0]
+		currentControl = null
+		@save()
+		console.log 'clear',@controls
+
+	init : ->
+		for key,control of @controls
+			[x,y,littera] = control
+			[lon,lat] = b2w.convert x,y
+			control[2] = ""
+			control[3] = lat
+			control[4] = lon
+			if currentControl != null
+				[z99,z99,z99,trgLat,trgLon] = @controls[currentControl]
+
+storage = null
 
 class Dump
 	constructor : ->
@@ -54,41 +92,7 @@ class Dump
 		result + BR + BR
 dump = new Dump()
 
-clearControls = ->
-	controls = data.controls
-	[trgLat,trgLon] = [0,0]
-	currentControl = null
-	initControls()
-	saveControls()
-
-# targets = [] # [id, littera, distance]
 platform = null
-
-saveControls = -> localStorage['gpsKarta'+MAP] = JSON.stringify controls
-
-getControls = ->
-	try
-		controls = JSON.parse localStorage['gpsKarta'+MAP]
-	catch
-		clearControls()
-
-initControls = ->
-	for key,control of controls
-		[x,y,littera] = control
-		[lon,lat] = b2w.convert x,y
-		control[3] = lat
-		control[4] = lon
-	if currentControl != null
-		[gpsLat,gpsLon,z99,trgLat,trgLon] = controls[currentControl]
-
-# makeTargets = ->
-# 	targets = []
-# 	c = LatLon gpsLat, gpsLon
-# 	for key,control of controls
-# 		[x,y,littera,lat,lon] = control
-# 		b = LatLon lat, lon
-# 		targets.push [key, littera, round b.distanceTo(c)]
-# 	targets
 
 [cx,cy] = [0,0] # center (image coordinates)
 SCALE = 1
@@ -119,8 +123,6 @@ timeout = null
 voiceQueue = []
 bearingSaid = ''
 distanceSaid = ''
-
-released = true
 
 sendMail = (subject,body) ->
 	mail.href = encodeURI "mailto:#{data.mail}?subject=#{subject}&body=#{body}"
@@ -240,7 +242,7 @@ decreaseQueue = ->
 		bearingSaid = arr[2] + ' ' + arr[3]
 		distanceSaid = arr[4]
 		say msg
-	else if arr[0] == 'saved'
+	else if arr[0] == 'sparade'
 		say msg
 
 
@@ -351,8 +353,8 @@ setup = ->
 
 	# myTest() Do not execute! Very dependent on .json file.
 
-	getControls()
-
+	storage = new Storage MAP
+	
 	position = [img.width/2,img.height/2]
 
 	navigator.geolocation.watchPosition locationUpdate, locationUpdateFail,
@@ -405,17 +407,22 @@ drawTrail = ->
 		point x-cx, y-cy
 
 drawControls = ->
-	textAlign LEFT,TOP
 	textSize data.radius
 	sw 2
-	for key,control of data.controls
-		[x,y] = control
-		sc 0
+	for key,control of storage.controls
+		[x,y,littera] = control
+		col = "#000"
+		if key in "ABC" then col = "#0f0"
+		if ":" in key then col ="#f00"
+		stroke col
 		fc()
 		circle x-cx,y-cy,data.radius
 		sc()
 		fc 0
+		textAlign LEFT,TOP
 		text key,x-cx+0.7*data.radius,y-cy+0.7*data.radius
+		textAlign CENTER,CENTER
+		text littera,x-cx,y-cy
 
 drawControl = ->
 
@@ -429,30 +436,13 @@ drawControl = ->
 	messages[1] = currentControl
 	messages[2] = "#{round(latLon1.distanceTo latLon2)} m"
 
-	control = controls[currentControl]
+	control = storage.controls[currentControl]
 	x = control[0]
 	y = control[1]
 
 	sc()
 	fc 0,0,0,0.25
 	circle x-cx, y-cy, data.radius
-
-# drawReferencePoints = ->
-# 	push()
-# 	textAlign CENTER,CENTER
-# 	textSize 20
-# 	for i in range 3
-# 		p = w2b.convert data.wgs[2*i], data.wgs[2*i+1]
-# 		sw 1
-# 		fc()
-# 		sc 0
-# 		circle data.bmp[2*i]-cx,data.bmp[2*i+1]-cy,9
-# 		circle p[0]-cx, p[1]-cy, 12
-# 		sw 2
-# 		fc 0
-# 		sc()
-# 		text i, data.bmp[2*i]-cx,1.5+data.bmp[2*i+1]-cy
-# 	pop()
 
 drawScale = ->
 	[w1,w0] = getMeters width, SCALE
@@ -470,7 +460,6 @@ drawScale = ->
 	textAlign CENTER,CENTER
 	sc()
 	fc 0
-	#text 0,d,y-20
 	text w0+"m",width/2,y-20
 
 draw = ->
@@ -488,7 +477,6 @@ draw = ->
 		translate width/2, height/2
 		scale SCALE
 		image img, -cx,-cy
-		#drawReferencePoints()
 		drawTrail()
 		drawTrack()
 		if data.drawControls then drawControls()
@@ -513,23 +501,26 @@ draw = ->
 		return
 
 setTarget = (key) ->
-	if key not of controls then return
-	if controls[currentControl] == null then return
+	console.log 'setTarget',key
+	if key not of storage.controls then return
+	if storage.controls[currentControl] == null then return
 	trail = []
 	recordingTrail = true
 	soundQueue = 0
 	currentControl = key
-	control = controls[currentControl]
+	control = storage.controls[currentControl]
 	x = control[0]
 	y = control[1]
 	[trgLon,trgLat] = b2w.convert x,y
+	console.log trgLon,trgLat
 	firstInfo key
+	storage.save()
 	dialogues.clear()
 
 executeMail = -> # Sends the trail
 	r = info().join BR
 	if currentControl 
-		littera = controls[currentControl][2]
+		littera = storage.controls[currentControl][2]
 		arr = ("[#{x},#{y}]" for [x,y] in trail)
 		s = arr.join ","
 	else
@@ -539,21 +530,16 @@ executeMail = -> # Sends the trail
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
 
-#getBike = -> setTarget 'bike'
-
-# setBike = ->
-# 	[x,y] = w2b.convert gpsLon,gpsLat
-# 	controls.bike = [x,y,'',gpsLat,gpsLon]
-# 	dialogues.clear()
-
 savePosition = ->
 	[x,y] = w2b.convert gpsLon,gpsLat
 	date = new Date()
 	h = addZero date.getHours()
 	M = addZero date.getMinutes()
 	key = "#{h}:#{M}"
-	controls[key] = [x,y,'',gpsLat,gpsLon]
-	voiceQueue.push "saved #{key}"
+	storage.controls[key] = [x,y,'',gpsLat,gpsLon]
+	storage.save()
+	console.log key, storage.controls[key]
+	voiceQueue.push "sparade #{key}"
 	dialogues.clear()
 
 menu1 = -> # Main Menu
@@ -564,20 +550,10 @@ menu1 = -> # Main Menu
 	dialogue.add 'Out', -> if SCALE > data.scale then SCALE /= 1.5
 	dialogue.add 'Take...', -> menu4()
 	dialogue.add 'More...', -> menu6()
-	#dialogue.add 'Target...', -> menu3()
 	dialogue.add 'Save', -> savePosition()
 	dialogue.add 'In', -> SCALE *= 1.5
 	dialogue.clock ' ',true
 	dialogue.textSize *= 1.5
-
-# menu3 = -> # Target
-# 	dialogue = new Dialogue 0,0
-# 	targets = makeTargets()
-# 	lst = targets.slice()
-# 	lst = lst.sort (a,b) -> a[2] - b[2]
-# 	dialogue.list lst, 8, false, (arr) ->
-# 		if arr.length > 0 then setTarget arr[0]
-# 		dialogues.clear()
 
 menu4 = -> # Take
 	dialogue = new Dialogue()
@@ -603,12 +579,11 @@ menu6 = -> # More
 		dialogues.clear()
 	dialogue.add 'Sector...', -> menu7()
 	dialogue.add 'Clear', ->
-		clearControls()
+		storage.clear()
 		dialogues.clear()
 	dialogue.add 'Info...', -> 
 		state = 2
 		dialogues.clear()
-	#dialogue.add 'Goto Bike', -> setTarget 'bike'
 	dialogue.clock()
 	dialogue.textSize *= 1.5
 
@@ -639,13 +614,12 @@ stdDateTime = (date) ->
 
 update = (littera,index=2) ->
 	recordingTrail = false
-	control = controls[currentControl]
+	control = storage.controls[currentControl]
 	[x,y] = w2b.convert gpsLon, gpsLat
-	controls[currentControl][index] = littera
-	saveControls()
+	storage.controls[currentControl][index] = littera
+	storage.save()
 	dialogues.clear()
 	executeMail()
-	# getBike()
 
 showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
 
@@ -655,9 +629,12 @@ positionClicked = (xc,yc) -> # canvaskoordinater
 	xi = cx + (xc - width/2) / SCALE
 	yi = cy + (yc - height/2) / SCALE
 
-	for key,control of controls
-		[x,y,z99,gpsLat,gpsLon] = control
+	console.log storage.controls
+
+	for key,control of storage.controls
+		[x,y,z99,z99,z99] = control
 		if data.radius > dist xi,yi,x,y 
+			console.log key
 			setTarget key 
 			return true
 	false 
