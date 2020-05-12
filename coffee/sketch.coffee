@@ -1,4 +1,4 @@
-VERSION = 106
+VERSION = 107
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -36,11 +36,14 @@ class Storage
 		key = 'gpsKarta' + @mapName
 		@trail = []
 		if localStorage[key]
-			obj = JSON.parse localStorage[key]
-			@controls = obj.controls
-			@trail = obj.trail
-			@mapName = obj.mapName
-			console.log 'controls read from localStorage'
+			try
+				obj = JSON.parse localStorage[key]
+				@controls = obj.controls
+				@trail = obj.trail
+				@mapName = obj.mapName
+				console.log 'controls read from localStorage'
+			catch
+				@clear()
 		else
 			@clear()
 			console.log 'controls read from json file'
@@ -462,11 +465,14 @@ drawScale = ->
 draw = ->
 	bg 0,1,0
 	if state == 0 
-		textSize 200
+		textSize 100
 		textAlign CENTER,CENTER
-		text mapName, width/2,height/2-200
-		text VERSION, width/2,height/2
-		if dump.active then text 'debug',width/2,height/2+200
+		x = width/2
+		y = height/2
+		text mapName, x,y-100
+		text 'Version: '+VERSION, x,y
+		if dump.active then text 'debug',x,y+100
+		text "Click to continue!", x,y+200
 		return
 
 	if state == 1
