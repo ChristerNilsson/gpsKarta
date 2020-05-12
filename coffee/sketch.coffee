@@ -1,9 +1,9 @@
-VERSION = 105
+VERSION = 106
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
 SECTOR = 10 # Bearing resolution in degrees
-MAP = null # json file
+#MAP = null # json file
 DIGITS = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
 BR = '<br>'
 
@@ -13,17 +13,7 @@ BR = '<br>'
 
 DISTLIST = [0,2,4,6,8,10,12,14,16,18,20,30,40,50,60,70,80,90,100, 120,140,160,180,200,250,300,350,400,450,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000]
 
-trail = [	# insert bitmap points from mail here
-	# [840,957], [842,943], [844,931], [855,925], [851,913], [842,903], [834,893], [828,882], [832,870], [833,858], [827,847], [818,839], [807,832], [800,822], [794,811], [787,801], [779,792], [767,787], [767,774], [767,760], [762,747], [754,738], [754,725], [754,711], [757,699], [756,687], [754,674], [754,661], [759,650], [757,638], [753,626], [746,615], [741,604], [741,591], [739,578], [738,566], [737,554], [734,542], [724,533], [714,525], [703,520], [691,516], [684,506], [684,493], [675,485], [672,473], [676,461], [680,449], [683,437], [686,425], [691,413], [692,401], [693,389], # A
-	# [694,382], [699,371], [706,360], [714,351], [726,347], [737,340], [749,339], [763,339], [775,340], [787,336], [800,336], [812,335], [822,328], [828,317], [836,308], [848,304], [860,303], [867,293], [872,282], [873,270], [883,262], [896,257], [908,253], [920,251], [932,247], [938,236], [947,227], # B
-	# [946,224], [956,233], [967,238], [978,245], [988,252], [996,262], [1007,268], [1017,276], [1027,283], [1040,286], [1052,284], [1064,285], [1077,285], [1089,288], [1102,289], [1111,297], [1121,290], [1130,282], [1143,283], [1156,280], [1168,274], [1179,269], [1191,268], [1203,266], [1215,268], [1226,273], [1239,273], [1250,279], [1263,280], [1268,291], [1279,286], [1291,283], [1300,275], [1312,271], [1323,266], [1333,273], [1346,273], [1359,269], [1372,272], [1382,279], [1394,281], [1407,280], [1416,288], # C
-	# [1417,285], [1429,287], [1440,293], [1451,299], [1459,309], [1471,313], [1484,313], [1496,314], [1508,318], [1517,310], [1528,315], [1540,317], [1552,316], [1564,317], [1575,322], [1587,326], [1599,330], [1611,327], [1621,319], [1633,314], [1644,320], [1652,330], [1663,335], [1676,335], [1688,337], [1701,337], [1713,338], [1725,342], [1737,343], [1749,342], [1760,347], [1773,352], [1784,358], [1796,361], [1808,365], [1821,365], [1834,365], [1846,367], [1858,369], [1870,368], [1882,364], [1893,369], [1903,376], [1910,386], [1923,386], [1934,391], [1944,398], [1955,403], [1966,409], [1978,413], [1989,418], [2001,420], [2011,427], [2020,435], [2032,433], [2043,439] , # D
-	# [2063,437], [2067,449], [2070,462], [2071,474], [2078,484], [2077,496], [2071,508], [2076,519], [2078,532], [2081,544], [2083,556], [2085,568], [2084,580], [2084,594], [2087,606], [2088,618], [2092,630], [2089,642], [2076,643], [2079,655], [2083,667], [2085,679], [2077,688], [2066,693], [2057,701], [2050,711], [2047,723], [2048,736], [2047,748], [2044,760], [2036,769], [2034,781], [2029,792], [2025,804], [2023,816], [2020,829], [2016,841], [2014,853], [2009,865], [1997,870], [1988,878], [1984,890], [1977,901], [1974,914], [1967,925], [1964,938], [1961,950], [1956,962], [1948,971], [1936,976], [1923,980], [1915,989], [1908,999], [1896,1004], [1883,1002], [1870,1003], [1857,1006], [1850,1016], [1851,1028], [1844,1039], [1835,1048], [1836,1060] , # E
-	# [1845,1072], [1844,1085], [1842,1097], [1830,1103], [1820,1110], [1809,1117], [1798,1123], [1786,1125], [1774,1126], [1762,1125], [1750,1129], [1738,1134], [1726,1133], [1723,1145], [1712,1150], [1702,1158], [1692,1166], [1686,1177], [1675,1183], [1666,1192], [1654,1195], [1665,1201], [1660,1213], [1664,1225], [1668,1237], [1670,1249], [1660,1256], [1647,1256], [1635,1259], [1623,1263], [1611,1267], [1601,1274], [1588,1276], [1576,1273], [1565,1278], [1554,1283], [1542,1281] , # F
-	# [1533,1269], [1521,1272], [1513,1282], [1508,1294], [1508,1310], [1499,1318], [1488,1323], [1477,1329], [1466,1334], [1456,1342], [1449,1353], [1441,1363], [1429,1365], [1420,1373], [1407,1374], [1395,1377], [1382,1380], [1370,1374], [1361,1382], [1349,1385], [1336,1384], [1324,1389], [1312,1391], [1300,1393], [1288,1394], [1276,1393], [1267,1402], [1255,1398], [1247,1407], [1235,1412], [1229,1423], [1223,1435], [1222,1447], [1216,1458], [1211,1469], [1203,1479], [1205,1491], [1200,1502], [1192,1511], [1182,1519], [1171,1524], [1159,1519], [1149,1511], [1145,1498], [1138,1487], [1126,1483], [1114,1480], [1105,1472], [1094,1477], [1082,1481], [1074,1490] # G
-]
-params = null
-recordingTrail = false
+mapName = "" # t ex skarpnäck
 
 state = 0 # 0=uninitialized 1=normal 2=info
 
@@ -39,32 +29,33 @@ startY = 0
 
 menuButton = null
 
+currentControl = null
+
 class Storage 
-	constructor : (@map) ->
-		@key = 'gpsKarta' + @map
-		if localStorage[@key]
-			@controls = JSON.parse localStorage[@key]
+	constructor : (@mapName) ->
+		key = 'gpsKarta' + @mapName
+		@trail = []
+		if localStorage[key]
+			obj = JSON.parse localStorage[key]
+			@controls = obj.controls
+			@trail = obj.trail
+			@mapName = obj.mapName
 			console.log 'controls read from localStorage'
 		else
 			@clear()
 			console.log 'controls read from json file'
-		console.log 'Storage',@controls
+		console.log 'Storage',@
 
-	save : -> localStorage[@key] = JSON.stringify @controls
-
-	# get : ->
-	# 	try
-	# 		@controls = JSON.parse localStorage[@key]
-	# 	catch
-	# 		@clear()
+	save : -> localStorage['gpsKarta' + @mapName] = JSON.stringify @
 
 	clear : ->
 		@controls = data.controls
+		@trail = []
 		@init()
 		[trgLat,trgLon] = [0,0]
 		currentControl = null
 		@save()
-		console.log 'clear',@controls
+		console.log 'clear',@
 
 	init : ->
 		for key,control of @controls
@@ -75,6 +66,13 @@ class Storage
 			control[4] = lon
 			if currentControl != null
 				[z99,z99,z99,trgLat,trgLon] = @controls[currentControl]
+
+	deleteControl : ->
+		console.log 'deleteControl',currentControl
+		@controls[currentControl] = null
+		@save()
+		currentControl = null
+
 
 storage = null
 
@@ -115,7 +113,6 @@ gpsCount = 0
 [gpsLat,gpsLon] = [0,0] # avgör om muntlig information ska ges
 [trgLat,trgLon] = [0,0] # koordinater för valt target
 
-currentControl = null
 lastLocation = '' # används för att skippa lika koordinater
 
 timeout = null
@@ -140,8 +137,8 @@ say = (m) ->
 preload = ->
 	params = getParameters()
 	if params.debug then dump.active = params.debug == '1'
-	MAP = params.map || 'skarpnäck'
-	loadJSON "data/#{MAP}.json", (json) ->
+	mapName = params.map || 'skarpnäck'
+	loadJSON "data/#{mapName}.json", (json) ->
 		data = json
 		for key,control of data.controls
 			control.push ""
@@ -274,13 +271,12 @@ updateTrack = (timestamp, pLat, pLon) ->
 		messages[4] = pLat + ' ' + pLon
 
 updateTrail = ->
-	if recordingTrail
-		if trail.length == 0
-			trail.push position
-		else
-			[x1,y1] = _.last trail
-			[x2,y2] = position
-			if 12 < dist x1,y1,x2,y2 then trail.push position
+	if storage.trail.length == 0
+		storage.trail.push position
+	else
+		[x1,y1] = _.last storage.trail
+		[x2,y2] = position
+		if 12 < dist x1,y1,x2,y2 then storage.trail.push position
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['Check location permissions']
 
@@ -353,7 +349,7 @@ setup = ->
 
 	# myTest() Do not execute! Very dependent on .json file.
 
-	storage = new Storage MAP
+	storage = new Storage mapName
 	
 	position = [img.width/2,img.height/2]
 
@@ -374,15 +370,15 @@ setup = ->
 
 info = () ->
 	result = []
-	result.push "MAP #{MAP}"
-	result.push "VERSION #{VERSION}"
-	result.push "dump.active #{dump.active}"  
-	result.push "dump.data.length #{dump.data.length}"
-	result.push "trail.length #{trail.length}"
-	result.push "gpsCount #{gpsCount}"
-	result.push "SECTOR #{SECTOR}"
-	result.push "cx #{cx} cy #{cy}"
-	result.push "SCALE #{SCALE}"
+	result.push "MAP: #{mapName}"
+	result.push "VERSION: #{VERSION}"
+	result.push "dump.active: #{dump.active}"  
+	result.push "dump.data.length: #{dump.data.length}"
+	result.push "trail.length: #{storage.trail.length}"
+	result.push "gpsCount: #{gpsCount}"
+	result.push "SECTOR: #{SECTOR}"
+	result.push "cx cy: #{cx} #{cy}"
+	result.push "SCALE: #{SCALE}"
 	result
 
 drawInfo = ->
@@ -403,13 +399,14 @@ drawTrail = ->
 	fc()
 	sw 12
 	sc 1,0,0,0.5 # RED
-	for [x,y] in trail
+	for [x,y] in storage.trail
 		point x-cx, y-cy
 
 drawControls = ->
 	textSize data.radius
 	sw 2
 	for key,control of storage.controls
+		if control == null then continue
 		[x,y,littera] = control
 		col = "#000"
 		if key in "ABC" then col = "#0f0"
@@ -436,13 +433,13 @@ drawControl = ->
 	messages[1] = currentControl
 	messages[2] = "#{round(latLon1.distanceTo latLon2)} m"
 
-	control = storage.controls[currentControl]
-	x = control[0]
-	y = control[1]
-
-	sc()
-	fc 0,0,0,0.25
-	circle x-cx, y-cy, data.radius
+	if currentControl 
+		control = storage.controls[currentControl]
+		x = control[0]
+		y = control[1]
+		sc()
+		fc 0,0,0,0.25
+		circle x-cx, y-cy, data.radius
 
 drawScale = ->
 	[w1,w0] = getMeters width, SCALE
@@ -467,7 +464,7 @@ draw = ->
 	if state == 0 
 		textSize 200
 		textAlign CENTER,CENTER
-		text MAP, width/2,height/2-200
+		text mapName, width/2,height/2-200
 		text VERSION, width/2,height/2
 		if dump.active then text 'debug',width/2,height/2+200
 		return
@@ -504,8 +501,7 @@ setTarget = (key) ->
 	console.log 'setTarget',key
 	if key not of storage.controls then return
 	if storage.controls[currentControl] == null then return
-	trail = []
-	recordingTrail = true
+	storage.trail = []
 	soundQueue = 0
 	currentControl = key
 	control = storage.controls[currentControl]
@@ -521,11 +517,11 @@ executeMail = -> # Sends the trail
 	r = info().join BR
 	if currentControl 
 		littera = storage.controls[currentControl][2]
-		arr = ("[#{x},#{y}]" for [x,y] in trail)
+		arr = ("[#{x},#{y}]" for [x,y] in storage.trail)
 		s = arr.join ","
 	else
 		s = ""
-	sendMail "#{data.map} #{currentControl} #{littera}", r + BR + dump.get() + s
+	sendMail "#{data.mapName} #{currentControl} #{littera}", r + BR + dump.get() + s
 
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
@@ -578,6 +574,7 @@ menu6 = -> # More
 		executeMail()
 		dialogues.clear()
 	dialogue.add 'Sector...', -> menu7()
+	dialogue.add 'Delete', -> storage.deleteControl()
 	dialogue.add 'Clear', ->
 		storage.clear()
 		dialogues.clear()
@@ -613,7 +610,6 @@ stdDateTime = (date) ->
 	"#{y}-#{m}-#{d} #{h}:#{M}:#{s}"
 
 update = (littera,index=2) ->
-	recordingTrail = false
 	control = storage.controls[currentControl]
 	[x,y] = w2b.convert gpsLon, gpsLat
 	storage.controls[currentControl][index] = littera
@@ -623,15 +619,16 @@ update = (littera,index=2) ->
 
 showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
 
-positionClicked = (xc,yc) -> # canvaskoordinater
+positionClicked = (xc,yc) -> # canvas koordinater
 
-	# Fungerar! imagekoordinater
+	# image koordinater
 	xi = cx + (xc - width/2) / SCALE
 	yi = cy + (yc - height/2) / SCALE
 
 	console.log storage.controls
 
 	for key,control of storage.controls
+		if control == null then continue
 		[x,y,z99,z99,z99] = control
 		if data.radius > dist xi,yi,x,y 
 			console.log key
