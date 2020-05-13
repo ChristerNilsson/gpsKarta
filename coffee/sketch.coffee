@@ -1,10 +1,10 @@
-VERSION = 112
+VERSION = 113
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
 SECTOR = 10 # Bearing resolution in degrees
-DIGITS = 'nolla ett tvåa trea fyra femma sexa sju åtta nia'.split ' '
-BR = '<br>' 
+DIGITS = 'zero one two three four five six seven eight niner'.split ' '
+BR = '<br>'
 
 # http://www.bvsok.se/Kartor/Skolkartor/
 # Högupplösta orienteringskartor: https://www.omaps.net
@@ -13,6 +13,7 @@ BR = '<br>'
 DISTLIST = [0,2,4,6,8,10,12,14,16,18,20,30,40,50,60,70,80,90,100, 120,140,160,180,200,250,300,350,400,450,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000]
 
 mapName = "" # t ex skarpnäck
+params = null
 
 state = 0 # 0=uninitialized 1=normal 2=info
 
@@ -178,9 +179,9 @@ increaseQueue = (p) ->
 		bearingb = b.bearingTo c
 		if dista >= LIMIT
 			sBearing = sayBearing bearinga,bearingb
-			if sBearing != "" then voiceQueue.push "bäring #{sBearing}"
+			if sBearing != "" then voiceQueue.push "bearing #{sBearing}"
 		sDistance = sayDistance dista,distb
-		if sDistance != "" then voiceQueue.push "distans #{sDistance}"
+		if sDistance != "" then voiceQueue.push "distance #{sDistance}"
 
 	if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = myRound p.coords.latitude,6
@@ -219,17 +220,17 @@ decreaseQueue = ->
 	msg = voiceQueue.shift()
 	arr = msg.split ' ' 
 
-	if arr[0] == 'bäring'
+	if arr[0] == 'bearing'
 		msg = arr[1] + ' ' + arr[2] # skippa ordet. t ex 'bäring etta tvåa'
 		if bearingSaid != msg then say msg
 		bearingSaid = msg
-	else if arr[0] == 'distans'
+	else if arr[0] == 'distance'
 		msg = arr[1]                # skippa ordet. t ex 'distans 30'
 		if distanceSaid != msg then say msg
 		distanceSaid = msg
 	else if arr[0] == 'target'
 		# 'target 11. bäring etta tvåa. distans 250 meter'
-		msg = "#{arr[0]} #{arr[1]}. bäring #{arr[2]} #{arr[3]}. distans #{arr[4]} meter"
+		msg = "#{arr[0]} #{arr[1]}. bearing #{arr[2]} #{arr[3]}. distance #{arr[4]} meter"
 		bearingSaid = arr[2] + ' ' + arr[3]
 		distanceSaid = arr[4]
 		say msg
@@ -273,8 +274,9 @@ updateTrail = ->
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
 
-initSpeaker = (index=5) ->
-	dump.store "initSpeaker in #{index}"
+initSpeaker = ->
+	#index = params.speaker || 5
+	#dump.store "initSpeaker in #{index}"
 	soundUp = loadSound 'soundUp.wav'
 	soundDown = loadSound 'soundDown.wav'
 	soundUp.setVolume 0.1
@@ -284,17 +286,18 @@ initSpeaker = (index=5) ->
 	soundQueue = 0
 
 	speaker = new SpeechSynthesisUtterance()
-	voices = speechSynthesis.getVoices()
-	speaker.voice = voices[index]
+	#voices = speechSynthesis.getVoices()
+	#speaker.voice = voices[index]
 	speaker.voiceURI = "native"
 	speaker.volume = 1
 	speaker.rate = 0.8
 	speaker.pitch = 0.8
 	speaker.text = '' 
-	speaker.lang = 'sv-SE'
+	speaker.lang = 'en-GB'
 	dialogues.clear()
-	say "Välkommen!"
+	say "Welcome!"
 	track = []
+	console.log 'speaker',speaker
 	dump.store "initSpeaker out"
 
 fraction = (x) -> x - int x 
@@ -535,7 +538,7 @@ savePosition = ->
 	storage.controls[key] = [x,y,'',gpsLat,gpsLon]
 	storage.save()
 	console.log key, storage.controls[key]
-	voiceQueue.push "sparade #{key}"
+	voiceQueue.push "saved #{key}"
 	dialogues.clear()
 
 menu1 = -> # Main Menu
