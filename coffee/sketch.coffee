@@ -1,4 +1,4 @@
-VERSION = 118
+VERSION = 119
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -274,12 +274,12 @@ updateTrail = ->
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
 
-window.speechSynthesis.onvoiceschanged = (e) ->
-	voices = window.speechSynthesis.getVoices()
-	index = getParameters().speaker || 5
-	#console.log 'onvoiceschanged',voices.length,index,voices[index]
-	#console.log index
+# window.speechSynthesis.onvoiceschanged = (e) ->
+# 	voices = window.speechSynthesis.getVoices()
+# 	index = getParameters().speaker || 5
 
+initSpeaker = ->
+	#dump.store "initSpeaker in #{index}"
 	speaker = new SpeechSynthesisUtterance()
 	speaker.voiceURI = "native"
 	speaker.volume = 1
@@ -287,10 +287,8 @@ window.speechSynthesis.onvoiceschanged = (e) ->
 	speaker.pitch = 0
 	speaker.text = '' 
 	speaker.lang = 'en-GB'
-	if index <= voices.length-1 then speaker.voice = voices[index]
+	#if index <= voices.length-1 then speaker.voice = voices[index]
 
-initSpeaker = ->
-	#dump.store "initSpeaker in #{index}"
 	soundUp = loadSound 'soundUp.wav'
 	soundDown = loadSound 'soundDown.wav'
 	soundUp.setVolume 0.1
@@ -300,8 +298,8 @@ initSpeaker = ->
 	soundQueue = 0
 
 	dialogues.clear()
-#	say "Welcome!"
-	say "target 11. Bearing one three. Distance 350 meters"
+	say "Welcome!"
+	#say "target 11. Bearing one three. Distance 350 meters"
 	track = []
 	console.log 'speaker',speaker
 	dump.store "initSpeaker out"
@@ -401,7 +399,7 @@ drawTrail = ->
 	fc()
 	sw 12
 	sc 1,0,0,0.5 # RED
-	for [x,y] in storage.trail
+	for [x,y] in storage.trail 
 		point x-cx, y-cy
 
 drawControls = ->
@@ -410,9 +408,9 @@ drawControls = ->
 	for key,control of storage.controls
 		if control == null then continue
 		[x,y,littera] = control
-		col = "#000"
-		if key in "ABC" then col = "#0f0"
-		if ":" in key then col ="#f00"
+		col = "#0008"
+		if key in "ABC" then col = "#0f08"
+		if ":" in key then col ="#f008"
 		stroke col
 		fc()
 		circle x-cx,y-cy,data.radius
@@ -422,6 +420,10 @@ drawControls = ->
 		text key,x-cx+0.7*data.radius,y-cy+0.7*data.radius
 		textAlign CENTER,CENTER
 		text littera,x-cx,y-cy
+
+		stroke 0
+		sw 2
+		point x-cx, y-cy
 
 drawControl = ->
 
