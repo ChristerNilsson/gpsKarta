@@ -275,7 +275,8 @@ updateTrail = ->
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
 
 initSpeaker = ->
-	#index = params.speaker || 5
+	index = params.speaker || 5
+	console.log index
 	#dump.store "initSpeaker in #{index}"
 	soundUp = loadSound 'soundUp.wav'
 	soundDown = loadSound 'soundDown.wav'
@@ -286,8 +287,8 @@ initSpeaker = ->
 	soundQueue = 0
 
 	speaker = new SpeechSynthesisUtterance()
-	#voices = speechSynthesis.getVoices()
-	#speaker.voice = voices[index]
+	voices = speechSynthesis.getVoices()
+	speaker.voice = voices[index]
 	speaker.voiceURI = "native"
 	speaker.volume = 1
 	speaker.rate = 0.8
@@ -572,7 +573,7 @@ menu5 = (letters) -> # ABCDE
 
 menu6 = -> # More
 	dialogue = new Dialogue()
-	dialogue.add 'Init', -> initSpeaker jcnindex++
+	dialogue.add 'Init', -> initSpeaker() # jcnindex++
 	dialogue.add 'Mail...', ->
 		executeMail()
 		dialogues.clear()
