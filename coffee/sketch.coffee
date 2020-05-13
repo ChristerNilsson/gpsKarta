@@ -1,4 +1,4 @@
-VERSION = 115
+VERSION = 116 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -276,12 +276,12 @@ locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then me
 
 window.speechSynthesis.onvoiceschanged = (e) ->
 	voices = window.speechSynthesis.getVoices()
-	index = getParameters().speaker || 5
-	console.log 'onvoiceschanged',voices.length,index,voices[index]
-	console.log index
+	index = 5 #getParameters().speaker || 5
+	#console.log 'onvoiceschanged',voices.length,index,voices[index]
+	#console.log index
 
 	speaker = new SpeechSynthesisUtterance()
-	speaker.voice = voices[index]
+	#speaker.voice = voices[index]
 	speaker.voiceURI = "native"
 	speaker.volume = 1
 	speaker.rate = 1.0
