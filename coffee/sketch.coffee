@@ -1,4 +1,4 @@
-VERSION = 117
+VERSION = 118
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -281,13 +281,13 @@ window.speechSynthesis.onvoiceschanged = (e) ->
 	#console.log index
 
 	speaker = new SpeechSynthesisUtterance()
-	speaker.voice = voices[index]
 	speaker.voiceURI = "native"
 	speaker.volume = 1
 	speaker.rate = 1.0
 	speaker.pitch = 0
 	speaker.text = '' 
 	speaker.lang = 'en-GB'
+	if index <= voices.length-1 then speaker.voice = voices[index]
 
 initSpeaker = ->
 	#dump.store "initSpeaker in #{index}"
