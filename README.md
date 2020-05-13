@@ -80,3 +80,6 @@ Reference points are stored under the names A,B and C. They are used for mapping
 * localStorage lagras per domän, per inloggad
 * Konflikt om två olika enheter ändrar localStorage samtidigt.
 * Alternativ: lagra i Google Sheets?
+
+* Har ej lyckats ställa in rätt röst på iOS. getVoices? Allt annat tycks fungera. Röst 0 är obegriplig. 
+  * Borde vara 10 på iOS, 5 på Android.

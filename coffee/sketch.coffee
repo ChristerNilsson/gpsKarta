@@ -1,4 +1,4 @@
-VERSION = 119
+VERSION = 120
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -14,6 +14,7 @@ DISTLIST = [0,2,4,6,8,10,12,14,16,18,20,30,40,50,60,70,80,90,100, 120,140,160,18
 
 mapName = "" # t ex skarpnäck
 params = null
+voices = null
 
 state = 0 # 0=uninitialized 1=normal 2=info
 
@@ -274,12 +275,13 @@ updateTrail = ->
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
 
-# window.speechSynthesis.onvoiceschanged = (e) ->
-# 	voices = window.speechSynthesis.getVoices()
-# 	index = getParameters().speaker || 5
+window.speechSynthesis.onvoiceschanged = (e) ->
+	voices = window.speechSynthesis.getVoices()
+	console.log 'onvoiceschanged',voices.length
 
 initSpeaker = ->
 	#dump.store "initSpeaker in #{index}"
+	index = int getParameters().speaker || 5
 	speaker = new SpeechSynthesisUtterance()
 	speaker.voiceURI = "native"
 	speaker.volume = 1
@@ -287,7 +289,7 @@ initSpeaker = ->
 	speaker.pitch = 0
 	speaker.text = '' 
 	speaker.lang = 'en-GB'
-	#if index <= voices.length-1 then speaker.voice = voices[index]
+	if voices and index <= voices.length-1 then speaker.voice = voices[index]
 
 	soundUp = loadSound 'soundUp.wav'
 	soundDown = loadSound 'soundDown.wav'
@@ -421,7 +423,7 @@ drawControls = ->
 		textAlign CENTER,CENTER
 		text littera,x-cx,y-cy
 
-		stroke 0
+		stroke col
 		sw 2
 		point x-cx, y-cy
 
