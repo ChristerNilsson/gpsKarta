@@ -1,4 +1,4 @@
-VERSION = 114 
+VERSION = 115
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -274,9 +274,22 @@ updateTrail = ->
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
 
-initSpeaker = ->
-	index = params.speaker || 5
+window.speechSynthesis.onvoiceschanged = (e) ->
+	voices = window.speechSynthesis.getVoices()
+	index = getParameters().speaker || 5
+	console.log 'onvoiceschanged',voices.length,index,voices[index]
 	console.log index
+
+	speaker = new SpeechSynthesisUtterance()
+	speaker.voice = voices[index]
+	speaker.voiceURI = "native"
+	speaker.volume = 1
+	speaker.rate = 1.0
+	speaker.pitch = 0
+	speaker.text = '' 
+	speaker.lang = 'en-GB'
+
+initSpeaker = ->
 	#dump.store "initSpeaker in #{index}"
 	soundUp = loadSound 'soundUp.wav'
 	soundDown = loadSound 'soundDown.wav'
@@ -286,17 +299,9 @@ initSpeaker = ->
 	timeout = setInterval playSound, DELAY
 	soundQueue = 0
 
-	speaker = new SpeechSynthesisUtterance()
-	voices = speechSynthesis.getVoices()
-	speaker.voice = voices[index]
-	speaker.voiceURI = "native"
-	speaker.volume = 1
-	speaker.rate = 0.8
-	speaker.pitch = 0.8
-	speaker.text = '' 
-	speaker.lang = 'en-GB'
 	dialogues.clear()
-	say "Welcome!"
+#	say "Welcome!"
+	say "target 11. Bearing one three. Distance 350 meters"
 	track = []
 	console.log 'speaker',speaker
 	dump.store "initSpeaker out"
