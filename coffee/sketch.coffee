@@ -1,4 +1,4 @@
-VERSION = 126
+VERSION = 127
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -93,7 +93,7 @@ SCALE = 1
 
 gps = null
 TRACKED = 5 # circles shows the player's position
-position = null # gps position (pixels)
+position = null # gps position [lon,lat,alt,hhmmss]
 track = [] # five latest GPS positions (pixels)
 
 speaker = null
@@ -267,9 +267,9 @@ updateTrack = (pLat, pLon, altitude, timestamp) ->
 	dump.store ""
 	dump.store "LU #{hms} #{pLat} #{pLon}"
 	#if gpsLat != 0
-	position = w2b.convert pLon,pLat
-	position.push altitude
-	position.push hms
+	position = [pLon,pLat,altitude,hms] #w2b.convert pLon,pLat
+	#position.push altitude
+	#position.push hms
 	track.push position
 	if track.length > TRACKED then track.shift()
 	t = _.last track
@@ -366,7 +366,7 @@ setup = ->
 
 	storage = new Storage mapName
 	
-	position = [img.width/2,img.height/2]
+	[cx,cy] = [img.width/2,img.height/2]
 
 	navigator.geolocation.watchPosition locationUpdate, locationUpdateFail,
 		enableHighAccuracy: true
@@ -568,7 +568,7 @@ savePosition = ->
 menu1 = -> # Main Menu
 	dialogue = new Dialogue()
 	dialogue.add 'Center', ->
-		[cx,cy] = position
+		[cx,cy] = w2b.convert position[0],position[1] 
 		dialogues.clear()
 	dialogue.add 'Out', -> if SCALE > data.scale then SCALE /= 1.5
 	dialogue.add 'Take...', -> menu4()
