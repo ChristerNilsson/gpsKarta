@@ -1,4 +1,4 @@
-VERSION = 129
+VERSION = 130
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -106,7 +106,7 @@ messages = ['','','','','','']
 gpsCount = 0
 
 [gpsLat,gpsLon] = [0,0] # avgör om muntlig information ska ges
-[trgLat,trgLon] = [0,0] # koordinater för valt target
+[trgLat,trgLon] = [0,0] # koordinater för vald target
 
 lastLocation = '' # används för att skippa lika koordinater
 
@@ -243,6 +243,8 @@ decreaseQueue = ->
 locationUpdate = (p) ->
 	pLat = myRound p.coords.latitude,6
 	pLon = myRound p.coords.longitude,6
+	gpsLat = pLat
+	gpsLon = pLon
 	nextLocation = "#{pLat} #{pLon}"
 	gpsCount++
 	messages[5] = gpsCount
@@ -252,7 +254,6 @@ locationUpdate = (p) ->
 	altitude = int p.coords.altitude
 	updateTrack pLat, pLon, altitude, p.timestamp
 	increaseQueue p
-	#if currentControl == null then return
 	updateTrail()
 
 updateTrack = (pLat, pLon, altitude, timestamp) ->
@@ -273,21 +274,9 @@ updateTrack = (pLat, pLon, altitude, timestamp) ->
 	if altitude then messages[3] = altitude
 	messages[4] = pLat + ' ' + pLon
 
-updateTrail = ->
-	console.log 'updateTrail',position
-	#if storage.trail.length == 0
-		#storage.trail.push position
-	#else
-		#[x1,y1] = _.last storage.trail
-		#[x2,y2] = position
-		# if 12 < dist x1,y1,x2,y2 then storage.trail.push position
-	storage.trail.push position
-
+updateTrail = -> storage.trail.push position
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
-
-window.speechSynthesis.onvoiceschanged = (e) ->
-	voices = window.speechSynthesis.getVoices()
-	console.log 'onvoiceschanged',voices.length
+window.speechSynthesis.onvoiceschanged = -> voices = window.speechSynthesis.getVoices()
 
 initSpeaker = ->
 	#dump.store "initSpeaker in #{index}"
@@ -311,9 +300,7 @@ initSpeaker = ->
 
 	dialogues.clear()
 	say "Welcome!"
-	#say "target 11. Bearing one three. Distance 350 meters"
 	track = []
-	console.log 'speaker',speaker
 	dump.store "initSpeaker out"
 
 fraction = (x) -> x - int x 
@@ -327,7 +314,6 @@ getMeters = (w,skala) ->
 	fract = fraction d
 	for i in [1,2,5]
 		if 10**fract > i then n = i
-	#return [425,200]
 	[round(distans), n * 10**int d]
 
 # myTest = ->
@@ -440,19 +426,18 @@ drawControls = ->
 drawControl = ->
 
 	if trgLat == 0 and trgLon == 0 then return
+	
+	if gpsLat != 0 and gpsLon != 0
+		latLon2 = LatLon trgLat,trgLon
+		latLon1 = LatLon gpsLat,gpsLon
 
-	latLon2 = LatLon trgLat,trgLon
-	latLon1 = LatLon gpsLat,gpsLon
-
-	bearing = latLon1.bearingTo latLon2
-	messages[0] = "#{int bearing}º"
-	messages[1] = currentControl || ""
-	messages[2] = "#{round(latLon1.distanceTo latLon2)} m"
+		bearing = latLon1.bearingTo latLon2
+		messages[0] = currentControl || ""
+		messages[1] = "#{int bearing}º"
+		messages[2] = "#{round(latLon1.distanceTo latLon2)} m"
 
 	if currentControl 
 		[x,y] = storage.controls[currentControl]
-		#x = control[0]
-		#y = control[1]
 		sc()
 		fc 0,0,0,0.25
 		circle x-cx, y-cy, data.radius
@@ -517,7 +502,7 @@ draw = ->
 
 setTarget = (key) ->
 	soundQueue = 0
-	if key == currentControl 
+	if key == currentControl
 		currentControl = null
 		messages[0] = ""
 		messages[1] = ""
