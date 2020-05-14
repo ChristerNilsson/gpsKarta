@@ -521,7 +521,7 @@ setTarget = (key) ->
 
 executeMail = ->
 	r = info().join BR
-	arr = ("#{timestamp} #{x} #{y} #{altitude}" for [x,y,altitude,timestamp] in storage.trail)
+	arr = ("#{timestamp} #{latitude} #{longitude} #{altitude}" for [longitude,latitude,altitude,timestamp] in storage.trail)
 	s = arr.join BR
 	if currentControl
 		littera = storage.controls[currentControl][2]
