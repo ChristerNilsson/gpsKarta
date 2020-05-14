@@ -1,4 +1,4 @@
-VERSION = 122
+VERSION = 123
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -250,31 +250,34 @@ locationUpdate = (p) ->
 	decreaseQueue()
 	if nextLocation == lastLocation then return
 	lastLocation = nextLocation
-	updateTrack p.timestamp, pLat, pLon
+	updateTrack pLat, pLon, p.coords.altitude, p.timestamp
 	increaseQueue p
 	#if currentControl == null then return
 	updateTrail()
 
-updateTrack = (timestamp, pLat, pLon) ->
+updateTrack = (pLat, pLon, altitude, timestamp) ->
 	d = new Date()
 	d.setTime timestamp
 	dump.store ""
 	dump.store "LU #{d.toLocaleString 'SWE'} #{pLat} #{pLon}"
 	#if gpsLat != 0
 	position = w2b.convert pLon,pLat
+	position.push altitude
+	position.push d.toLocaleString 'SWE'
 	track.push position
 	if track.length > TRACKED then track.shift()
 	t = _.last track
 	dump.store "T #{t[0]} #{t[1]}"
-	messages[4] = pLat + ' ' + pLon
+	messages[4] = pLat + ' ' + pLon + ' ' + altitude
 
 updateTrail = ->
 	if storage.trail.length == 0
 		storage.trail.push position
 	else
-		[x1,y1] = _.last storage.trail
-		[x2,y2] = position
-		if 12 < dist x1,y1,x2,y2 then storage.trail.push position
+		#[x1,y1] = _.last storage.trail
+		#[x2,y2] = position
+		# if 12 < dist x1,y1,x2,y2 then storage.trail.push position
+		storage.trail.push position
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
 
@@ -534,11 +537,14 @@ executeMail = -> # Sends the trail
 	r = info().join BR
 	if currentControl 
 		littera = storage.controls[currentControl][2]
-		arr = ("[#{x},#{y}]" for [x,y] in storage.trail)
-		s = arr.join ","
+		arr = ("#{x},#{y},#{altitude},#{timestamp}" for [x,y,altitude,timestamp] in storage.trail)
+		s = arr.join BR
 	else
 		s = ""
-	sendMail "#{data.mapName} #{currentControl} #{littera}", r + BR + dump.get() + s
+	if currentControl
+		sendMail "#{data.mapName} #{currentControl} #{littera}", r + BR + dump.get() + s
+	else
+		sendMail "#{data.mapName}", r + BR + dump.get() + s
 
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
