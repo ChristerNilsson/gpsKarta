@@ -1,4 +1,4 @@
-VERSION = 128 
+VERSION = 129
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -92,16 +92,15 @@ platform = null
 SCALE = 1
 
 gps = null
-TRACKED = 5 # circles shows the player's position
+TRACKED = 5 # circles shows the user position
 position = null # gps position [lon,lat,alt,hhmmss]
-track = [] # five latest GPS positions (pixels)
+track = [] # five latest GPS positions (bitmap coordinates)
 
 speaker = null
 
 soundUp = null
 soundDown = null
 soundQueue = 0 # neg=minskat avstånd pos=ökat avstånd
-jcnindex = 0
 
 messages = ['','','','','','']
 gpsCount = 0
@@ -114,8 +113,8 @@ lastLocation = '' # används för att skippa lika koordinater
 timeout = null
 
 voiceQueue = []
-bearingSaid = ''
-distanceSaid = ''
+bearingSaid = '' # förhindrar upprepning
+distanceSaid = '' # förhindrar upprepning
 
 sendMail = (subject,body) ->
 	mail.href = encodeURI "mailto:#{data.mail}?subject=#{subject}&body=#{body}"
@@ -266,11 +265,8 @@ updateTrack = (pLat, pLon, altitude, timestamp) ->
 
 	dump.store ""
 	dump.store "LU #{hms} #{pLat} #{pLon}"
-	#if gpsLat != 0
-	position = [pLon,pLat,altitude,hms] #w2b.convert pLon,pLat
-	#position.push altitude
-	#position.push hms
-	track.push position
+	position = [pLon,pLat,altitude,hms] 
+	track.push w2b.convert pLon,pLat
 	if track.length > TRACKED then track.shift()
 	t = _.last track
 	dump.store "T #{t[0]} #{t[1]}"
@@ -533,8 +529,6 @@ setTarget = (key) ->
 		# soundQueue = 0
 		currentControl = key
 		[x,y] = storage.controls[currentControl]
-		#x = control[0]
-		#y = control[1]
 		[trgLon,trgLat] = b2w.convert x,y
 		firstInfo key
 	storage.save()
@@ -596,7 +590,7 @@ menu5 = (letters) -> # ABCDE
 
 menu6 = -> # More
 	dialogue = new Dialogue()
-	dialogue.add 'Init', -> initSpeaker() # jcnindex++
+	dialogue.add 'Init', -> initSpeaker()
 	dialogue.add 'Mail...', ->
 		executeMail()
 		dialogues.clear()
