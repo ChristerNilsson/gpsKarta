@@ -1,4 +1,4 @@
-VERSION = 121
+VERSION = 122
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -167,6 +167,9 @@ sayBearing = (a0,b0) -> # a is newer (degrees)
 
 increaseQueue = (p) ->
 	#dump.store "soundIndicator #{p.coords.latitude} #{p.coords.longitude}"
+
+	if currentControl == null then return 
+
 	a = LatLon p.coords.latitude,p.coords.longitude # newest
 	b = LatLon gpsLat, gpsLon
 	c = LatLon trgLat, trgLon # target
