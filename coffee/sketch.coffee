@@ -1,4 +1,4 @@
-VERSION = 123
+VERSION = 124
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -262,7 +262,7 @@ updateTrack = (pLat, pLon, altitude, timestamp) ->
 	dump.store "LU #{d.toLocaleString 'SWE'} #{pLat} #{pLon}"
 	#if gpsLat != 0
 	position = w2b.convert pLon,pLat
-	position.push altitude
+	position.push int altitude
 	position.push d.toLocaleString 'SWE'
 	track.push position
 	if track.length > TRACKED then track.shift()
@@ -533,15 +533,12 @@ setTarget = (key) ->
 	storage.save()
 	dialogues.clear()
 
-executeMail = -> # Sends the trail
+executeMail = ->
 	r = info().join BR
-	if currentControl 
-		littera = storage.controls[currentControl][2]
-		arr = ("#{x},#{y},#{altitude},#{timestamp}" for [x,y,altitude,timestamp] in storage.trail)
-		s = arr.join BR
-	else
-		s = ""
+	arr = ("#{x},#{y},#{altitude},#{timestamp}" for [x,y,altitude,timestamp] in storage.trail)
+	s = arr.join BR
 	if currentControl
+		littera = storage.controls[currentControl][2]
 		sendMail "#{data.mapName} #{currentControl} #{littera}", r + BR + dump.get() + s
 	else
 		sendMail "#{data.mapName}", r + BR + dump.get() + s
