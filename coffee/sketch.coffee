@@ -355,8 +355,8 @@ setup = ->
 	dcs = data.controls
 	bmp = [dcs.A[0], dcs.A[1], dcs.B[0], dcs.B[1], dcs.C[0], dcs.C[1]]
 
-	b2w = new Converter bmp,data.wgs,6
-	w2b = new Converter data.wgs,bmp,0
+	b2w = new Converter bmp,data.ABC,6
+	w2b = new Converter data.ABC,bmp,0
 
 	# myTest() Do not execute! Very dependent on .json file.
 
