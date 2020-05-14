@@ -1,4 +1,4 @@
-VERSION = 127
+VERSION = 128
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -354,7 +354,7 @@ setup = ->
 
 	SCALE = data.scale
 
-	[cx,cy] = [img.width/2,img.height/2]
+	# [cx,cy] = [img.width/2,img.height/2]
 	
 	dcs = data.controls
 	bmp = [dcs.A[0], dcs.A[1], dcs.B[0], dcs.B[1], dcs.C[0], dcs.C[1]]
@@ -392,7 +392,7 @@ info = () ->
 	result.push "trail.length: #{storage.trail.length}"
 	result.push "gpsCount: #{gpsCount}"
 	result.push "SECTOR: #{SECTOR}"
-	result.push "cx cy: #{cx} #{cy}"
+	result.push "cx cy: #{round cx} #{round cy}"
 	result.push "SCALE: #{SCALE}"
 	result
 
