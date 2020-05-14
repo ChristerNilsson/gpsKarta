@@ -1,4 +1,4 @@
-VERSION = 125
+VERSION = 126
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -257,8 +257,8 @@ locationUpdate = (p) ->
 	updateTrail()
 
 updateTrack = (pLat, pLon, altitude, timestamp) ->
-	d = new Date()
-	d.setTime timestamp
+	date = new Date()
+	date.setTime timestamp
 	h = addZero date.getHours()
 	M = addZero date.getMinutes()
 	s = addZero date.getSeconds()
@@ -277,6 +277,7 @@ updateTrack = (pLat, pLon, altitude, timestamp) ->
 	messages[4] = pLat + ' ' + pLon + ' ' + altitude
 
 updateTrail = ->
+	console.log 'updateTrail',position
 	#if storage.trail.length == 0
 		#storage.trail.push position
 	#else
@@ -541,7 +542,7 @@ setTarget = (key) ->
 
 executeMail = ->
 	r = info().join BR
-	arr = ("#{x},#{y},#{altitude},#{timestamp}" for [x,y,altitude,timestamp] in storage.trail)
+	arr = ("#{timestamp} #{x} #{y} #{altitude}" for [x,y,altitude,timestamp] in storage.trail)
 	s = arr.join BR
 	if currentControl
 		littera = storage.controls[currentControl][2]
