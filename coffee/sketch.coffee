@@ -1,4 +1,4 @@
-VERSION = 120
+VERSION = 121
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -440,9 +440,9 @@ drawControl = ->
 	messages[2] = "#{round(latLon1.distanceTo latLon2)} m"
 
 	if currentControl 
-		control = storage.controls[currentControl]
-		x = control[0]
-		y = control[1]
+		[x,y] = storage.controls[currentControl]
+		#x = control[0]
+		#y = control[1]
 		sc()
 		fc 0,0,0,0.25
 		circle x-cx, y-cy, data.radius
@@ -507,6 +507,7 @@ draw = ->
 		return
 
 setTarget = (key) ->
+	soundQueue = 0
 	if key == currentControl 
 		currentControl = null
 		messages[0] = ""
@@ -516,11 +517,11 @@ setTarget = (key) ->
 	else
 		if key not of storage.controls then return
 		if storage.controls[currentControl] == null then return
-		soundQueue = 0
+		# soundQueue = 0
 		currentControl = key
-		control = storage.controls[currentControl]
-		x = control[0]
-		y = control[1]
+		[x,y] = storage.controls[currentControl]
+		#x = control[0]
+		#y = control[1]
 		[trgLon,trgLat] = b2w.convert x,y
 		firstInfo key
 	storage.save()
@@ -626,8 +627,8 @@ stdDateTime = (date) ->
 
 update = (littera,index=2) ->
 	control = storage.controls[currentControl]
-	[x,y] = w2b.convert gpsLon, gpsLat
-	storage.controls[currentControl][index] = littera
+	#[x,y] = w2b.convert gpsLon, gpsLat
+	control[index] = littera
 	storage.save()
 	dialogues.clear()
 	executeMail()
