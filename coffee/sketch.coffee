@@ -233,7 +233,7 @@ decreaseQueue = ->
 		distanceSaid = msg
 	else if arr[0] == 'target'
 		# 'target 11. bäring etta tvåa. distans 250 meter'
-		msg = "#{arr[0]} #{arr[1]}. bearing #{arr[2]} #{arr[3]}. distance #{arr[4]} meter"
+		msg = "#{arr[0]} #{arr[1]}. bearing #{arr[2]} #{arr[3]}. distance #{arr[4]} meters"
 		bearingSaid = arr[2] + ' ' + arr[3]
 		distanceSaid = arr[4]
 		say msg
@@ -270,7 +270,8 @@ updateTrack = (pLat, pLon, altitude, timestamp) ->
 	if track.length > TRACKED then track.shift()
 	t = _.last track
 	dump.store "T #{t[0]} #{t[1]}"
-	messages[4] = pLat + ' ' + pLon + ' ' + altitude
+	if altitude then messages[3] = altitude
+	messages[4] = pLat + ' ' + pLon
 
 updateTrail = ->
 	console.log 'updateTrail',position
@@ -456,23 +457,22 @@ drawControl = ->
 		fc 0,0,0,0.25
 		circle x-cx, y-cy, data.radius
 
-drawScale = ->
+drawRuler = ->
 	[w1,w0] = getMeters width, SCALE
 	d = (w1-w0)/2/w1 * width
 	x = d
 	y = height * 0.9
 	w = w0/w1 * width
-	h = 10
+	h = height * 0.03
 	sc 0
-	sw 2
-	line x,y,x+w,y
-	line x,y,x,y-10
-	line x+w,y,x+w,y-10
+	sw 1
+	fc()
+	rect x,y,w,h
 	textSize height/30
 	textAlign CENTER,CENTER
 	sc()
 	fc 0
-	text w0+"m",width/2,y-20
+	text w0+"m",width/2,y+h*0.6
 
 draw = ->
 	bg 0,1,0
@@ -508,7 +508,7 @@ draw = ->
 			text message, [margin,width/2,width-margin][i%3], [margin,height][i//3] 
 		showDialogue()
 		menuButton.draw()
-		drawScale()
+		drawRuler()
 		return
 
 	if state == 2
