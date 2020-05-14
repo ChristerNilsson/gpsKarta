@@ -25,7 +25,7 @@ img = null
 b2w = null
 w2b = null
 
-startX = 0 
+startX = 0
 startY = 0
 
 menuButton = null
@@ -232,10 +232,10 @@ decreaseQueue = ->
 		if distanceSaid != msg then say msg
 		distanceSaid = msg
 	else if arr[0] == 'target'
-		# 'target 11. bäring etta tvåa. distans 250 meter'
-		msg = "#{arr[0]} #{arr[1]}. bearing #{arr[2]} #{arr[3]}. distance #{arr[4]} meters"
 		bearingSaid = arr[2] + ' ' + arr[3]
 		distanceSaid = arr[4]
+		msg = "#{arr[0]} #{arr[1]}. bearing #{bearingSaid}. distance #{distanceSaid} meters"
+		# Example: 'target 11. bearing zero niner. distance 250 meters'
 		say msg
 	else 
 		say msg
