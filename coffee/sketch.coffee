@@ -1,4 +1,4 @@
-VERSION = 130
+VERSION = 131
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -40,6 +40,7 @@ class Storage
 				obj = JSON.parse localStorage[key]
 				@controls = obj.controls
 				@trail = obj.trail
+				@tickSound = obj.tickSound
 		@clear()
 
 	save : -> localStorage['gpsKarta' + @mapName] = JSON.stringify @
@@ -190,7 +191,7 @@ increaseQueue = (p) ->
 		gpsLat = myRound p.coords.latitude,6
 		gpsLon = myRound p.coords.longitude,6
 
-	if abs(distance) < 10 then soundQueue = distance # ett antal DIST
+	if 10 > abs distance then soundQueue = distance # ett antal DIST
 
 firstInfo = (key) ->
 	b = LatLon gpsLat, gpsLon
@@ -210,6 +211,7 @@ firstInfo = (key) ->
 	if abs(distance) < 10 then soundQueue = distance # ett antal DIST
 
 playSound = ->
+	if not storage.tickSound then return
 	if soundQueue == 0 then return
 	if soundQueue < 0 and soundDown != null
 		soundQueue++
@@ -243,15 +245,15 @@ decreaseQueue = ->
 locationUpdate = (p) ->
 	pLat = myRound p.coords.latitude,6
 	pLon = myRound p.coords.longitude,6
-	gpsLat = pLat
-	gpsLon = pLon
+	altitude = int p.coords.altitude
+	#gpsLat = pLat
+	#gpsLon = pLon
 	nextLocation = "#{pLat} #{pLon}"
 	gpsCount++
 	messages[5] = gpsCount
 	decreaseQueue()
 	if nextLocation == lastLocation then return
 	lastLocation = nextLocation
-	altitude = int p.coords.altitude
 	updateTrack pLat, pLon, altitude, p.timestamp
 	increaseQueue p
 	updateTrail()
@@ -389,7 +391,7 @@ drawInfo = ->
 
 drawTrack = ->
 	fc()
-	sw 1/SCALE
+	sw 2/SCALE
 	sc 0
 	for [x,y],i in track
 		circle x-cx, y-cy, 5 * (track.length-i)
@@ -398,7 +400,8 @@ drawTrail = ->
 	fc()
 	sw 12
 	sc 1,0,0,0.5 # RED
-	for [x,y] in storage.trail 
+	for [lon,lat] in storage.trail 
+		[x,y] = w2b.convert lon,lat
 		point x-cx, y-cy
 
 drawControls = ->
@@ -410,15 +413,19 @@ drawControls = ->
 		col = "#0008"
 		if key in "ABC" then col = "#0f08"
 		if ":" in key then col ="#f008"
+
+		r = data.radius
+		if key in 'ABC' or ':' in key then r /= 2
+
 		stroke col
 		fc()
-		circle x-cx,y-cy,data.radius
+		circle x-cx, y-cy, r
 		sc()
 		fc 0
 		textAlign LEFT,TOP
-		text key,x-cx+0.7*data.radius,y-cy+0.7*data.radius
+		text key, x-cx+0.7*r, y-cy+0.7*r
 		textAlign CENTER,CENTER
-		text littera,x-cx,y-cy
+		text littera, x-cx, y-cy
 
 		stroke col
 		sw 2
@@ -437,11 +444,13 @@ drawControl = ->
 		messages[1] = "#{int bearing}º"
 		messages[2] = "#{round(latLon1.distanceTo latLon2)} m"
 
-	if currentControl 
+	if currentControl
 		[x,y] = storage.controls[currentControl]
 		sc()
 		fc 0,0,0,0.25
-		circle x-cx, y-cy, data.radius
+		r = data.radius
+		if currentControl in 'ABC' or ':' in currentControl then r /= 2
+		circle x-cx, y-cy, r
 
 drawRuler = ->
 	[w1,w0] = getMeters width, SCALE
@@ -522,13 +531,14 @@ setTarget = (key) ->
 
 executeMail = ->
 	r = info().join BR
-	arr = ("#{timestamp} #{latitude} #{longitude} #{altitude}" for [longitude,latitude,altitude,timestamp] in storage.trail)
-	s = arr.join BR
+	s = ("#{timestamp} #{latitude} #{longitude} #{altitude}" for [longitude,latitude,altitude,timestamp] in storage.trail).join BR
+	t = ("#{key} #{x} #{y} #{littera} #{lat} #{lon}" for key,[x,y,littera,lat, lon] of storage.controls).join BR
+	content = r + BR + dump.get() + t + BR + s
 	if currentControl
 		littera = storage.controls[currentControl][2]
-		sendMail "#{mapName} #{currentControl} #{littera}", r + BR + dump.get() + s
+		sendMail "#{mapName} #{currentControl} #{littera}", content
 	else
-		sendMail "#{mapName}", r + BR + dump.get() + s
+		sendMail "#{mapName}", content
 
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
