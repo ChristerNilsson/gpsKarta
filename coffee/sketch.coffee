@@ -159,7 +159,7 @@ sayBearing = (a0,b0) -> # a is newer (degrees)
 	a = SECTOR * round(a0/SECTOR)
 	b = SECTOR * round(b0/SECTOR)
 	if a == b and b0 != -1 then return "" # samma sektor
-	a = round a / 10
+	a = round a / 10 
 	if a == 0 then a = 36 # 01..36
 	tiotal = DIGITS[a // 10]
 	ental = DIGITS[a %% 10]
@@ -246,8 +246,9 @@ locationUpdate = (p) ->
 	pLat = myRound p.coords.latitude,6
 	pLon = myRound p.coords.longitude,6
 	altitude = int p.coords.altitude
-	#gpsLat = pLat
-	#gpsLon = pLon
+	if trail.length == 0 	
+		gpsLat = pLat
+		gpsLon = pLon
 	nextLocation = "#{pLat} #{pLon}"
 	gpsCount++
 	messages[5] = gpsCount
@@ -258,7 +259,7 @@ locationUpdate = (p) ->
 	increaseQueue p
 	updateTrail()
 
-updateTrack = (pLat, pLon, altitude, timestamp) ->
+updateTrack = (pLat, pLon, altitude, timestamp) -> # senaste fem positionerna
 	date = new Date()
 	date.setTime timestamp
 	h = addZero date.getHours()
