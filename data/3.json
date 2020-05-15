@@ -1,7 +1,7 @@
 {
 	"map" : "alviksskolan.png",
 	"mail" : "janchrister.nilsson@gmail.com",
-	"ABC" : [17.972856, 59.336126, 17.977964, 59.335434, 17.975166, 59.334601],
+	"ABC" : [59.336126,17.972856,  59.335434,17.977964, 59.334601, 17.975166],
 	"drawControls": true,
 	"radius" : 25,
 	"scale" : 1,

@@ -1,4 +1,4 @@
-VERSION = 134
+VERSION = 135
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -336,18 +336,16 @@ setup = ->
 	canvas.position 0,0 # hides text field used for clipboard copy.
 
 	platform = window.navigator.platform
-
 	angleMode DEGREES
-
 	SCALE = data.scale
 
-	# [cx,cy] = [img.width/2,img.height/2]
-	
 	dcs = data.controls
 	bmp = [dcs.A[0], dcs.A[1], dcs.B[0], dcs.B[1], dcs.C[0], dcs.C[1]]
+	abc = data.ABC
+	wgs = [abc[1],abc[0],abc[3],abc[2],abc[5],abc[4]] # lat lon <=> lon lat
 
-	b2w = new Converter bmp,data.ABC,6
-	w2b = new Converter data.ABC,bmp,0
+	b2w = new Converter bmp,wgs,6
+	w2b = new Converter wgs,bmp,0
 
 	# myTest() Do not execute! Very dependent on .json file.
 
@@ -368,8 +366,6 @@ setup = ->
 		mx = touch.pageX
 		my = touch.pageY
 		myMousePressed mx,my
-
-	console.log w2b.convert 18.168066, 59.271853
 
 info = () ->
 	result = []
@@ -407,31 +403,38 @@ drawTrail = ->
 		point x-cx, y-cy
 
 drawControls = ->
-	textSize data.radius
 	sw 2
 	for key,control of storage.controls
 		if control == null then continue
 		[x,y,littera] = control
 		col = "#0008"
 		if key in "ABC" then col = "#0f08"
+		if key in "DEFGHIJKLMNOPQRSTUVWXYZ" then col = "#00f8"
 		if ":" in key then col ="#f008"
 
-		r = data.radius
-		if key in 'ABC' or ':' in key then r /= 2
+		r = radius key
 
 		stroke col
 		fc()
 		circle x-cx, y-cy, r
 		sc()
-		fc 0
-		textAlign LEFT,TOP
-		text key, x-cx+0.7*r, y-cy+0.7*r
-		textAlign CENTER,CENTER
-		text littera, x-cx, y-cy
+		fill col
+		if r == data.radius # Full Size
+			textSize r
+			textAlign LEFT,TOP
+			text key, x-cx+0.7*r, y-cy+0.7*r
+			textAlign CENTER,CENTER
+			text littera, x-cx, y-cy
+		else # Half Size
+			textSize r*1.5
+			textAlign CENTER,CENTER
+			text key, x-cx, y-cy
 
 		stroke col
 		sw 2
 		point x-cx, y-cy
+
+radius = (key) -> if key in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' or ':' in key then data.radius/2 else data.radius
 
 drawControl = ->
 
@@ -450,9 +453,7 @@ drawControl = ->
 		[x,y] = storage.controls[currentControl]
 		sc()
 		fc 0,0,0,0.25
-		r = data.radius
-		if currentControl in 'ABC' or ':' in currentControl then r /= 2
-		circle x-cx, y-cy, r
+		circle x-cx, y-cy, radius currentControl
 
 drawRuler = ->
 	[w1,w0] = getMeters width, SCALE
@@ -648,7 +649,7 @@ positionClicked = (xc,yc) -> # canvas koordinater
 	for key,control of storage.controls
 		if control == null then continue
 		[x,y,z99,z99,z99] = control
-		if data.radius > dist xi,yi,x,y 
+		if radius(key) > dist xi,yi,x,y 
 			setTarget key 
 			return true
 	false 

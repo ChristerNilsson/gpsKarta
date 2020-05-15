@@ -1,7 +1,7 @@
 {
 	"map" : "skarpnäck.png",
 	"mail" : "janchrister.nilsson@gmail.com",
-	"ABC" :	[18.120732,	59.269381, 18.134470,59.269657, 18.123698,59.265035],
+	"ABC" :	[59.269381,18.120732,	59.269657,18.134470, 59.265035,18.123698],
 	"drawControls": true,
 	"radius" : 30,
 	"scale" : 1,
