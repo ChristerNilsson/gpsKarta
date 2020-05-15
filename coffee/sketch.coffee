@@ -1,4 +1,4 @@
-VERSION = 133
+VERSION = 134
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -40,7 +40,7 @@ class Storage
 				obj = JSON.parse localStorage[key]
 				@controls = obj.controls
 				@trail = obj.trail
-				@tickSound = obj.tickSound
+				#@tickSound = obj.tickSound
 		@clear()
 
 	save : -> localStorage['gpsKarta' + @mapName] = JSON.stringify @
@@ -166,7 +166,7 @@ sayBearing = (a0,b0) -> # a is newer (degrees)
 	"#{tiotal} #{ental}"
 
 increaseQueue = (p) ->
-	#dump.store "soundIndicator #{p.coords.latitude} #{p.coords.longitude}"
+	dump.store "increaseQueue #{p.coords.latitude} #{p.coords.longitude}"
 
 	if currentControl == null then return 
 
@@ -211,7 +211,8 @@ firstInfo = (key) ->
 	if abs(distance) < 10 then soundQueue = distance # ett antal DIST
 
 playSound = ->
-	if not storage.tickSound then return
+	dump.store 'playSound',soundQueue
+	#if not storage.tickSound then return
 	if soundQueue == 0 then return
 	if soundQueue < 0 and soundDown != null
 		soundQueue++
@@ -239,8 +240,8 @@ decreaseQueue = ->
 		msg = "#{arr[0]} #{arr[1]}. bearing #{bearingSaid}. distance #{distanceSaid} meters"
 		# Example: 'target 11. bearing zero niner. distance 250 meters'
 		say msg
-	else 
-		say msg
+	else if arr[0] == 'saved'
+		say msg.replace ':',' and '
 
 locationUpdate = (p) ->
 	pLat = myRound p.coords.latitude,6
@@ -534,7 +535,7 @@ executeMail = ->
 	r = info().join BR
 	s = ("#{timestamp} #{latitude} #{longitude} #{altitude}" for [longitude,latitude,altitude,timestamp] in storage.trail).join BR
 	t = ("#{key} #{x} #{y} #{littera} #{lat} #{lon}" for key,[x,y,littera,lat, lon] of storage.controls).join BR
-	content = r + BR + dump.get() + t + BR + s
+	content = r + BR + dump.get() + t + BR + BR + s
 	if currentControl
 		littera = storage.controls[currentControl][2]
 		sendMail "#{mapName} #{currentControl} #{littera}", content
