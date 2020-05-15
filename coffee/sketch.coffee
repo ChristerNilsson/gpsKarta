@@ -132,7 +132,7 @@ say = (m) ->
 preload = ->
 	params = getParameters()
 	if params.debug then dump.active = params.debug == '1'
-	mapName = params.map || 'skarpnäck'
+	mapName = params.map || '20A' # 'skarpnäck'
 	loadJSON "data/#{mapName}.json", (json) ->
 		data = json
 		for key,control of data.controls
@@ -365,6 +365,7 @@ setup = ->
 		my = touch.pageY
 		myMousePressed mx,my
 
+	console.log w2b.convert 18.168066, 59.271853
 
 info = () ->
 	result = []
@@ -673,3 +674,9 @@ touchEnded = (event) ->
 		positionClicked mouseX,mouseY
 
 	false
+
+keyPressed = ->
+	if key == ' '
+		xi = round cx + (mouseX - width/2) / SCALE  	# image koordinater
+		yi = round cy + (mouseY - height/2) / SCALE
+		console.log xi,yi
