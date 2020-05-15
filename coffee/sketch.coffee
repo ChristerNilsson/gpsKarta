@@ -1,4 +1,4 @@
-VERSION = 132
+VERSION = 133
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -246,7 +246,7 @@ locationUpdate = (p) ->
 	pLat = myRound p.coords.latitude,6
 	pLon = myRound p.coords.longitude,6
 	altitude = int p.coords.altitude
-	if trail.length == 0 	
+	if storage.trail.length == 0
 		gpsLat = pLat
 		gpsLon = pLon
 	nextLocation = "#{pLat} #{pLon}"
