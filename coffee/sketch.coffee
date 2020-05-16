@@ -1,4 +1,4 @@
-VERSION = 140
+VERSION = 141
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -211,7 +211,7 @@ firstInfo = (key) ->
 	if abs(distance) < 10 then soundQueue = distance # ett antal DIST
 
 playSound = ->
-	dump.store 'playSound #{soundQueue}'
+	dump.store "playSound #{soundQueue}"
 	#if not storage.tickSound then return
 	if soundQueue == 0 then return
 	if soundQueue < 0 and soundDown != null
@@ -282,7 +282,7 @@ updateTrail = (pLat, pLon, position)->
 	if storage.trail.length == 0 
 		storage.trail.push position
 		return
-	[qLon, qLat] = _.last trail
+	[qLon, qLat] = _.last storage.trail
 	a = LatLon pLat, pLon # newest
 	b = LatLon qLat, qLon # last
 	c = LatLon trgLat, trgLon # target
