@@ -187,7 +187,7 @@ increaseQueue = (p) ->
 		sDistance = sayDistance dista,distb
 		if sDistance != "" then voiceQueue.push "distance #{sDistance}"
 
-	if abs(distance) >= 1 # update only if DIST detected. Otherwise some beeps will be lost.
+	if abs(distance) >= 0.5 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = myRound p.coords.latitude,6
 		gpsLon = myRound p.coords.longitude,6
 
