@@ -1,4 +1,4 @@
-VERSION = 147
+VERSION = 148
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -288,14 +288,14 @@ updateTrail = (pLat, pLon, position)->
 	[qLon, qLat] = _.last storage.trail
 	a = LatLon pLat, pLon # newest
 	b = LatLon qLat, qLon # last
-	c = LatLon trgLat, trgLon # target
+	#c = LatLon trgLat, trgLon # target
 
-	dista = a.distanceTo c # meters
-	distb = b.distanceTo c
-	distance = (dista - distb)/DIST
+	dist = a.distanceTo b # meters
+#	distb = b.distanceTo c
+	#distance = (dista - distb)/DIST
 	dump.store "updateTrail #{dista} #{distb} #{distance}"
 
-	if abs(distance) > 1 then storage.trail.push position # 5
+	if dist > 5 then storage.trail.push position
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
 window.speechSynthesis.onvoiceschanged = -> voices = window.speechSynthesis.getVoices()
