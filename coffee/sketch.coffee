@@ -133,7 +133,7 @@ say = (m) ->
 preload = ->
 	params = getParameters()
 	if params.debug then dump.active = params.debug == '1'
-	mapName = params.map || '20A' # 'skarpnäck'
+	mapName = params.map || 'skarpnäck'
 	loadJSON "data/#{mapName}.json", (json) ->
 		data = json
 		for key,control of data.controls
