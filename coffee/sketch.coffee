@@ -1,4 +1,4 @@
-VERSION = 136
+VERSION = 138
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -109,7 +109,7 @@ gpsCount = 0
 [gpsLat,gpsLon] = [0,0] # avgör om muntlig information ska ges
 [trgLat,trgLon] = [0,0] # koordinater för vald target
 
-lastLocation = '' # används för att skippa lika koordinater
+#lastLocation = '' # används för att skippa lika koordinater
 
 timeout = null
 
@@ -176,7 +176,7 @@ increaseQueue = (p) ->
 
 	dista = a.distanceTo c # meters
 	distb = b.distanceTo c
-	distance = round (dista - distb)/DIST
+	distance = (dista - distb)/DIST
 
 	if trgLat != 0
 		bearinga = a.bearingTo c
@@ -187,14 +187,13 @@ increaseQueue = (p) ->
 		sDistance = sayDistance dista,distb
 		if sDistance != "" then voiceQueue.push "distance #{sDistance}"
 
-	if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
+	if abs(distance) >= 1 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = myRound p.coords.latitude,6
 		gpsLon = myRound p.coords.longitude,6
 
-	if distance > 5 # meters
-		updateTrail()
+	if abs(distance) < 10 then soundQueue = round distance # ett antal DIST
 
-	if 10 > abs distance then soundQueue = distance # ett antal DIST
+	distance
 
 firstInfo = (key) ->
 	b = LatLon gpsLat, gpsLon
@@ -214,7 +213,7 @@ firstInfo = (key) ->
 	if abs(distance) < 10 then soundQueue = distance # ett antal DIST
 
 playSound = ->
-	dump.store 'playSound',soundQueue
+	dump.store 'playSound #{soundQueue}'
 	#if not storage.tickSound then return
 	if soundQueue == 0 then return
 	if soundQueue < 0 and soundDown != null
@@ -253,14 +252,15 @@ locationUpdate = (p) ->
 	if storage.trail.length == 0
 		gpsLat = pLat
 		gpsLon = pLon
-	nextLocation = "#{pLat} #{pLon}"
+	#nextLocation = "#{pLat} #{pLon}"
 	gpsCount++
 	messages[5] = gpsCount
 	decreaseQueue()
-	if nextLocation == lastLocation then return
-	lastLocation = nextLocation
-	updateTrack pLat, pLon, altitude, p.timestamp
-	increaseQueue p
+	#if nextLocation == lastLocation then return
+	#lastLocation = nextLocation
+	distance = increaseQueue p # meters
+	if distance > 1 then updateTrack pLat, pLon, altitude, p.timestamp
+	if distance > 5 then updateTrail()
 
 updateTrack = (pLat, pLon, altitude, timestamp) -> # senaste fem positionerna
 	date = new Date()
