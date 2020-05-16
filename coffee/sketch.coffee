@@ -1,4 +1,4 @@
-VERSION = 138
+VERSION = 140
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -193,8 +193,6 @@ increaseQueue = (p) ->
 
 	if abs(distance) < 10 then soundQueue = round distance # ett antal DIST
 
-	distance
-
 firstInfo = (key) ->
 	b = LatLon gpsLat, gpsLon
 	c = LatLon trgLat, trgLon # target
@@ -252,17 +250,12 @@ locationUpdate = (p) ->
 	if storage.trail.length == 0
 		gpsLat = pLat
 		gpsLon = pLon
-	#nextLocation = "#{pLat} #{pLon}"
-	gpsCount++
-	messages[5] = gpsCount
+	messages[5] = gpsCount++
 	decreaseQueue()
-	#if nextLocation == lastLocation then return
-	#lastLocation = nextLocation
-	distance = increaseQueue p # meters
-	if distance > 1 then updateTrack pLat, pLon, altitude, p.timestamp
-	if distance > 5 then updateTrail()
+	increaseQueue p # meters
+	uppdatera pLat, pLon, altitude, p.timestamp
 
-updateTrack = (pLat, pLon, altitude, timestamp) -> # senaste fem positionerna
+uppdatera = (pLat, pLon, altitude, timestamp) -> # senaste fem positionerna
 	date = new Date()
 	date.setTime timestamp
 	h = addZero date.getHours()
@@ -273,6 +266,11 @@ updateTrack = (pLat, pLon, altitude, timestamp) -> # senaste fem positionerna
 	dump.store ""
 	dump.store "LU #{hms} #{pLat} #{pLon}"
 	position = [pLon,pLat,altitude,hms] 
+
+	updateTrack pLat, pLon, altitude
+	updateTrail pLat, pLon, position
+
+updateTrack = (pLat, pLon, altitude) ->
 	track.push w2b.convert pLon,pLat
 	if track.length > TRACKED then track.shift()
 	t = _.last track
@@ -280,7 +278,21 @@ updateTrack = (pLat, pLon, altitude, timestamp) -> # senaste fem positionerna
 	if altitude then messages[3] = altitude
 	messages[4] = pLat + ' ' + pLon
 
-updateTrail = -> storage.trail.push position
+updateTrail = (pLat, pLon, position)->
+	if storage.trail.length == 0 
+		storage.trail.push position
+		return
+	[qLon, qLat] = _.last trail
+	a = LatLon pLat, pLon # newest
+	b = LatLon qLat, qLon # last
+	c = LatLon trgLat, trgLon # target
+
+	dista = a.distanceTo c # meters
+	distb = b.distanceTo c
+	distance = (dista - distb)/DIST
+
+	if distance > 5 then storage.trail.push position
+
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
 window.speechSynthesis.onvoiceschanged = -> voices = window.speechSynthesis.getVoices()
 
