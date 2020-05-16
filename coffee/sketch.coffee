@@ -1,4 +1,4 @@
-VERSION = 135
+VERSION = 136
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -174,7 +174,7 @@ increaseQueue = (p) ->
 	b = LatLon gpsLat, gpsLon
 	c = LatLon trgLat, trgLon # target
 
-	dista = a.distanceTo c
+	dista = a.distanceTo c # meters
 	distb = b.distanceTo c
 	distance = round (dista - distb)/DIST
 
@@ -190,6 +190,9 @@ increaseQueue = (p) ->
 	if distance != 0 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = myRound p.coords.latitude,6
 		gpsLon = myRound p.coords.longitude,6
+
+	if distance > 5 # meters
+		updateTrail()
 
 	if 10 > abs distance then soundQueue = distance # ett antal DIST
 
@@ -258,7 +261,6 @@ locationUpdate = (p) ->
 	lastLocation = nextLocation
 	updateTrack pLat, pLon, altitude, p.timestamp
 	increaseQueue p
-	updateTrail()
 
 updateTrack = (pLat, pLon, altitude, timestamp) -> # senaste fem positionerna
 	date = new Date()
@@ -396,7 +398,7 @@ drawTrack = ->
 
 drawTrail = ->
 	fc()
-	sw 12
+	sw 2
 	sc 1,0,0,0.5 # RED
 	for [lon,lat] in storage.trail 
 		[x,y] = w2b.convert lon,lat
