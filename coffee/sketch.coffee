@@ -1,4 +1,4 @@
-VERSION = 141
+VERSION = 142
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -191,7 +191,10 @@ increaseQueue = (p) ->
 		gpsLat = myRound p.coords.latitude,6
 		gpsLon = myRound p.coords.longitude,6
 
-	if abs(distance) < 10 then soundQueue = round distance # ett antal DIST
+	if abs(distance) <= 10
+		soundQueue = round distance 
+	else if distance < -10 then soundQueue = -10
+	else if distance > 10 then soundQueue = 10
 
 firstInfo = (key) ->
 	b = LatLon gpsLat, gpsLon
@@ -211,9 +214,9 @@ firstInfo = (key) ->
 	if abs(distance) < 10 then soundQueue = distance # ett antal DIST
 
 playSound = ->
+	if soundQueue == 0 then return
 	dump.store "playSound #{soundQueue}"
 	#if not storage.tickSound then return
-	if soundQueue == 0 then return
 	if soundQueue < 0 and soundDown != null
 		soundQueue++
 		soundDown.play()
