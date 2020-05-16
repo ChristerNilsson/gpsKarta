@@ -1,4 +1,4 @@
-VERSION = 148
+VERSION = 149
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -293,7 +293,7 @@ updateTrail = (pLat, pLon, position)->
 	dist = a.distanceTo b # meters
 #	distb = b.distanceTo c
 	#distance = (dista - distb)/DIST
-	dump.store "updateTrail #{dista} #{distb} #{distance}"
+	dump.store "updateTrail #{dist}"
 
 	if dist > 5 then storage.trail.push position
 
