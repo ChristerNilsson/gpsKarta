@@ -1,4 +1,4 @@
-VERSION = 150
+VERSION = 151
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -409,12 +409,12 @@ drawTrack = ->
 		circle x-cx, y-cy, 5 * (track.length-i)
 
 drawTrail = ->
-	fc()
-	sw 2
-	sc 1,0,0,0.5 # RED
+	fc 1,1,0
+	sw 1
+	sc 0
 	for [lon,lat] in storage.trail 
 		[x,y] = w2b.convert lon,lat
-		point x-cx, y-cy
+		circle x-cx, y-cy, 2
 
 drawControls = ->
 	sw 2
