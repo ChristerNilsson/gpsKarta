@@ -3,13 +3,16 @@ DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
 
+platform = window.navigator.platform
+console.log platform
+
 # Setup
 COINS = true
 DISTANCE = true 
 SECTOR = 10 # Bearing resolution in degrees
 
 DIGITS = 'zero one two three four five six seven eight niner'.split ' '
-BR = '<br>'
+BR = if platform == 'Win32' then "\n" else '<br>'
 
 # http://www.bvsok.se/Kartor/Skolkartor/
 # Högupplösta orienteringskartor: https://www.omaps.net
@@ -89,7 +92,7 @@ class Dump
 	get : ->
 		result = @data.join BR
 		@data = []
-		result + BR + BR
+		result + BR
 dump = new Dump()
 
 platform = null
@@ -349,7 +352,6 @@ setup = ->
 	canvas = createCanvas innerWidth-0.0, innerHeight #-0.5
 	canvas.position 0,0 # hides text field used for clipboard copy.
 
-	platform = window.navigator.platform
 	angleMode DEGREES
 	SCALE = data.scale
 
@@ -562,10 +564,10 @@ setTarget = (key) ->
 	dialogues.clear()
 
 executeMail = ->
+	link = "https://christernilsson.github.io/gpsKarta/index.html?map=" + mapName + "&trail=" + JSON.stringify storage.trail
 	r = info().join BR
-	#s = ([longitude,latitude] for [longitude,latitude] in storage.trail)
 	t = ("#{key} #{x} #{y} #{littera} #{lat} #{lon}" for key,[x,y,littera,lat, lon] of storage.controls).join BR
-	content = r + BR + dump.get() + t + BR + BR + "https://christernilsson.github.io/gpsKarta/index.html?map=" + mapName + "&trail=" + JSON.stringify(storage.trail)
+	content = link + BR + BR + r + BR + dump.get() + t
 	if currentControl
 		littera = storage.controls[currentControl][2]
 		sendMail "#{mapName} #{currentControl} #{littera}", content
