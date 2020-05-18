@@ -1,4 +1,4 @@
-VERSION = 158
+VERSION = 159
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -131,9 +131,11 @@ say = (m) ->
 	speechSynthesis.speak speaker
 
 preload = ->
+	console.log 'preload'
 	params = getParameters()
+	mapName = params.map || "skarpnäck"
+	console.log mapName
 	if params.debug then dump.active = params.debug == '1'
-	mapName = params.map || 'skarpnäck'
 	loadJSON "data/#{mapName}.json", (json) ->
 		data = json
 		for key,control of data.controls
@@ -361,10 +363,13 @@ setup = ->
 	b2w = new Converter bmp,wgs,6
 	w2b = new Converter wgs,bmp,0
 
+	mapName = params.map || 'skarpnäck'
+	storage = new Storage mapName
+	storage.trail = []
+	if params.trail then storage.trail = JSON.parse params.trail
+
 	# myTest() Do not execute! Very dependent on .json file.
 
-	storage = new Storage mapName
-	
 	[cx,cy] = [img.width/2,img.height/2]
 
 	navigator.geolocation.watchPosition locationUpdate, locationUpdateFail,
@@ -548,10 +553,9 @@ setTarget = (key) ->
 
 executeMail = ->
 	r = info().join BR
-	s = (w2b.convert longitude,latitude for [longitude,latitude,altitude,timestamp] in storage.trail).join '|'
-	console.log s
+	s = ([longitude,latitude] for [longitude,latitude,altitude,timestamp] in storage.trail)
 	t = ("#{key} #{x} #{y} #{littera} #{lat} #{lon}" for key,[x,y,littera,lat, lon] of storage.controls).join BR
-	content = r + BR + dump.get() + t + BR + BR + "https://christernilsson.github.io/gpsKarta/index.html?map=" + mapName + "&trail=" + s
+	content = r + BR + dump.get() + t + BR + BR + "https://christernilsson.github.io/gpsKarta/index.html?map=" + mapName + "&trail=" + JSON.stringify(s)
 	if currentControl
 		littera = storage.controls[currentControl][2]
 		sendMail "#{mapName} #{currentControl} #{littera}", content
