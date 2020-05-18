@@ -2,7 +2,12 @@ VERSION = 162
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
+
+# Setup
+COINS = true
+DISTANCE = true 
 SECTOR = 10 # Bearing resolution in degrees
+
 DIGITS = 'zero one two three four five six seven eight niner'.split ' '
 BR = '<br>'
 
@@ -216,6 +221,7 @@ firstInfo = (key) ->
 	if distance < 10 then soundQueue = distance else soundQueue = 10 # ett antal DIST
 
 playSound = ->
+	if not COINS then return 
 	if soundQueue == 0 then return
 	dump.store "playSound #{soundQueue}"
 	#if not storage.tickSound then return
@@ -235,7 +241,7 @@ decreaseQueue = ->
 		msg = arr[1] + ' ' + arr[2] # skippa ordet. t ex 'bäring etta tvåa'
 		if bearingSaid != msg then say msg
 		bearingSaid = msg
-	else if arr[0] == 'distance'
+	else if arr[0] == 'distance' and DISTANCE
 		msg = arr[1]                # skippa ordet. t ex 'distans 30'
 		if distanceSaid != msg then say msg
 		distanceSaid = msg
@@ -251,7 +257,6 @@ decreaseQueue = ->
 locationUpdate = (p) ->
 	pLat = myRound p.coords.latitude,6
 	pLon = myRound p.coords.longitude,6
-	#altitude = int p.coords.altitude
 	if storage.trail.length == 0
 		gpsLat = pLat
 		gpsLon = pLon
@@ -260,35 +265,25 @@ locationUpdate = (p) ->
 	increaseQueue p # meters
 	uppdatera pLat, pLon
 
-uppdatera = (pLat, pLon) -> # senaste fem positionerna
-	# date = new Date()
-	# date.setTime timestamp
-	# h = addZero date.getHours()
-	# M = addZero date.getMinutes()
-	# s = addZero date.getSeconds()
-	# hms = "#{h}:#{M}:#{s}"
-
+uppdatera = (pLat, pLon) ->
 	dump.store ""
 	dump.store "LU #{pLat} #{pLon}"
-
 	[x,y] = w2b.convert pLon,pLat
 	updateTrack pLat, pLon, x,y
 	updateTrail pLat, pLon, x,y
 
-updateTrack = (pLat, pLon, x,y) ->
+updateTrack = (pLat, pLon, x,y) -> # senaste fem positionerna
 	track.push [x,y]
 	if track.length > TRACKED then track.shift()
 	t = _.last track
 	dump.store "T #{t[0]} #{t[1]}"
-	# if altitude then messages[3] = altitude
 	messages[4] = pLat + ' ' + pLon
 
 updateTrail = (pLat, pLon, x,y)->
-	position = [x,y] # w2b.convert pLon,pLat
+	position = [x,y]
 	if storage.trail.length == 0 
 		storage.trail.push position
 		return
-
 	[qx, qy] = _.last storage.trail
 	[qLon,qLat] = b2w.convert qx,qy
 	a = LatLon pLat, pLon # newest
@@ -574,14 +569,10 @@ findKey = ->
 
 savePosition = ->
 	[x,y] = w2b.convert gpsLon,gpsLat
-	date = new Date()
 	key = findKey()
-	#h = addZero date.getHours()
-	#M = addZero date.getMinutes()
-	#key = "#{h}:#{M}"
 	storage.controls[key] = [x,y,'',gpsLat,gpsLon]
 	storage.save()
-	console.log key, storage.controls[key]
+	# console.log key, storage.controls[key]
 	voiceQueue.push "saved #{key}"
 	dialogues.clear()
 
@@ -594,10 +585,29 @@ menu1 = -> # Main Menu
 	dialogue.add 'Out', -> if SCALE > data.scale then SCALE /= 1.5
 	dialogue.add 'Take...', -> menu4()
 	dialogue.add 'More...', -> menu6()
+	dialogue.add 'Setup...', -> menu2()
+	dialogue.add 'Aim', -> 
 	dialogue.add 'Save', -> savePosition()
 	dialogue.add 'In', -> SCALE *= 1.5
 	dialogue.clock ' ',true
 	dialogue.textSize *= 1.5
+
+menu2 = -> # Setup
+	dialogue = new Dialogue()
+	dialogue.add 'Coins', -> COINS = not COINS
+	dialogue.add 'Distance', -> DISTANCE = not DISTANCE
+	dialogue.add 'Sector...', -> menu3()
+	dialogue.clock()
+
+menu3 = -> # Sector
+	dialogue = new Dialogue()
+	dialogue.add '10', -> SetSector 10 # 36
+	dialogue.add '20', -> SetSector 20 # 18
+	dialogue.add '30', -> SetSector 30 # 12
+	dialogue.add '45', -> SetSector 45 # 8
+	dialogue.add '60', -> SetSector 60 # 6
+	dialogue.add '90', -> SetSector 90 # 4
+	dialogue.clock()
 
 menu4 = -> # Take
 	dialogue = new Dialogue()
@@ -621,7 +631,6 @@ menu6 = -> # More
 	dialogue.add 'Mail...', ->
 		executeMail()
 		dialogues.clear()
-	dialogue.add 'Sector...', -> menu7()
 	dialogue.add 'Delete', ->
 		storage.deleteControl()
 		dialogues.clear()
@@ -633,16 +642,6 @@ menu6 = -> # More
 		dialogues.clear()
 	dialogue.clock()
 	dialogue.textSize *= 1.5
-
-menu7 = -> # Sector
-	dialogue = new Dialogue()
-	dialogue.add '10', -> SetSector 10 # 36
-	dialogue.add '20', -> SetSector 20 # 18
-	dialogue.add '30', -> SetSector 30 # 12
-	dialogue.add '45', -> SetSector 45 # 8
-	dialogue.add '60', -> SetSector 60 # 6
-	dialogue.add '90', -> SetSector 90 # 4
-	dialogue.clock()
 
 SetSector = (sector) ->
 	SECTOR = sector
