@@ -1,4 +1,4 @@
-VERSION = 153
+VERSION = 154
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -556,7 +556,7 @@ executeMail = ->
 		littera = storage.controls[currentControl][2]
 		sendMail "#{mapName} #{currentControl} #{littera}", content
 	else
-		sendMail "#{mapName}", content + "<br><a href="https://www.w3schools.com">Visit W3Schools.com!</a>"
+		sendMail "#{mapName}", content + '<br><a href="https://www.w3schools.com">Visit W3Schools.com!</a>'
 
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
