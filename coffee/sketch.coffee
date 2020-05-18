@@ -1,4 +1,4 @@
-VERSION = 155
+VERSION = 156
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -551,8 +551,7 @@ executeMail = ->
 	s = (w2b.convert longitude,latitude for [longitude,latitude,altitude,timestamp] in storage.trail).join '|'
 	console.log s
 	t = ("#{key} #{x} #{y} #{littera} #{lat} #{lon}" for key,[x,y,littera,lat, lon] of storage.controls).join BR
-	content = r + BR + dump.get() + t + BR + BR + s # "https://christernilsson.github.io/gpsKarta/?map=#{mapName}&trail=" + s
-	content += '<br><a href="https://www.w3schools.com">Visit W3Schools.com!</a>'
+	content = r + BR + dump.get() + t + BR + BR + "https://christernilsson.github.io/gpsKarta/?map=#{mapName}&trail=#{s}"
 	if currentControl
 		littera = storage.controls[currentControl][2]
 		sendMail "#{mapName} #{currentControl} #{littera}", content
