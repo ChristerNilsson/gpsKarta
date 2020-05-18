@@ -398,6 +398,17 @@ info = () ->
 	result.push "SCALE: #{SCALE}"
 	result
 
+drawCrossHair = ->
+	[x,y] = [width/2,height/2]
+	sw 1
+	sc 0
+	fc()
+	circle x,y,10
+	line x,y+5,x,y+10
+	line x,y-5,x,y-10
+	line x+5,y,x+10,y
+	line x-5,y,x-10,y
+
 drawInfo = ->
 	textAlign LEFT,CENTER
 	sc()
@@ -512,6 +523,8 @@ draw = ->
 		drawControl()
 		pop()
 	
+		drawCrossHair()
+
 		fc 0
 		sc 1,1,0
 		sw 3
@@ -576,6 +589,11 @@ savePosition = ->
 	voiceQueue.push "saved #{key}"
 	dialogues.clear()
 
+aim = ->
+	[lon,lat] = b2w.convert cx,cy
+	storage.controls.Z = [cx,cy, '', lat,lon]
+	dialogues.clear()
+
 menu1 = -> # Main Menu
 	dialogue = new Dialogue()
 	dialogue.add 'Center', ->
@@ -586,7 +604,7 @@ menu1 = -> # Main Menu
 	dialogue.add 'Take...', -> menu4()
 	dialogue.add 'More...', -> menu6()
 	dialogue.add 'Setup...', -> menu2()
-	dialogue.add 'Aim', -> 
+	dialogue.add 'Aim', -> aim()
 	dialogue.add 'Save', -> savePosition()
 	dialogue.add 'In', -> SCALE *= 1.5
 	dialogue.clock ' ',true
