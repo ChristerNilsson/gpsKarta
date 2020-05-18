@@ -1,3 +1,17 @@
+		# "1": [1528,1334],
+		# "2": [1425,1248],
+		# "3": [1097,384],
+		# "4": [1532,288],
+		# "5": [1773,109],
+		# "6": [1916,313],
+		# "7": [2090,376],
+		# "8": [1826,591],
+		# "9": [1568,668],
+		# "10": [1019,1375],
+		# "11": [900,1489],
+		# "12": [646,1421],
+		# "13": [472,1594],
+
 VERSION = 165
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -8,8 +22,9 @@ console.log platform
 
 # Setup
 COINS = true
-DISTANCE = true 
+DISTANCE = true
 SECTOR = 10 # Bearing resolution in degrees
+#ATTACHED = false
 
 DIGITS = 'zero one two three four five six seven eight niner'.split ' '
 BR = if platform == 'Win32' then "\n" else '<br>'
@@ -23,6 +38,7 @@ DISTLIST = [0,2,4,6,8,10,12,14,16,18,20,30,40,50,60,70,80,90,100, 120,140,160,18
 mapName = "" # t ex skarpnäck
 params = null
 voices = null
+frameTime = 0
 
 state = 0 # 0=uninitialized 1=normal 2=info
 
@@ -138,10 +154,10 @@ say = (m) ->
 	dump.store "say #{m} #{JSON.stringify voiceQueue}"
 	speechSynthesis.speak speaker
 
-preload = ->
+preload = -> 
 	console.log 'preload'
 	params = getParameters()
-	mapName = params.map || "skarpnäck"
+	mapName = params.map || "21A"
 	console.log mapName
 	if params.debug then dump.active = params.debug == '1'
 	loadJSON "data/#{mapName}.json", (json) ->
@@ -363,7 +379,7 @@ setup = ->
 	b2w = new Converter bmp,wgs,6
 	w2b = new Converter wgs,bmp,0
 
-	mapName = params.map || 'skarpnäck'
+	# mapName = params.map || '21A'
 	storage = new Storage mapName
 	storage.trail = []
 	if params.trail then storage.trail = JSON.parse params.trail
@@ -400,19 +416,21 @@ info = () ->
 	result.push "DISTANCE: #{DISTANCE}"
 	result.push "cx cy: #{round cx} #{round cy}"
 	result.push "SCALE: #{SCALE}"
+	result.push "frameTime: #{frameTime} ms"
 	result
 
 drawCrossHair = ->
-	if currentControl then return 
-	[x,y] = [width/2,height/2]
-	sw 1
-	sc 0
+	[x,y] = if currentControl then [0,0] else [width/2,height/2]
+	r1 = 0.45 * data.radius
+	r2 = 0.9 * data.radius
+	sw 2
+	sc 1,0,0
 	fc()
-	circle x,y,10
-	line x,y+5,x,y+10
-	line x,y-5,x,y-10
-	line x+5,y,x+10,y
-	line x-5,y,x-10,y
+	circle x,y,r2
+	line x,y+r1,x,y+r2
+	line x,y-r1,x,y-r2
+	line x+r1,y,x+r2,y
+	line x-r1,y,x-r2,y
 
 drawInfo = ->
 	textAlign LEFT,CENTER
@@ -466,7 +484,7 @@ drawControls = ->
 		sw 2
 		point x-cx, y-cy
 
-radius = (key) -> if key in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' or ':' in key then data.radius/2 else data.radius
+radius = (key) -> if key in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' then data.radius/2 else data.radius
 
 drawControl = ->
 
@@ -518,6 +536,7 @@ draw = ->
 		return
 
 	if state == 1
+		start = new Date()
 		push()
 		translate width/2, height/2
 		scale SCALE
@@ -526,10 +545,10 @@ draw = ->
 		drawTrack()
 		if data.drawControls then drawControls()
 		drawControl()
+		if currentControl then drawCrossHair()
 		pop()
-	
-		drawCrossHair()
 
+		if not currentControl then drawCrossHair()
 		fc 0
 		sc 1,1,0
 		sw 3
@@ -538,9 +557,11 @@ draw = ->
 			textAlign [LEFT,CENTER,RIGHT][i%3], [TOP,BOTTOM][i//3]
 			textSize [100,50][i//3]
 			text message, [margin,width/2,width-margin][i%3], [margin,height][i//3] 
+		drawRuler()
+		frameTime = round (new Date()) - start
+
 		showDialogue()
 		menuButton.draw()
-		drawRuler()
 		return
 
 	if state == 2
@@ -595,8 +616,13 @@ savePosition = ->
 	dialogues.clear()
 
 aim = ->
-	[lon,lat] = b2w.convert cx,cy
-	storage.controls.Z = [cx,cy, '', lat,lon]
+	if currentControl 
+		currentControl = null
+	else
+		[lon,lat] = b2w.convert cx,cy
+		storage.controls.Z = [cx,cy, '', lat,lon]
+		currentControl = 'Z'
+	#ATTACHED = not ATTACHED
 	dialogues.clear()
 
 menu1 = -> # Main Menu
