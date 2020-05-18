@@ -1,4 +1,4 @@
-VERSION = 160
+VERSION = 161
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -420,8 +420,7 @@ drawTrail = ->
 	fc 1,1,0
 	sw 1
 	sc 0
-	for [lon,lat] in storage.trail 
-		[x,y] = w2b.convert lon,lat
+	for [x,y] in storage.trail 
 		circle x-cx, y-cy, 2
 
 drawControls = ->
@@ -556,9 +555,9 @@ setTarget = (key) ->
 
 executeMail = ->
 	r = info().join BR
-	s = ([longitude,latitude] for [longitude,latitude,altitude,timestamp] in storage.trail)
+	#s = ([longitude,latitude] for [longitude,latitude] in storage.trail)
 	t = ("#{key} #{x} #{y} #{littera} #{lat} #{lon}" for key,[x,y,littera,lat, lon] of storage.controls).join BR
-	content = r + BR + dump.get() + t + BR + BR + "https://christernilsson.github.io/gpsKarta/index.html?map=" + mapName + "&trail=" + JSON.stringify(s)
+	content = r + BR + dump.get() + t + BR + BR + "https://christernilsson.github.io/gpsKarta/index.html?map=" + mapName + "&trail=" + JSON.stringify(storage.trail)
 	if currentControl
 		littera = storage.controls[currentControl][2]
 		sendMail "#{mapName} #{currentControl} #{littera}", content
