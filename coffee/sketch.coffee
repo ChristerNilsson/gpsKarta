@@ -396,11 +396,14 @@ info = () ->
 	result.push "trail.length: #{storage.trail.length}"
 	result.push "gpsCount: #{gpsCount}"
 	result.push "SECTOR: #{SECTOR}"
+	result.push "COINS: #{COINS}"
+	result.push "DISTANCE: #{DISTANCE}"
 	result.push "cx cy: #{round cx} #{round cy}"
 	result.push "SCALE: #{SCALE}"
 	result
 
 drawCrossHair = ->
+	if currentControl then return 
 	[x,y] = [width/2,height/2]
 	sw 1
 	sc 0
@@ -416,7 +419,7 @@ drawInfo = ->
 	sc()
 	fc 0
 	for m,i in info()
-		text m,20,100*(i+1)
+		text m,20,(i+0.5) * height / info().length
 
 drawTrack = ->
 	fc()
