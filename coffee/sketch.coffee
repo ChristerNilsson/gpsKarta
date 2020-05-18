@@ -429,18 +429,17 @@ drawControls = ->
 	for key,control of storage.controls
 		if control == null then continue
 		[x,y,littera] = control
-		col = "#0008"
-		if key in "ABC" then col = "#0f08"
-		if key in "DEFGHIJKLMNOPQRSTUVWXYZ" then col = "#00f8"
-		if ":" in key then col ="#f008"
+		[strokeCol,fillCol] = ["#0008","#0000"]
+		if key in "ABC" then [strokeCol,fillCol] = ["#0f08","#ff08"]
+		if key in "DEFGHIJKLMNOPQRSTUVWXYZ" then [strokeCol,fillCol] = ["#0008","#ff08"]
 
 		r = radius key
 
-		stroke col
-		fc()
+		stroke strokeCol
+		fill fillCol
 		circle x-cx, y-cy, r
 		sc()
-		fill col
+		fill 0
 		if r == data.radius # Full Size
 			textSize r
 			textAlign LEFT,TOP
@@ -452,7 +451,7 @@ drawControls = ->
 			textAlign CENTER,CENTER
 			text key, x-cx, y-cy
 
-		stroke col
+		stroke strokeCol
 		sw 2
 		point x-cx, y-cy
 
@@ -568,12 +567,18 @@ executeMail = ->
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
 
+findKey = ->
+	for key in 'DEFGHIJKLMNOPQRSTUVWXY'
+		if key not of storage.controls then return key
+	false
+
 savePosition = ->
 	[x,y] = w2b.convert gpsLon,gpsLat
 	date = new Date()
-	h = addZero date.getHours()
-	M = addZero date.getMinutes()
-	key = "#{h}:#{M}"
+	key = findKey()
+	#h = addZero date.getHours()
+	#M = addZero date.getMinutes()
+	#key = "#{h}:#{M}"
 	storage.controls[key] = [x,y,'',gpsLat,gpsLon]
 	storage.save()
 	console.log key, storage.controls[key]
