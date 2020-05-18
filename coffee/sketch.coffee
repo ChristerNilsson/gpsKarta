@@ -1,4 +1,4 @@
-VERSION = 159
+VERSION = 160
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -94,7 +94,7 @@ SCALE = 1
 
 gps = null
 TRACKED = 5 # circles shows the user position
-position = null # gps position [lon,lat,alt,hhmmss]
+position = null # gps position [x,y] # [lon,lat,alt,hhmmss]
 track = [] # five latest GPS positions (bitmap coordinates)
 
 speaker = null
@@ -251,49 +251,51 @@ decreaseQueue = ->
 locationUpdate = (p) ->
 	pLat = myRound p.coords.latitude,6
 	pLon = myRound p.coords.longitude,6
-	altitude = int p.coords.altitude
+	#altitude = int p.coords.altitude
 	if storage.trail.length == 0
 		gpsLat = pLat
 		gpsLon = pLon
 	messages[5] = gpsCount++
 	decreaseQueue()
 	increaseQueue p # meters
-	uppdatera pLat, pLon, altitude, p.timestamp
+	uppdatera pLat, pLon
 
-uppdatera = (pLat, pLon, altitude, timestamp) -> # senaste fem positionerna
-	date = new Date()
-	date.setTime timestamp
-	h = addZero date.getHours()
-	M = addZero date.getMinutes()
-	s = addZero date.getSeconds()
-	hms = "#{h}:#{M}:#{s}"
+uppdatera = (pLat, pLon) -> # senaste fem positionerna
+	# date = new Date()
+	# date.setTime timestamp
+	# h = addZero date.getHours()
+	# M = addZero date.getMinutes()
+	# s = addZero date.getSeconds()
+	# hms = "#{h}:#{M}:#{s}"
 
 	dump.store ""
-	dump.store "LU #{hms} #{pLat} #{pLon}"
-	position = [pLon,pLat,altitude,hms] 
+	dump.store "LU #{pLat} #{pLon}"
 
-	updateTrack pLat, pLon, altitude
-	updateTrail pLat, pLon, position
+	[x,y] = w2b.convert pLon,pLat
+	updateTrack pLat, pLon, x,y
+	updateTrail pLat, pLon, x,y
 
-updateTrack = (pLat, pLon, altitude) ->
-	track.push w2b.convert pLon,pLat
+updateTrack = (pLat, pLon, x,y) ->
+	track.push [x,y]
 	if track.length > TRACKED then track.shift()
 	t = _.last track
 	dump.store "T #{t[0]} #{t[1]}"
-	if altitude then messages[3] = altitude
+	# if altitude then messages[3] = altitude
 	messages[4] = pLat + ' ' + pLon
 
-updateTrail = (pLat, pLon, position)->
+updateTrail = (pLat, pLon, x,y)->
+	position = [x,y] # w2b.convert pLon,pLat
 	if storage.trail.length == 0 
 		storage.trail.push position
 		return
-	[qLon, qLat] = _.last storage.trail
-	a = LatLon pLat, pLon # newest
-	b = LatLon qLat, qLon # last
-	dist = a.distanceTo b # meters
-	if dist > 5 
-		dump.store "updateTrail #{dist}"
-		storage.trail.push position
+
+	# [qLon, qLat] = _.last storage.trail
+	# a = LatLon pLat, pLon # newest
+	# b = LatLon qLat, qLon # last
+	# dist = a.distanceTo b # meters
+	# if dist > 5 
+	# 	dump.store "updateTrail #{dist}"
+	storage.trail.push position
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
 window.speechSynthesis.onvoiceschanged = -> voices = window.speechSynthesis.getVoices()
@@ -581,7 +583,8 @@ savePosition = ->
 menu1 = -> # Main Menu
 	dialogue = new Dialogue()
 	dialogue.add 'Center', ->
-		[cx,cy] = w2b.convert position[0],position[1] 
+		# [cx,cy] = w2b.convert position[0],position[1] 
+		[cx,cy] = position
 		dialogues.clear()
 	dialogue.add 'Out', -> if SCALE > data.scale then SCALE /= 1.5
 	dialogue.add 'Take...', -> menu4()
