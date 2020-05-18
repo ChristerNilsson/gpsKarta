@@ -367,6 +367,7 @@ setup = ->
 	storage = new Storage mapName
 	storage.trail = []
 	if params.trail then storage.trail = JSON.parse params.trail
+	console.log storage.trail
 
 	# myTest() Do not execute! Very dependent on .json file.
 
