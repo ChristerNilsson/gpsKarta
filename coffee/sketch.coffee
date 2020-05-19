@@ -1,4 +1,4 @@
-VERSION = 174 
+VERSION = 175
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -257,6 +257,7 @@ decreaseQueue = ->
 		say msg.replace ':',' and '
 
 locationUpdate = (p) ->
+	return
 	pLat = myRound p.coords.latitude,6
 	pLon = myRound p.coords.longitude,6
 	if storage.trail.length == 0
