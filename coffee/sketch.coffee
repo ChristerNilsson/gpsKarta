@@ -13,7 +13,7 @@
 		# "12": [646,1421],
 		# "13": [472,1594],
 
-VERSION = 169
+VERSION = 170
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -216,22 +216,25 @@ increaseQueue = (p) ->
 	else if distance < -10 then soundQueue = -10
 	else if distance > 10 then soundQueue = 10
 
-# firstInfo = (key) ->
-# 	b = LatLon gpsLat, gpsLon
-# 	c = LatLon trgLat, trgLon # target
+firstInfo = ->
+	[x,y] = crossHair
+	[trgLon,trgLat] = b2w.convert qx,qy
 
-# 	distb = round b.distanceTo c
-# 	distance = round (distb)/DIST
+	b = LatLon gpsLat, gpsLon
+	c = LatLon trgLat, trgLon 
 
-# 	bearingb = b.bearingTo c
-# 	voiceQueue.push "target #{key} #{sayBearing bearingb,-1} #{sayDistance distb,-1}"
-# 	dump.store ""
-# 	dump.store "target #{crossHair}"
-# 	dump.store "gps #{[gpsLat,gpsLon]}"
-# 	dump.store "trg #{[trgLat,trgLon]}"
-# 	dump.store "voiceQueue #{voiceQueue}"
+	distb = round b.distanceTo c
+	distance = round (distb)/DIST
+
+	bearingb = b.bearingTo c
+	voiceQueue.push "target #{key} #{sayBearing bearingb,-1} #{sayDistance distb,-1}"
+	dump.store ""
+	dump.store "target #{crossHair}"
+	dump.store "gps #{[gpsLat,gpsLon]}"
+	dump.store "trg #{[trgLat,trgLon]}"
+	dump.store "voiceQueue #{voiceQueue}"
 	
-# 	if distance < 10 then soundQueue = distance else soundQueue = 10 # ett antal DIST
+	if distance < 10 then soundQueue = distance else soundQueue = 1 # ett antal DIST
 
 playSound = ->
 	if not COINS then return 
@@ -570,24 +573,24 @@ draw = ->
 		drawInfo()
 		return
 
-# setTarget = (key) ->
-# 	soundQueue = 0
-# 	if key == currentControl
-# 		currentControl = null
-# 		messages[0] = ""
-# 		messages[1] = ""
-# 		messages[2] = ""
-# 		[trgLon,trgLat] = [0,0]
-# 	else
-# 		if key not of storage.controls then return
-# 		if storage.controls[currentControl] == null then return
-# 		# soundQueue = 0
-# 		currentControl = key
-# 		[x,y] = storage.controls[currentControl]
-# 		[trgLon,trgLat] = b2w.convert x,y
-# 		firstInfo key
-# 	storage.save()
-# 	dialogues.clear()
+setTarget = ->
+	soundQueue = 0
+	# if key == currentControl
+	# 	currentControl = null
+	# 	messages[0] = ""
+	# 	messages[1] = ""
+	# 	messages[2] = ""
+	# 	[trgLon,trgLat] = [0,0]
+	# else
+		# if key not of storage.controls then return
+		# if storage.controls[currentControl] == null then return
+		# soundQueue = 0
+		# currentControl = key
+		#[x,y] = crossHair
+		#[trgLon,trgLat] = b2w.convert x,y
+	firstInfo()
+	storage.save()
+	dialogues.clear()
 
 executeMail = ->
 	link = "https://christernilsson.github.io/gpsKarta/index.html?map=" + mapName + "&trail=" + JSON.stringify storage.trail
@@ -619,6 +622,7 @@ savePosition = ->
 
 aim = -> 
 	crossHair = if crossHair == null then [cx,cy] else null
+	setTarget()
 	dialogues.clear()
 
 menu1 = -> # Main Menu
