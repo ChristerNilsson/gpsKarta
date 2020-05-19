@@ -1,4 +1,4 @@
-VERSION = 173
+VERSION = 174 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -8,6 +8,7 @@ platform = window.navigator.platform # Win32
 # Setup
 COINS = true
 DISTANCE = true
+TRAIL = true
 SECTOR = 10 # Bearing resolution in degrees
 
 DIGITS = 'zero one two three four five six seven eight niner'.split ' '
@@ -396,6 +397,7 @@ info = () ->
 	result.push "SECTOR: #{SECTOR}"
 	result.push "COINS: #{COINS}"
 	result.push "DISTANCE: #{DISTANCE}"
+	result.push "TRAIL: #{TRAIL}"
 	result.push "cx cy: #{round cx} #{round cy}"
 	result.push "SCALE: #{SCALE}"
 	result.push "frameTime: #{frameTime} ms"
@@ -431,10 +433,11 @@ drawTrack = ->
 		circle x-cx, y-cy, 5 * (track.length-i)
 
 drawTrail = ->
+	if not TRAIL then return
 	fc 1,1,0
 	sw 1
 	sc 0
-	for [x,y] in storage.trail 
+	for [x,y] in storage.trail
 		circle x-cx, y-cy, 2
 
 drawControls = ->
@@ -617,8 +620,12 @@ menu2 = -> # Setup
 	dialogue.add 'Distance', -> 
 		DISTANCE = not DISTANCE
 		dialogues.clear()
+	dialogue.add 'Trail', -> 
+		TRAIL = not TRAIL
+		dialogues.clear()
 	dialogue.add 'Sector...', -> menu3()
 	dialogue.clock()
+	dialogue.textSize *= 1.5
 
 menu3 = -> # Sector
 	dialogue = new Dialogue()
