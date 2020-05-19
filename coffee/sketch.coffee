@@ -257,7 +257,6 @@ decreaseQueue = ->
 		say msg.replace ':',' and '
 
 locationUpdate = (p) ->
-	return
 	pLat = myRound p.coords.latitude,6
 	pLon = myRound p.coords.longitude,6
 	if storage.trail.length == 0
@@ -373,10 +372,10 @@ setup = ->
 
 	[cx,cy] = [img.width/2,img.height/2]
 
-	# navigator.geolocation.watchPosition locationUpdate, locationUpdateFail,
-	# 	enableHighAccuracy: true
-	# 	maximumAge: 30000
-	# 	timeout: 27000
+	navigator.geolocation.watchPosition locationUpdate, locationUpdateFail,
+		enableHighAccuracy: true
+		maximumAge: 30000
+		timeout: 27000
 
 	menuButton = new MenuButton width-160
 
@@ -566,7 +565,7 @@ executeMail = ->
 	link = "https://christernilsson.github.io/gpsKarta/index.html?map=" + mapName + "&trail=" + JSON.stringify storage.trail
 	r = info().join BR
 	t = ("#{key} #{x} #{y} #{littera} #{lat} #{lon}" for key,[x,y,littera,lat, lon] of storage.controls).join BR
-	content = link + BR + BR + r + BR + dump.get() + t
+	content = link + BR+BR + r + BR+BR + t + BR+BR + dump.get()
 	# if currentControl
 	# 	littera = storage.controls[currentControl][2]
 	# 	sendMail "#{mapName} #{currentControl} #{littera}", content
