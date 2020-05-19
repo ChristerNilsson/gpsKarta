@@ -243,7 +243,7 @@ decreaseQueue = ->
 		msg = arr[1] + ' ' + arr[2] # skippa ordet. t ex 'bäring etta tvåa'
 		if bearingSaid != msg then say msg
 		bearingSaid = msg
-	else if arr[0] == 'distance' and (DISTANCE or arr[1] < 20)
+	else if arr[0] == 'distance' and (DISTANCE or arr[1] < LIMIT)
 		msg = arr[1]                # skippa ordet. t ex 'distans 30'
 		if distanceSaid != msg then say msg
 		distanceSaid = msg
