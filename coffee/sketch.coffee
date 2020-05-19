@@ -12,7 +12,7 @@
 		# "12": [646,1421],
 		# "13": [472,1594],
 
-VERSION = 165
+VERSION = 166
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -24,7 +24,6 @@ console.log platform
 COINS = true
 DISTANCE = true
 SECTOR = 10 # Bearing resolution in degrees
-#ATTACHED = false
 
 DIGITS = 'zero one two three four five six seven eight niner'.split ' '
 BR = if platform == 'Win32' then "\n" else '<br>'
@@ -54,7 +53,7 @@ startY = 0
 
 menuButton = null
 
-currentControl = null
+crossHair = null
 
 class Storage 
 	constructor : (@mapName) ->
@@ -73,8 +72,7 @@ class Storage
 		@controls = data.controls
 		@trail = []
 		@init()
-		[trgLat,trgLon] = [0,0]
-		currentControl = null
+		crossHair = null
 		@save()
 
 	init : ->
@@ -84,16 +82,14 @@ class Storage
 			control[2] = ""
 			control[3] = lat
 			control[4] = lon
-			if currentControl != null
-				[z99,z99,z99,trgLat,trgLon] = @controls[currentControl]
 
-	deleteControl : ->
-		if ':' in currentControl
-			delete @controls[currentControl]
-			@save()
-			currentControl = null
-		else
-			voiceQueue.push "computer says no"
+	# deleteControl : ->
+	# 	if ':' in currentControl
+	# 		delete @controls[currentControl]
+	# 		@save()
+	# 		currentControl = null
+	# 	else
+	# 		voiceQueue.push "computer says no"
 
 storage = null
 
@@ -131,9 +127,6 @@ messages = ['','','','','','']
 gpsCount = 0
 
 [gpsLat,gpsLon] = [0,0] # avgör om muntlig information ska ges
-[trgLat,trgLon] = [0,0] # koordinater för vald target
-
-#lastLocation = '' # används för att skippa lika koordinater
 
 timeout = null
 
@@ -194,7 +187,9 @@ sayBearing = (a0,b0) -> # a is newer (degrees)
 increaseQueue = (p) ->
 	dump.store "increaseQueue #{p.coords.latitude} #{p.coords.longitude}"
 
-	if currentControl == null then return 
+	if crossHair == null then return 
+
+	[trgLon,trgLat] = b2w.convert crossHair[0],crossHair[1]
 
 	a = LatLon p.coords.latitude,p.coords.longitude # newest
 	b = LatLon gpsLat, gpsLon
@@ -204,14 +199,13 @@ increaseQueue = (p) ->
 	distb = b.distanceTo c
 	distance = (dista - distb)/DIST
 
-	if trgLat != 0
-		bearinga = a.bearingTo c
-		bearingb = b.bearingTo c
-		if dista >= LIMIT
-			sBearing = sayBearing bearinga,bearingb
-			if sBearing != "" then voiceQueue.push "bearing #{sBearing}"
-		sDistance = sayDistance dista,distb
-		if sDistance != "" then voiceQueue.push "distance #{sDistance}"
+	bearinga = a.bearingTo c
+	bearingb = b.bearingTo c
+	if dista >= LIMIT
+		sBearing = sayBearing bearinga,bearingb
+		if sBearing != "" then voiceQueue.push "bearing #{sBearing}"
+	sDistance = sayDistance dista,distb
+	if sDistance != "" then voiceQueue.push "distance #{sDistance}"
 
 	if abs(distance) >= 0.5 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = myRound p.coords.latitude,6
@@ -222,22 +216,22 @@ increaseQueue = (p) ->
 	else if distance < -10 then soundQueue = -10
 	else if distance > 10 then soundQueue = 10
 
-firstInfo = (key) ->
-	b = LatLon gpsLat, gpsLon
-	c = LatLon trgLat, trgLon # target
+# firstInfo = (key) ->
+# 	b = LatLon gpsLat, gpsLon
+# 	c = LatLon trgLat, trgLon # target
 
-	distb = round b.distanceTo c
-	distance = round (distb)/DIST
+# 	distb = round b.distanceTo c
+# 	distance = round (distb)/DIST
 
-	bearingb = b.bearingTo c
-	voiceQueue.push "target #{key} #{sayBearing bearingb,-1} #{sayDistance distb,-1}"
-	dump.store ""
-	dump.store "target #{currentControl}"
-	dump.store "gps #{[gpsLat,gpsLon]}"
-	dump.store "trg #{[trgLat,trgLon]}"
-	dump.store "voiceQueue #{voiceQueue}"
+# 	bearingb = b.bearingTo c
+# 	voiceQueue.push "target #{key} #{sayBearing bearingb,-1} #{sayDistance distb,-1}"
+# 	dump.store ""
+# 	dump.store "target #{crossHair}"
+# 	dump.store "gps #{[gpsLat,gpsLon]}"
+# 	dump.store "trg #{[trgLat,trgLon]}"
+# 	dump.store "voiceQueue #{voiceQueue}"
 	
-	if distance < 10 then soundQueue = distance else soundQueue = 10 # ett antal DIST
+# 	if distance < 10 then soundQueue = distance else soundQueue = 10 # ett antal DIST
 
 playSound = ->
 	if not COINS then return 
@@ -379,7 +373,6 @@ setup = ->
 	b2w = new Converter bmp,wgs,6
 	w2b = new Converter wgs,bmp,0
 
-	# mapName = params.map || '21A'
 	storage = new Storage mapName
 	storage.trail = []
 	if params.trail then storage.trail = JSON.parse params.trail
@@ -419,18 +412,16 @@ info = () ->
 	result.push "frameTime: #{frameTime} ms"
 	result
 
-drawCrossHair = ->
-	[x,y] = if currentControl then [0,0] else [width/2,height/2]
-	r1 = 0.45 * data.radius
-	r2 = 0.9 * data.radius
-	sw 2
-	sc 1,0,0
+drawCrossHair = (x,y) ->
+	r = 0.9 * data.radius
+	if not crossHair then r *= SCALE
+	if crossHair then sw 3 else sw 1
+	if crossHair then sc 1,0,0,0.5 else sc 1,0,0
 	fc()
-	circle x,y,r2
-	line x,y+r1,x,y+r2
-	line x,y-r1,x,y-r2
-	line x+r1,y,x+r2,y
-	line x-r1,y,x-r2,y
+	circle x,y,r
+	sw 1
+	line x,y-r,x,y+r
+	line x-r,y,x+r,y
 
 drawInfo = ->
 	textAlign LEFT,CENTER
@@ -464,6 +455,10 @@ drawControls = ->
 
 		r = radius key
 
+		# if key == 'Z'
+		# 	drawCrossHair()
+		# 	continue
+
 		stroke strokeCol
 		fill fillCol
 		circle x-cx, y-cy, r
@@ -488,22 +483,26 @@ radius = (key) -> if key in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' then data.radius/2 else
 
 drawControl = ->
 
-	if trgLat == 0 and trgLon == 0 then return
-	
-	if gpsLat != 0 and gpsLon != 0
+	if crossHair and gpsLat != 0 and gpsLon != 0
+		[trgLon,trgLat] = b2w.convert crossHair[0],crossHair[1]
 		latLon2 = LatLon trgLat,trgLon
 		latLon1 = LatLon gpsLat,gpsLon
 
 		bearing = latLon1.bearingTo latLon2
-		messages[0] = currentControl || ""
+		messages[0] = ""
 		messages[1] = "#{int bearing}º"
 		messages[2] = "#{round(latLon1.distanceTo latLon2)} m"
+	else 
+		messages[0] = ""
+		messages[1] = ""
+		messages[2] = ""
 
-	if currentControl
-		[x,y] = storage.controls[currentControl]
-		sc()
-		fc 0,0,0,0.25
-		circle x-cx, y-cy, radius currentControl
+
+	# if currentControl
+	# 	[x,y] = storage.controls[currentControl]
+	# 	sc()
+	# 	fc 0,0,0,0.25
+	# 	circle x-cx, y-cy, radius currentControl
 
 drawRuler = ->
 	[w1,w0] = getMeters width, SCALE
@@ -545,10 +544,11 @@ draw = ->
 		drawTrack()
 		if data.drawControls then drawControls()
 		drawControl()
-		if currentControl then drawCrossHair()
-		pop()
+		if crossHair then drawCrossHair crossHair[0]-cx, crossHair[1]-cy # detached
 
-		if not currentControl then drawCrossHair()
+		pop()
+		if not crossHair then drawCrossHair width/2,height/2 # attached
+
 		fc 0
 		sc 1,1,0
 		sw 3
@@ -568,35 +568,35 @@ draw = ->
 		drawInfo()
 		return
 
-setTarget = (key) ->
-	soundQueue = 0
-	if key == currentControl
-		currentControl = null
-		messages[0] = ""
-		messages[1] = ""
-		messages[2] = ""
-		[trgLon,trgLat] = [0,0]
-	else
-		if key not of storage.controls then return
-		if storage.controls[currentControl] == null then return
-		# soundQueue = 0
-		currentControl = key
-		[x,y] = storage.controls[currentControl]
-		[trgLon,trgLat] = b2w.convert x,y
-		firstInfo key
-	storage.save()
-	dialogues.clear()
+# setTarget = (key) ->
+# 	soundQueue = 0
+# 	if key == currentControl
+# 		currentControl = null
+# 		messages[0] = ""
+# 		messages[1] = ""
+# 		messages[2] = ""
+# 		[trgLon,trgLat] = [0,0]
+# 	else
+# 		if key not of storage.controls then return
+# 		if storage.controls[currentControl] == null then return
+# 		# soundQueue = 0
+# 		currentControl = key
+# 		[x,y] = storage.controls[currentControl]
+# 		[trgLon,trgLat] = b2w.convert x,y
+# 		firstInfo key
+# 	storage.save()
+# 	dialogues.clear()
 
 executeMail = ->
 	link = "https://christernilsson.github.io/gpsKarta/index.html?map=" + mapName + "&trail=" + JSON.stringify storage.trail
 	r = info().join BR
 	t = ("#{key} #{x} #{y} #{littera} #{lat} #{lon}" for key,[x,y,littera,lat, lon] of storage.controls).join BR
 	content = link + BR + BR + r + BR + dump.get() + t
-	if currentControl
-		littera = storage.controls[currentControl][2]
-		sendMail "#{mapName} #{currentControl} #{littera}", content
-	else
-		sendMail "#{mapName}", content
+	# if currentControl
+	# 	littera = storage.controls[currentControl][2]
+	# 	sendMail "#{mapName} #{currentControl} #{littera}", content
+	# else
+	sendMail "#{mapName}", content
 
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
@@ -616,19 +616,17 @@ savePosition = ->
 	dialogues.clear()
 
 aim = ->
-	if currentControl 
-		currentControl = null
+	if crossHair != null
+		console.log 'detached'
+		crossHair = null
 	else
-		[lon,lat] = b2w.convert cx,cy
-		storage.controls.Z = [cx,cy, '', lat,lon]
-		currentControl = 'Z'
-	#ATTACHED = not ATTACHED
+		console.log 'attached'
+		crossHair = [cx,cy]
 	dialogues.clear()
 
 menu1 = -> # Main Menu
 	dialogue = new Dialogue()
 	dialogue.add 'Center', ->
-		# [cx,cy] = w2b.convert position[0],position[1] 
 		[cx,cy] = position
 		dialogues.clear()
 	dialogue.add 'Out', -> if SCALE > data.scale then SCALE /= 1.5
@@ -696,39 +694,39 @@ SetSector = (sector) ->
 	SECTOR = sector
 	dialogues.clear()
 
-addZero = (n) -> if n <= 9 then "0" + n else n
+#addZero = (n) -> if n <= 9 then "0" + n else n
 
-stdDateTime = (date) ->
-	y = date.getFullYear()
-	m = addZero date.getMonth() + 1
-	d = addZero date.getDate()
-	h = addZero date.getHours()
-	M = addZero date.getMinutes()
-	s =	addZero date.getSeconds()
-	"#{y}-#{m}-#{d} #{h}:#{M}:#{s}"
+# stdDateTime = (date) ->
+# 	y = date.getFullYear()
+# 	m = addZero date.getMonth() + 1
+# 	d = addZero date.getDate()
+# 	h = addZero date.getHours()
+# 	M = addZero date.getMinutes()
+# 	s =	addZero date.getSeconds()
+# 	"#{y}-#{m}-#{d} #{h}:#{M}:#{s}"
 
-update = (littera,index=2) ->
-	control = storage.controls[currentControl]
-	#[x,y] = w2b.convert gpsLon, gpsLat
-	control[index] = littera
-	storage.save()
-	dialogues.clear()
-	executeMail()
+# update = (littera,index=2) ->
+# 	control = storage.controls[currentControl]
+# 	#[x,y] = w2b.convert gpsLon, gpsLat
+# 	control[index] = littera
+# 	storage.save()
+# 	dialogues.clear()
+# 	executeMail()
 
 showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
 
-positionClicked = (xc,yc) -> # canvas koordinater
+# positionClicked = (xc,yc) -> # canvas koordinater
 
-	xi = cx + (xc - width/2) / SCALE  	# image koordinater
-	yi = cy + (yc - height/2) / SCALE
+# 	xi = cx + (xc - width/2) / SCALE  	# image koordinater
+# 	yi = cy + (yc - height/2) / SCALE
 
-	for key,control of storage.controls
-		if control == null then continue
-		[x,y,z99,z99,z99] = control
-		if radius(key) > dist xi,yi,x,y 
-			setTarget key 
-			return true
-	false 
+# 	for key,control of storage.controls
+# 		if control == null then continue
+# 		[x,y,z99,z99,z99] = control
+# 		if radius(key) > dist xi,yi,x,y 
+# 			setTarget key 
+# 			return true
+# 	false 
 
 touchStarted = (event) ->
 	event.preventDefault()
@@ -759,8 +757,8 @@ touchEnded = (event) ->
 	if dialogues.length > 0
 		dialogue = _.last dialogues
 		if not dialogue.execute mouseX,mouseY then dialogues.pop()
-	else if state == 1 and startX == mouseX and startY == mouseY
-		positionClicked mouseX,mouseY
+	# else if state == 1 and startX == mouseX and startY == mouseY
+	# 	positionClicked mouseX,mouseY
 
 	false
 
