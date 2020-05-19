@@ -1,4 +1,4 @@
-VERSION = 175
+VERSION = 176
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -373,10 +373,10 @@ setup = ->
 
 	[cx,cy] = [img.width/2,img.height/2]
 
-	navigator.geolocation.watchPosition locationUpdate, locationUpdateFail,
-		enableHighAccuracy: true
-		maximumAge: 30000
-		timeout: 27000
+	# navigator.geolocation.watchPosition locationUpdate, locationUpdateFail,
+	# 	enableHighAccuracy: true
+	# 	maximumAge: 30000
+	# 	timeout: 27000
 
 	menuButton = new MenuButton width-160
 
