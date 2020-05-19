@@ -711,7 +711,7 @@ touchEnded = (event) ->
 		if not dialogue.execute mouseX,mouseY then dialogues.pop()
 	false
 
-keyPressed = ->
+keyPressed = -> # Används för att avläsa ABC bitmapskoordinater
 	if key == ' '
 		xi = round cx + (mouseX - width/2) / SCALE  	# image koordinater
 		yi = round cy + (mouseY - height/2) / SCALE
