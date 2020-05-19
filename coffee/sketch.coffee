@@ -383,22 +383,22 @@ setup = ->
 		myMousePressed mx,my
 
 info = () ->
-	result = []
-	result.push "platform: #{platform}"
-	result.push "MAP: #{mapName}"
-	result.push "VERSION: #{VERSION}"
-	#result.push "dump.active: #{dump.active}"  
-	#result.push "dump.data.length: #{dump.data.length}"
-	result.push "trail.length: #{storage.trail.length}"
-	result.push "gpsCount: #{gpsCount}"
-	result.push "SECTOR: #{SECTOR}"
-	result.push "COINS: #{COINS}"
-	result.push "DISTANCE: #{DISTANCE}"
-	result.push "TRAIL: #{TRAIL}"
-	#result.push "cx cy: #{round cx} #{round cy}"
-	#result.push "SCALE: #{SCALE}"
-	#result.push "frameTime: #{frameTime} ms"
-	result
+	[
+		"platform: #{platform}"
+		"MAP: #{mapName}"
+		"VERSION: #{VERSION}"
+		# "dump.active: #{dump.active}"  
+		# "dump.data.length: #{dump.data.length}"
+		"trail.length: #{storage.trail.length}"
+		"gpsCount: #{gpsCount}"
+		"SECTOR: #{SECTOR}"
+		"COINS: #{COINS}"
+		"DISTANCE: #{DISTANCE}"
+		"TRAIL: #{TRAIL}"
+		# "cx cy: #{round cx} #{round cy}"
+		# "SCALE: #{SCALE}"
+		# "frameTime: #{frameTime} ms"
+	]
 
 drawCrossHair = (x,y) ->
 	r = 0.9 * data.radius
