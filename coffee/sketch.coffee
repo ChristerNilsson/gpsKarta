@@ -1,3 +1,4 @@
+		# 21A
 		# "1": [1528,1334],
 		# "2": [1425,1248],
 		# "3": [1097,384],
@@ -12,13 +13,12 @@
 		# "12": [646,1421],
 		# "13": [472,1594],
 
-VERSION = 166
+VERSION = 167
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
 
-platform = window.navigator.platform
-console.log platform
+platform = window.navigator.platform # Win32
 
 # Setup
 COINS = true
@@ -377,6 +377,7 @@ setup = ->
 	storage.trail = []
 	if params.trail then storage.trail = JSON.parse params.trail
 	console.log storage.trail
+	console.log storage.controls
 
 	# myTest() Do not execute! Very dependent on .json file.
 
@@ -414,12 +415,16 @@ info = () ->
 
 drawCrossHair = (x,y) ->
 	r = 0.9 * data.radius
-	if not crossHair then r *= SCALE
-	if crossHair then sw 3 else sw 1
-	if crossHair then sc 1,0,0,0.5 else sc 1,0,0
-	fc()
+	if crossHair
+		sw 1
+		sc 1,1,1,0.5
+		fc 1,0,0,0.5
+	else
+		sw 1
+		sc 1,0,0
+		fc 0,0,0,0.25
+		r *= SCALE
 	circle x,y,r
-	sw 1
 	line x,y-r,x,y+r
 	line x-r,y,x+r,y
 
@@ -449,37 +454,39 @@ drawControls = ->
 	for key,control of storage.controls
 		if control == null then continue
 		[x,y,littera] = control
-		[strokeCol,fillCol] = ["#0008","#0000"]
-		if key in "ABC" then [strokeCol,fillCol] = ["#0f08","#ff08"]
-		if key in "DEFGHIJKLMNOPQRSTUVWXYZ" then [strokeCol,fillCol] = ["#0008","#ff08"]
 
-		r = radius key
+		r = data.radius
 
-		# if key == 'Z'
-		# 	drawCrossHair()
-		# 	continue
-
-		stroke strokeCol
-		fill fillCol
-		circle x-cx, y-cy, r
-		sc()
-		fill 0
-		if r == data.radius # Full Size
-			textSize r
-			textAlign LEFT,TOP
-			text key, x-cx+0.7*r, y-cy+0.7*r
-			textAlign CENTER,CENTER
-			text littera, x-cx, y-cy
-		else # Half Size
-			textSize r*1.5
+		if key in 'ABC' # Half Size
+			stroke "#0f08"
+			fill "#ff08"
+			circle x-cx, y-cy, r/2
+			sc()
+			fc 0
+			textSize r*0.75
 			textAlign CENTER,CENTER
 			text key, x-cx, y-cy
+		else # Full Size
+			if littera == ''
+				stroke 0
+				fc()
+				circle x-cx, y-cy, r
+				sc()
+				fc 0
+				textSize 1.5*data.radius
+				textAlign CENTER,CENTER
+				text key, x-cx, y-cy
+			else
+				sc()
+				fc 0
+				textSize 1.5*data.radius
+				textAlign CENTER,CENTER
+				text littera, x-cx, y-cy
 
-		stroke strokeCol
-		sw 2
+		stroke 0
 		point x-cx, y-cy
 
-radius = (key) -> if key in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' then data.radius/2 else data.radius
+# radius = (key) -> data.radius # if key in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' then data.radius/2 else data.radius
 
 drawControl = ->
 
@@ -602,7 +609,7 @@ Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
 
 findKey = ->
-	for key in 'DEFGHIJKLMNOPQRSTUVWXY'
+	for key in 'DEFGHIJKLMNOPQRSTUVWXYZ'
 		if key not of storage.controls then return key
 	false
 
@@ -611,7 +618,7 @@ savePosition = ->
 	key = findKey()
 	storage.controls[key] = [x,y,'',gpsLat,gpsLon]
 	storage.save()
-	# console.log key, storage.controls[key]
+	console.log key, storage.controls[key]
 	voiceQueue.push "saved #{key}"
 	dialogues.clear()
 
@@ -705,13 +712,19 @@ SetSector = (sector) ->
 # 	s =	addZero date.getSeconds()
 # 	"#{y}-#{m}-#{d} #{h}:#{M}:#{s}"
 
-# update = (littera,index=2) ->
-# 	control = storage.controls[currentControl]
-# 	#[x,y] = w2b.convert gpsLon, gpsLat
-# 	control[index] = littera
-# 	storage.save()
-# 	dialogues.clear()
-# 	executeMail()
+update = (littera) ->
+	key = findKey()
+	[x,y] = crossHair
+	[lon,lat] = b2w.convert x,y
+	storage.controls[key] = [x,y,littera,lat,lon]
+	console.log 'update', [x,y,littera,lat,lon]
+	#control = storage.controls[currentControl]
+	#[x,y] = w2b.convert gpsLon, gpsLat
+	#control[index] = littera
+	storage.save()
+	crossHair = null
+	dialogues.clear()
+	#executeMail()
 
 showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
 
