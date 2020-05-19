@@ -13,7 +13,7 @@
 		# "12": [646,1421],
 		# "13": [472,1594],
 
-VERSION = 168
+VERSION = 169
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -486,15 +486,11 @@ drawControls = ->
 		stroke 0
 		point x-cx, y-cy
 
-# radius = (key) -> data.radius # if key in 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' then data.radius/2 else data.radius
-
 drawControl = ->
-
 	if crossHair and gpsLat != 0 and gpsLon != 0
 		[trgLon,trgLat] = b2w.convert crossHair[0],crossHair[1]
 		latLon2 = LatLon trgLat,trgLon
 		latLon1 = LatLon gpsLat,gpsLon
-
 		bearing = latLon1.bearingTo latLon2
 		messages[0] = ""
 		messages[1] = "#{int bearing}º"
@@ -503,7 +499,6 @@ drawControl = ->
 		messages[0] = ""
 		messages[1] = ""
 		messages[2] = ""
-
 
 	# if currentControl
 	# 	[x,y] = storage.controls[currentControl]
@@ -547,28 +542,28 @@ draw = ->
 		translate width/2, height/2
 		scale SCALE
 		image img, -cx,-cy
-		#drawTrail()
-		#drawTrack()
-		#if data.drawControls then drawControls()
-		#drawControl()
-		#if crossHair then drawCrossHair crossHair[0]-cx, crossHair[1]-cy # detached
+		drawTrail()
+		drawTrack()
+		if data.drawControls then drawControls()
+		drawControl()
+		if crossHair then drawCrossHair crossHair[0]-cx, crossHair[1]-cy # detached
 
 		pop()
-		#if not crossHair then drawCrossHair width/2,height/2 # attached
+		if not crossHair then drawCrossHair width/2,height/2 # attached
 
-		# fc 0
-		# sc 1,1,0
-		# sw 3
-		# margin = 25
-		# for message,i in messages
-		# 	textAlign [LEFT,CENTER,RIGHT][i%3], [TOP,BOTTOM][i//3]
-		# 	textSize [100,50][i//3]
-		# 	text message, [margin,width/2,width-margin][i%3], [margin,height][i//3] 
-		# drawRuler()
+		fc 0
+		sc 1,1,0
+		sw 3
+		margin = 25
+		for message,i in messages
+			textAlign [LEFT,CENTER,RIGHT][i%3], [TOP,BOTTOM][i//3]
+			textSize [100,50][i//3]
+			text message, [margin,width/2,width-margin][i%3], [margin,height][i//3] 
+		drawRuler()
 		frameTime = round (new Date()) - start
 
-		#showDialogue()
-		#menuButton.draw()
+		showDialogue()
+		menuButton.draw()
 		return
 
 	if state == 2
@@ -696,17 +691,6 @@ SetSector = (sector) ->
 	SECTOR = sector
 	dialogues.clear()
 
-#addZero = (n) -> if n <= 9 then "0" + n else n
-
-# stdDateTime = (date) ->
-# 	y = date.getFullYear()
-# 	m = addZero date.getMonth() + 1
-# 	d = addZero date.getDate()
-# 	h = addZero date.getHours()
-# 	M = addZero date.getMinutes()
-# 	s =	addZero date.getSeconds()
-# 	"#{y}-#{m}-#{d} #{h}:#{M}:#{s}"
-
 update = (littera) ->
 	key = findKey()
 	[x,y] = crossHair
@@ -724,7 +708,6 @@ update = (littera) ->
 showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
 
 # positionClicked = (xc,yc) -> # canvas koordinater
-
 # 	xi = cx + (xc - width/2) / SCALE  	# image koordinater
 # 	yi = cy + (yc - height/2) / SCALE
 
