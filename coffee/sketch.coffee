@@ -1,19 +1,4 @@
-		# 21A
-		# "1": [1528,1334],
-		# "2": [1425,1248],
-		# "3": [1097,384],
-		# "4": [1532,288],
-		# "5": [1773,109],
-		# "6": [1916,313],
-		# "7": [2090,376],
-		# "8": [1826,591],
-		# "9": [1568,668],
-		# "10": [1019,1375],
-		# "11": [900,1489],
-		# "12": [646,1421],
-		# "13": [472,1594],
-
-VERSION = 171
+VERSION = 172
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -503,12 +488,6 @@ drawControl = ->
 		messages[1] = ""
 		messages[2] = ""
 
-	# if currentControl
-	# 	[x,y] = storage.controls[currentControl]
-	# 	sc()
-	# 	fc 0,0,0,0.25
-	# 	circle x-cx, y-cy, radius currentControl
-
 drawRuler = ->
 	[w1,w0] = getMeters width, SCALE
 	d = (w1-w0)/2/w1 * width
@@ -575,19 +554,6 @@ draw = ->
 
 setTarget = ->
 	soundQueue = 0
-	# if key == currentControl
-	# 	currentControl = null
-	# 	messages[0] = ""
-	# 	messages[1] = ""
-	# 	messages[2] = ""
-	# 	[trgLon,trgLat] = [0,0]
-	# else
-		# if key not of storage.controls then return
-		# if storage.controls[currentControl] == null then return
-		# soundQueue = 0
-		# currentControl = key
-		#[x,y] = crossHair
-		#[trgLon,trgLat] = b2w.convert x,y
 	firstInfo()
 	storage.save()
 	dialogues.clear()
@@ -620,9 +586,12 @@ savePosition = ->
 	voiceQueue.push "saved #{key}"
 	dialogues.clear()
 
-aim = -> 
-	crossHair = if crossHair == null then [cx,cy] else null
-	setTarget()
+aim = ->
+	if crossHair == null 
+		crossHair = [cx,cy]
+		setTarget()
+	else
+		crossHair = null
 	dialogues.clear()
 
 menu1 = -> # Main Menu
@@ -642,8 +611,12 @@ menu1 = -> # Main Menu
 
 menu2 = -> # Setup
 	dialogue = new Dialogue()
-	dialogue.add 'Coins', -> COINS = not COINS
-	dialogue.add 'Distance', -> DISTANCE = not DISTANCE
+	dialogue.add 'Coins', -> 
+		COINS = not COINS
+		dialogues.clear()
+	dialogue.add 'Distance', -> 
+		DISTANCE = not DISTANCE
+		dialogues.clear()
 	dialogue.add 'Sector...', -> menu3()
 	dialogue.clock()
 
@@ -701,27 +674,12 @@ update = (littera) ->
 	[lon,lat] = b2w.convert x,y
 	storage.controls[key] = [x,y,littera,lat,lon]
 	console.log 'update', [x,y,littera,lat,lon]
-	#control = storage.controls[currentControl]
-	#[x,y] = w2b.convert gpsLon, gpsLat
-	#control[index] = littera
 	storage.save()
 	crossHair = null
 	dialogues.clear()
 	#executeMail()
 
 showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
-
-# positionClicked = (xc,yc) -> # canvas koordinater
-# 	xi = cx + (xc - width/2) / SCALE  	# image koordinater
-# 	yi = cy + (yc - height/2) / SCALE
-
-# 	for key,control of storage.controls
-# 		if control == null then continue
-# 		[x,y,z99,z99,z99] = control
-# 		if radius(key) > dist xi,yi,x,y 
-# 			setTarget key 
-# 			return true
-# 	false 
 
 touchStarted = (event) ->
 	event.preventDefault()
@@ -748,13 +706,9 @@ touchEnded = (event) ->
 	if menuButton.inside mouseX,mouseY
 		menuButton.click()
 		return false
-
 	if dialogues.length > 0
 		dialogue = _.last dialogues
 		if not dialogue.execute mouseX,mouseY then dialogues.pop()
-	# else if state == 1 and startX == mouseX and startY == mouseY
-	# 	positionClicked mouseX,mouseY
-
 	false
 
 keyPressed = ->
