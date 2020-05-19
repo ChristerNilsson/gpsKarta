@@ -95,8 +95,6 @@ class Dump
 		result + BR
 dump = new Dump()
 
-platform = null
-
 [cx,cy] = [0,0] # center (image coordinates)
 SCALE = 1
 
@@ -386,19 +384,20 @@ setup = ->
 
 info = () ->
 	result = []
+	result.push "platform: #{platform}"
 	result.push "MAP: #{mapName}"
 	result.push "VERSION: #{VERSION}"
-	result.push "dump.active: #{dump.active}"  
-	result.push "dump.data.length: #{dump.data.length}"
+	#result.push "dump.active: #{dump.active}"  
+	#result.push "dump.data.length: #{dump.data.length}"
 	result.push "trail.length: #{storage.trail.length}"
 	result.push "gpsCount: #{gpsCount}"
 	result.push "SECTOR: #{SECTOR}"
 	result.push "COINS: #{COINS}"
 	result.push "DISTANCE: #{DISTANCE}"
 	result.push "TRAIL: #{TRAIL}"
-	result.push "cx cy: #{round cx} #{round cy}"
-	result.push "SCALE: #{SCALE}"
-	result.push "frameTime: #{frameTime} ms"
+	#result.push "cx cy: #{round cx} #{round cy}"
+	#result.push "SCALE: #{SCALE}"
+	#result.push "frameTime: #{frameTime} ms"
 	result
 
 drawCrossHair = (x,y) ->
