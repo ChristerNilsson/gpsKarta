@@ -1,4 +1,4 @@
-VERSION = 176
+VERSION = 177
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -69,13 +69,15 @@ class Storage
 			control[3] = lat
 			control[4] = lon
 
-	# deleteControl : ->
-	# 	if ':' in currentControl
-	# 		delete @controls[currentControl]
-	# 		@save()
-	# 		currentControl = null
-	# 	else
-	# 		voiceQueue.push "computer says no"
+	deleteControl : ->
+		[pLon,pLat] = b2w.convert cx,cy
+		b = LatLon pLat,pLon
+		for key,control of @controls
+			[z,z,z,qLat,qLon] = control
+			c = LatLon qLat,qLon
+			distbc = b.distanceTo(c) 
+			if distbc < data.radius and key not in "ABC" then delete @controls[key]
+		@save()
 
 storage = null
 
@@ -134,10 +136,8 @@ say = (m) ->
 	speechSynthesis.speak speaker
 
 preload = -> 
-	console.log 'preload'
 	params = getParameters()
 	mapName = params.map || "21A"
-	console.log mapName
 	if params.debug then dump.active = params.debug == '1'
 	loadJSON "data/#{mapName}.json", (json) ->
 		data = json
@@ -243,7 +243,7 @@ decreaseQueue = ->
 		msg = arr[1] + ' ' + arr[2] # skippa ordet. t ex 'bäring etta tvåa'
 		if bearingSaid != msg then say msg
 		bearingSaid = msg
-	else if arr[0] == 'distance' and DISTANCE
+	else if arr[0] == 'distance' and (DISTANCE or arr[1] < 20)
 		msg = arr[1]                # skippa ordet. t ex 'distans 30'
 		if distanceSaid != msg then say msg
 		distanceSaid = msg
@@ -365,8 +365,6 @@ setup = ->
 	storage = new Storage mapName
 	storage.trail = []
 	if params.trail then storage.trail = JSON.parse params.trail
-	console.log storage.trail
-	console.log storage.controls
 
 	# myTest() Do not execute! Very dependent on .json file.
 
@@ -585,7 +583,6 @@ savePosition = ->
 	key = findKey()
 	storage.controls[key] = [x,y,'',gpsLat,gpsLon]
 	storage.save()
-	console.log key, storage.controls[key]
 	voiceQueue.push "saved #{key}"
 	dialogues.clear()
 
@@ -680,7 +677,6 @@ update = (littera) ->
 	[x,y] = crossHair
 	[lon,lat] = b2w.convert x,y
 	storage.controls[key] = [x,y,littera,lat,lon]
-	console.log 'update', [x,y,littera,lat,lon]
 	storage.save()
 	crossHair = null
 	dialogues.clear()
