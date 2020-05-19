@@ -13,7 +13,7 @@
 		# "12": [646,1421],
 		# "13": [472,1594],
 
-VERSION = 170
+VERSION = 171
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -218,10 +218,10 @@ increaseQueue = (p) ->
 
 firstInfo = ->
 	[x,y] = crossHair
-	[trgLon,trgLat] = b2w.convert qx,qy
+	[lon,lat] = b2w.convert x,y
 
 	b = LatLon gpsLat, gpsLon
-	c = LatLon trgLat, trgLon 
+	c = LatLon lat, lon 
 
 	distb = round b.distanceTo c
 	distance = round (distb)/DIST
@@ -231,7 +231,7 @@ firstInfo = ->
 	dump.store ""
 	dump.store "target #{crossHair}"
 	dump.store "gps #{[gpsLat,gpsLon]}"
-	dump.store "trg #{[trgLat,trgLon]}"
+	dump.store "trg #{[lat,lon]}"
 	dump.store "voiceQueue #{voiceQueue}"
 	
 	if distance < 10 then soundQueue = distance else soundQueue = 1 # ett antal DIST

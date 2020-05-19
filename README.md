@@ -25,11 +25,15 @@ The size of the controls are roughly 100 meter.
 * More	
 	* Init (initializes speaker)
 	* Mail (sends data in a mail)
-	* Sector
-		* Selects size of sector. 10-90 degrees.
+	* Setup
+		* Coins. Toggle Meter indication sound
+		* Distances. Toggle Distance voice
+		* Sector
+			* Selects size of sector. 10-90 degrees.
 	* Clear
 	* Info
 * Save (stores one or many current positions with names hh:mm)
+* Aim (sets target to crosshair position)
 
 Accuracy : Approx ten meters
 
