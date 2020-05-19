@@ -13,7 +13,7 @@
 		# "12": [646,1421],
 		# "13": [472,1594],
 
-VERSION = 167
+VERSION = 168
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -547,28 +547,28 @@ draw = ->
 		translate width/2, height/2
 		scale SCALE
 		image img, -cx,-cy
-		drawTrail()
-		drawTrack()
-		if data.drawControls then drawControls()
-		drawControl()
-		if crossHair then drawCrossHair crossHair[0]-cx, crossHair[1]-cy # detached
+		#drawTrail()
+		#drawTrack()
+		#if data.drawControls then drawControls()
+		#drawControl()
+		#if crossHair then drawCrossHair crossHair[0]-cx, crossHair[1]-cy # detached
 
 		pop()
-		if not crossHair then drawCrossHair width/2,height/2 # attached
+		#if not crossHair then drawCrossHair width/2,height/2 # attached
 
-		fc 0
-		sc 1,1,0
-		sw 3
-		margin = 25
-		for message,i in messages
-			textAlign [LEFT,CENTER,RIGHT][i%3], [TOP,BOTTOM][i//3]
-			textSize [100,50][i//3]
-			text message, [margin,width/2,width-margin][i%3], [margin,height][i//3] 
-		drawRuler()
+		# fc 0
+		# sc 1,1,0
+		# sw 3
+		# margin = 25
+		# for message,i in messages
+		# 	textAlign [LEFT,CENTER,RIGHT][i%3], [TOP,BOTTOM][i//3]
+		# 	textSize [100,50][i//3]
+		# 	text message, [margin,width/2,width-margin][i%3], [margin,height][i//3] 
+		# drawRuler()
 		frameTime = round (new Date()) - start
 
-		showDialogue()
-		menuButton.draw()
+		#showDialogue()
+		#menuButton.draw()
 		return
 
 	if state == 2
@@ -622,13 +622,8 @@ savePosition = ->
 	voiceQueue.push "saved #{key}"
 	dialogues.clear()
 
-aim = ->
-	if crossHair != null
-		console.log 'detached'
-		crossHair = null
-	else
-		console.log 'attached'
-		crossHair = [cx,cy]
+aim = -> 
+	crossHair = if crossHair == null then [cx,cy] else null
 	dialogues.clear()
 
 menu1 = -> # Main Menu
