@@ -1,4 +1,4 @@
-VERSION = 177
+VERSION = 178
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -24,6 +24,7 @@ mapName = "" # t ex skarpnäck
 params = null
 voices = null
 frameTime = 0
+measure = {}
 
 state = 0 # 0=uninitialized 1=normal 2=info
 
@@ -715,6 +716,8 @@ touchEnded = (event) ->
 
 keyPressed = -> # Används för att avläsa ABC bitmapskoordinater
 	if key == ' '
-		xi = round cx + (mouseX - width/2) / SCALE  	# image koordinater
-		yi = round cy + (mouseY - height/2) / SCALE
-		console.log xi,yi
+		x = round cx + (mouseX - width/2) / SCALE  	# image koordinater
+		y = round cy + (mouseY - height/2) / SCALE
+		letter = "ABC"[_.size measure]
+		measure[letter] = [x,y]
+		if letter == 'C' then console.log '"controls": ' + JSON.stringify measure
