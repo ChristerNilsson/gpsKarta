@@ -181,17 +181,18 @@ increaseQueue = (p) ->
 	b = LatLon gpsLat, gpsLon
 	c = LatLon trgLat, trgLon # target
 
-	dista = a.distanceTo c # meters
-	distb = b.distanceTo c
-	distance = (dista - distb)/DIST
+	distac = a.distanceTo c # meters
+	distbc = b.distanceTo c
+	distance = (distac - distbc)/DIST
 
-	bearinga = a.bearingTo c
-	bearingb = b.bearingTo c
-	if dista >= LIMIT
-		sBearing = sayBearing bearinga,bearingb
-		if sBearing != "" then voiceQueue.push "bearing #{sBearing}"
-	sDistance = sayDistance dista,distb
-	if sDistance != "" then voiceQueue.push "distance #{sDistance}"
+	bearingac = a.bearingTo c
+	bearingbc = b.bearingTo c
+	if distac >= LIMIT then sBearing = sayBearing bearingac,bearingbc
+	sDistance = sayDistance distac,distbc
+
+	if sBearing != "" and sDistance != "" then voiceQueue.push "both #{sBearing} #{sDistance}"
+	else if sBearing != "" then voiceQueue.push "bearing #{sBearing}"
+	else if sDistance != "" then voiceQueue.push "distance #{sDistance}"
 
 	if abs(distance) >= 0.5 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = myRound p.coords.latitude,6
@@ -237,9 +238,19 @@ playSound = ->
 decreaseQueue = ->
 	if voiceQueue.length == 0 then return
 	msg = voiceQueue.shift()
-	arr = msg.split ' ' 
+	arr = msg.split ' '
 
-	if arr[0] == 'bearing'
+	if arr[0] == 'both'
+		result = ""
+		msg = arr[1] + ' ' + arr[2] # skippa ordet. t ex 'bäring etta tvåa'
+		if bearingSaid != arr[1] + ' ' + arr[2]
+			bearingSaid = arr[1] + ' ' + arr[2]
+			result += arr[1] + ' ' + arr[2]
+		if distanceSaid != arr[3]
+			distanceSaid = arr[3]
+			result += '. ' + arr[3]
+		if result != "" then say result
+	else if arr[0] == 'bearing'
 		msg = arr[1] + ' ' + arr[2] # skippa ordet. t ex 'bäring etta tvåa'
 		if bearingSaid != msg then say msg
 		bearingSaid = msg
