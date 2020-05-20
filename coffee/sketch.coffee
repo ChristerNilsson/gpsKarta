@@ -25,6 +25,7 @@ params = null
 voices = null
 frameTime = 0
 measure = {}
+surplus = 0
 
 state = 0 # 0=uninitialized 1=normal 2=info
 
@@ -282,7 +283,7 @@ updateTrack = (pLat, pLon, x,y) -> # senaste fem positionerna
 
 updateTrail = (pLat, pLon, x,y)->
 	position = [x,y]
-	if storage.trail.length == 0 
+	if storage.trail.length == 0
 		storage.trail.push position
 		return
 	[qx, qy] = _.last storage.trail
@@ -290,9 +291,10 @@ updateTrail = (pLat, pLon, x,y)->
 	a = LatLon pLat, pLon # newest
 	b = LatLon qLat, qLon # last
 	dist = a.distanceTo b # meters
-	if dist > 5 
+	if dist > 5 + surplus
 		dump.store "updateTrail #{dist}"
 		storage.trail.push position
+		surplus += dist-5
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
 window.speechSynthesis.onvoiceschanged = -> voices = window.speechSynthesis.getVoices()
