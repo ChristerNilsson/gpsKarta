@@ -188,7 +188,7 @@ increaseQueue = (p) ->
 
 	bearingac = a.bearingTo c
 	bearingbc = b.bearingTo c
-	if distac >= LIMIT then sBearing = sayBearing bearingac,bearingbc
+	sBearing = if distac >= LIMIT then sayBearing bearingac,bearingbc else ""
 	sDistance = sayDistance distac,distbc
 
 	if sBearing != "" and sDistance != "" then voiceQueue.push "both #{sBearing} #{sDistance}"
@@ -199,10 +199,9 @@ increaseQueue = (p) ->
 		gpsLat = myRound p.coords.latitude,6
 		gpsLon = myRound p.coords.longitude,6
 
-	if abs(distance) <= 10
-		soundQueue = round distance 
-	else if distance < -10 then soundQueue = -10
+	if distance < -10 then soundQueue = -10
 	else if distance > 10 then soundQueue = 10
+	else soundQueue = round distance
 
 firstInfo = ->
 	[x,y] = crossHair
