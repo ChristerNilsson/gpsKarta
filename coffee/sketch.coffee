@@ -1,9 +1,9 @@
-VERSION = 178
+VERSION = 179
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
 
-platform = window.navigator.platform # Win32
+platform = window.navigator.platform # Win32 
 
 # Setup
 COINS = true
@@ -20,6 +20,7 @@ BR = if platform == 'Win32' then "\n" else '<br>'
 
 DISTLIST = [0,2,4,6,8,10,12,14,16,18,20,30,40,50,60,70,80,90,100, 120,140,160,180,200,250,300,350,400,450,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000]
 
+released = true
 mapName = "" # t ex skarpnäck
 params = null
 voices = null
@@ -699,6 +700,8 @@ showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
 
 touchStarted = (event) ->
 	event.preventDefault()
+	if not released then return 
+	released = false
 	startX = mouseX
 	startY = mouseY
 	false
@@ -714,6 +717,8 @@ touchMoved = (event) ->
 
 touchEnded = (event) ->
 	event.preventDefault()
+	if released then return 
+	released = true
 	if state == 0 then initSpeaker()
 	if state == 2 then dialogues.clear()
 	if state in [0,2]
