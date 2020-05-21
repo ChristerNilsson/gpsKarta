@@ -1,4 +1,4 @@
-VERSION = 189 
+VERSION = 190
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -389,13 +389,6 @@ setup = ->
 
 	menuButton = new MenuButton width-160
 
-	# addEventListener 'touchstart', (evt) ->
-	# 	touches = evt.changedTouches
-	# 	touch = touches[touches.length-1]
-	# 	mx = touch.pageX
-	# 	my = touch.pageY
-	# 	myMousePressed mx,my
-
 info = () ->
 	[
 		"Platform: #{platform}"
@@ -690,6 +683,7 @@ showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
 
 touchStarted = (event) ->
 	console.log 'touchStarted',released,state
+	dump.store "touchStarted #{new Date()} #{JSON.stringify touches}"
 	event.preventDefault()
 	if not released then return 
 	released = false
@@ -699,7 +693,7 @@ touchStarted = (event) ->
 
 touchMoved = (event) ->
 	console.log 'touchMoved',released,state
-	dump.store "touches #{JSON.stringify touches}"
+	dump.store "touchMoved #{new Date()} #{JSON.stringify touches}"
 	event.preventDefault()
 	if dialogues.length == 0 and state == 1
 		cx += (startX - mouseX)/SCALE
@@ -710,6 +704,7 @@ touchMoved = (event) ->
 
 touchEnded = (event) ->
 	console.log 'touchEnded',released,state
+	dump.store "touchEnded #{new Date()} #{JSON.stringify touches}"
 	event.preventDefault()
 	if released then return
 	released = true
