@@ -6,10 +6,10 @@ LIMIT = 20 # meter. Under this value is no bearing given.
 platform = window.navigator.platform # Win32
 
 # Setup 
-COINS = true
-DISTANCE = true
-TRAIL = true
-SECTOR = 10 # Bearing resolution in degrees
+# COINS = true
+# DISTANCE = true
+# TRAIL = true
+# SECTOR = 10 # Bearing resolution in degrees
 
 DIGITS = 'zero one two three four five six seven eight niner'.split ' '
 BR = if platform in ['Win32','iPad'] then "\n" else '<br>'
@@ -26,6 +26,7 @@ params = null
 voices = null
 measure = {}
 surplus = 0
+pois = null
 
 start = new Date()
 
@@ -50,7 +51,16 @@ fraction = (x) -> x - int x
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
 
-class Storage 
+general = {}
+loadGeneral = ->
+	general = {COINS: true, DISTANCE: true, TRAIL: true, SECTOR: 10}
+	if localStorage.gpsKarta then general = _.extend general, JSON.parse localStorage.gpsKarta
+	console.log general
+saveGeneral = -> 
+	localStorage.gpsKarta = JSON.stringify general
+	console.log localStorage.gpsKarta
+
+class Storage
 	constructor : (@mapName) ->
 		key = 'gpsKarta' + @mapName
 		if localStorage[key]
@@ -141,7 +151,7 @@ say = (m) ->
 	dump.store "say #{m} #{JSON.stringify voiceQueue}"
 	speechSynthesis.speak speaker
 
-preload = -> 
+preload = ->
 	params = getParameters()
 	mapName = params.map || "21A"
 	if params.debug then dump.active = params.debug == '1'
@@ -152,6 +162,7 @@ preload = ->
 			control.push 0
 			control.push 0
 		img = loadImage "data/" + data.map
+	loadJSON "data/poi.json", (json) -> pois = json
 
 sayDistance = (a,b) -> # a is newer (meter)
 	# if a border is crossed, produce speech
@@ -167,8 +178,8 @@ sayDistance = (a,b) -> # a is newer (meter)
 sayBearing = (a0,b0) -> # a is newer (degrees)
 	dump.store "B #{myRound a0,1} #{myRound b0,1}"
 	# if a sector limit is crossed, tell the new bearing
-	a = SECTOR * round(a0/SECTOR)
-	b = SECTOR * round(b0/SECTOR)
+	a = general.SECTOR * round(a0/general.SECTOR)
+	b = general.SECTOR * round(b0/general.SECTOR)
 	if a == b and b0 != -1 then return "" # samma sektor
 	a = round a / 10 
 	if a == 0 then a = 36 # 01..36
@@ -229,7 +240,7 @@ firstInfo = ->
 	if distance < 10 then soundQueue = distance else soundQueue = 1 # ett antal DIST
 
 playSound = ->
-	if not COINS then return 
+	if not general.COINS then return 
 	if soundQueue == 0 then return
 	dump.store "playSound #{soundQueue}"
 	if soundQueue < 0 and soundDown != null
@@ -258,7 +269,7 @@ decreaseQueue = ->
 		msg = arr[1] + ' ' + arr[2] # skippa ordet. t ex 'bäring etta tvåa'
 		if bearingSaid != msg then say msg
 		bearingSaid = msg
-	else if arr[0] == 'distance' and (DISTANCE or arr[1] < LIMIT)
+	else if arr[0] == 'distance' and (general.DISTANCE or arr[1] < LIMIT)
 		msg = arr[1]                # skippa ordet. t ex 'distans 30'
 		if distanceSaid != msg then say msg
 		distanceSaid = msg
@@ -366,6 +377,8 @@ setup = ->
 	canvas = createCanvas innerWidth-0.0, innerHeight #-0.5
 	canvas.position 0,0 # hides text field used for clipboard copy.
 
+	loadGeneral()
+
 	angleMode DEGREES
 	SCALE = data.scale
 
@@ -399,10 +412,10 @@ info = () ->
 		"Version: #{VERSION}"
 		"TrailPoints: #{storage.trail.length}"
 		"GpsPoints: #{gpsCount}"
-		"Sector: #{SECTOR}"
-		"Hear Coins: #{COINS}"
-		"Hear Distance: #{DISTANCE}"
-		"See Trail: #{TRAIL}"
+		"Sector: #{general.SECTOR}"
+		"Hear Coins: #{general.COINS}"
+		"Hear Distance: #{general.DISTANCE}"
+		"See Trail: #{general.TRAIL}"
 		"Scale: #{SCALE}"
 		"Dump: #{dump.data.length}"
 	]
@@ -437,7 +450,7 @@ drawTrack = ->
 		circle x-cx, y-cy, 5 * (track.length-i)
 
 drawTrail = ->
-	if not TRAIL then return
+	if not general.TRAIL then return
 	fc 1,1,0
 	sw 1
 	sc 0
@@ -512,6 +525,17 @@ drawRuler = ->
 	fc 0
 	text w0+"m",width/2,y+h*0.6
 
+drawPois = ->
+	for key,poi of pois
+		[lat,lon] = poi
+		[x,y] = w2b.convert lon,lat
+		sw 1
+		stroke "#ff0"
+		fill "#000"
+		textSize 0.25 * data.radius
+		textAlign CENTER,CENTER
+		text key, x-cx, y-cy
+
 draw = ->
 	bg 0,1,0
 	if state == 0 
@@ -535,7 +559,7 @@ draw = ->
 		if data.drawControls then drawControls()
 		drawControl()
 		if crossHair then drawCrossHair crossHair[0]-cx, crossHair[1]-cy # detached
-
+		drawPois()
 		pop()
 		if not crossHair then drawCrossHair width/2,height/2 # attached
 
@@ -612,13 +636,16 @@ menu1 = -> # Main Menu
 menu2 = -> # Setup
 	dialogue = new Dialogue()
 	dialogue.add 'Coins', -> 
-		COINS = not COINS
+		general.COINS = not general.COINS
+		saveGeneral()
 		dialogues.clear()
 	dialogue.add 'Distance', -> 
-		DISTANCE = not DISTANCE
+		general.DISTANCE = not general.DISTANCE
+		saveGeneral()
 		dialogues.clear()
 	dialogue.add 'Trail', -> 
-		TRAIL = not TRAIL
+		general.TRAIL = not general.TRAIL
+		saveGeneral()
 		dialogues.clear()
 	dialogue.add 'Sector...', -> menu3()
 	dialogue.clock()
@@ -669,7 +696,8 @@ menu6 = -> # More
 	dialogue.textSize *= 1.5
 
 SetSector = (sector) ->
-	SECTOR = sector
+	general.SECTOR = sector
+	saveGeneral()
 	dialogues.clear()
 
 update = (littera) ->
@@ -686,7 +714,7 @@ showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
 
 touchStarted = (event) ->
 	lastTouchStarted = new Date()
-	console.log 'touchStarted',released,state
+	#console.log 'touchStarted',released,state
 	event.preventDefault()
 	if not released then return 
 	dump.store "touchStarted #{(new Date())-start} #{JSON.stringify touches}"
@@ -696,7 +724,7 @@ touchStarted = (event) ->
 	false
 
 touchMoved = (event) ->
-	console.log 'touchMoved',released,state
+	#console.log 'touchMoved',released,state
 	dump.store "touchMoved #{(new Date())-start} #{JSON.stringify touches}"
 	event.preventDefault()
 	if dialogues.length == 0 and state == 1
@@ -707,7 +735,7 @@ touchMoved = (event) ->
 	false
 
 touchEnded = (event) ->
-	console.log 'touchEnded',released,state
+	#console.log 'touchEnded',released,state
 	event.preventDefault()
 	if (new Date()) - lastTouchEnded < 500
 		lastTouchEnded = new Date()
