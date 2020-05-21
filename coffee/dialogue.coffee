@@ -97,7 +97,9 @@ class Button
 		pop()
 
 	inside : (mx,my) ->  @r > dist mx, my, @dlg.x + @x, @dlg.y + @y 
-	execute : -> if @active then @event()
+	execute : -> 
+		dump.store "Button #{@title} #{@active}"
+		if @active then @event()
 
 class RectButton 
 	constructor : (@dlg, @arr, @x, @y, @w, @h, @event = -> print @item) -> @active = true 
