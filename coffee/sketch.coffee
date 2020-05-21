@@ -1,4 +1,4 @@
-VERSION = 194
+VERSION = 195
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -44,6 +44,7 @@ startY = 0
 menuButton = null
 
 crossHair = null
+lastTouchEnded = null # to prevent double bounce in menus
 
 fraction = (x) -> x - int x 
 Array.prototype.clear = -> @length = 0
@@ -684,6 +685,7 @@ update = (littera) ->
 showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
 
 touchStarted = (event) ->
+	lastTouchStarted = new Date()
 	console.log 'touchStarted',released,state
 	event.preventDefault()
 	if not released then return 
@@ -707,6 +709,9 @@ touchMoved = (event) ->
 touchEnded = (event) ->
 	console.log 'touchEnded',released,state
 	event.preventDefault()
+	if (new Date()) - lastTouchEnded < 500
+		lastTouchEnded = new Date()
+		return # to prevent double bounce
 	if released then return
 	dump.store "touchEnded #{(new Date())-start} #{JSON.stringify touches}"
 	released = true
