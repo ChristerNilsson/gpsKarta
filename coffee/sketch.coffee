@@ -1,11 +1,11 @@
-VERSION = 188
+VERSION = 189 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
 
 platform = window.navigator.platform # Win32
 
-# Setup
+# Setup 
 COINS = true
 DISTANCE = true
 TRAIL = true
@@ -699,8 +699,7 @@ touchStarted = (event) ->
 
 touchMoved = (event) ->
 	console.log 'touchMoved',released,state
-	console.log touches
-	dump.store "touches #{touches}"
+	dump.store "touches #{JSON.stringify touches}"
 	event.preventDefault()
 	if dialogues.length == 0 and state == 1
 		cx += (startX - mouseX)/SCALE
