@@ -1,4 +1,4 @@
-VERSION = 187
+VERSION = 188
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -24,7 +24,6 @@ released = true
 mapName = "" # t ex skarpnäck
 params = null
 voices = null
-frameTime = 0
 measure = {}
 surplus = 0
 
@@ -531,7 +530,6 @@ draw = ->
 		return
 
 	if state == 1
-		start = new Date()
 		push()
 		translate width/2, height/2
 		scale SCALE
@@ -554,7 +552,6 @@ draw = ->
 			textSize [100,50][i//3]
 			text message, [margin,width/2,width-margin][i%3], [margin,height][i//3] 
 		drawRuler()
-		frameTime = round (new Date()) - start
 
 		showDialogue()
 		menuButton.draw()
@@ -702,6 +699,8 @@ touchStarted = (event) ->
 
 touchMoved = (event) ->
 	console.log 'touchMoved',released,state
+	console.log touches
+	dump.store "touches #{touches}"
 	event.preventDefault()
 	if dialogues.length == 0 and state == 1
 		cx += (startX - mouseX)/SCALE
