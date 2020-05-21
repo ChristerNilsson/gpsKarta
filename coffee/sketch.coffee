@@ -1,15 +1,9 @@
-VERSION = 197
+VERSION = 198
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
 
-platform = window.navigator.platform # Win32
-
-# Setup 
-# COINS = true
-# DISTANCE = true
-# TRAIL = true
-# SECTOR = 10 # Bearing resolution in degrees
+platform = window.navigator.platform # Win32|iPad|Linux
 
 DIGITS = 'zero one two three four five six seven eight niner'.split ' '
 BR = if platform in ['Win32','iPad'] then "\n" else '<br>'
@@ -51,14 +45,9 @@ fraction = (x) -> x - int x
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
 
-general = {}
-loadGeneral = ->
-	general = {COINS: true, DISTANCE: true, TRAIL: true, SECTOR: 10}
-	if localStorage.gpsKarta then general = _.extend general, JSON.parse localStorage.gpsKarta
-	console.log general
-saveGeneral = -> 
-	localStorage.gpsKarta = JSON.stringify general
-	console.log localStorage.gpsKarta
+general = {COINS: true, DISTANCE: true, TRAIL: true, SECTOR: 10}
+loadGeneral = -> if localStorage.gpsKarta then general = _.extend general, JSON.parse localStorage.gpsKarta
+saveGeneral = -> localStorage.gpsKarta = JSON.stringify general
 
 class Storage
 	constructor : (@mapName) ->
@@ -728,8 +717,8 @@ touchMoved = (event) ->
 	dump.store "touchMoved #{(new Date())-start} #{JSON.stringify touches}"
 	event.preventDefault()
 	if dialogues.length == 0 and state == 1
-		cx += (startX - mouseX)/SCALE
-		cy += (startY - mouseY)/SCALE
+		cx += (startX - mouseX)/SCALE/2
+		cy += (startY - mouseY)/SCALE/2
 		startX = mouseX
 		startY = mouseY
 	false
