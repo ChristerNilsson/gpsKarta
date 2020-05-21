@@ -150,4 +150,4 @@ class MenuButton
 		rect @x+@d,@y+3*@d,@w-2*@d,@d
 		rect @x+@d,@y+5*@d,@w-2*@d,@d
 	inside : (mx,my) -> @x < mx < @x+@w and @y < my < @y+@h
-	click : -> if dialogues.length == 0 then menu1() else dialogues.clear()
+	click : -> if dialogues.length == 0 then menu1() # else dialogues.clear()
