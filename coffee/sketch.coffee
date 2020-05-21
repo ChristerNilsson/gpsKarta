@@ -1,9 +1,9 @@
-VERSION = 180 
+VERSION = 181
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
 
-platform = window.navigator.platform # Win32 
+platform = window.navigator.platform # Win32
 
 # Setup
 COINS = true
@@ -44,6 +44,10 @@ menuButton = null
 
 crossHair = null
 
+fraction = (x) -> x - int x 
+Array.prototype.clear = -> @length = 0
+assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
+
 class Storage 
 	constructor : (@mapName) ->
 		key = 'gpsKarta' + @mapName
@@ -52,7 +56,6 @@ class Storage
 				obj = JSON.parse localStorage[key]
 				@controls = obj.controls
 				@trail = obj.trail
-				#@tickSound = obj.tickSound
 		@clear()
 
 	save : -> localStorage['gpsKarta' + @mapName] = JSON.stringify @
@@ -227,7 +230,6 @@ playSound = ->
 	if not COINS then return 
 	if soundQueue == 0 then return
 	dump.store "playSound #{soundQueue}"
-	#if not storage.tickSound then return
 	if soundQueue < 0 and soundDown != null
 		soundQueue++
 		soundDown.play()
@@ -305,7 +307,7 @@ updateTrail = (pLat, pLon, x,y)->
 	if dist > 5 + surplus
 		dump.store "updateTrail #{dist}"
 		storage.trail.push position
-		surplus += dist-5
+		surplus += 5 - dist
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
 window.speechSynthesis.onvoiceschanged = -> voices = window.speechSynthesis.getVoices()
@@ -335,7 +337,6 @@ initSpeaker = ->
 	track = []
 	dump.store "initSpeaker out"
 
-fraction = (x) -> x - int x 
 getMeters = (w,skala) ->
 	[lon0,lat0] = b2w.convert 0,height
 	[lon1,lat1] = b2w.convert w,height
@@ -398,20 +399,15 @@ setup = ->
 
 info = () ->
 	[
-		"platform: #{platform}"
-		"MAP: #{mapName}"
-		"VERSION: #{VERSION}"
-		# "dump.active: #{dump.active}"  
-		# "dump.data.length: #{dump.data.length}"
-		"trail.length: #{storage.trail.length}"
-		"gpsCount: #{gpsCount}"
-		"SECTOR: #{SECTOR}"
-		"COINS: #{COINS}"
-		"DISTANCE: #{DISTANCE}"
-		"TRAIL: #{TRAIL}"
-		# "cx cy: #{round cx} #{round cy}"
-		# "SCALE: #{SCALE}"
-		# "frameTime: #{frameTime} ms"
+		"Platform: #{platform}"
+		"Map: #{mapName}"
+		"Version: #{VERSION}"
+		"TrailPoints: #{storage.trail.length}"
+		"GpsPoints: #{gpsCount}"
+		"Sector: #{SECTOR}"
+		"Hear Coins: #{COINS}"
+		"Hear Distance: #{DISTANCE}"
+		"See Trail: #{TRAIL}"
 	]
 
 drawCrossHair = (x,y) ->
@@ -576,15 +572,7 @@ executeMail = ->
 	link = "https://christernilsson.github.io/gpsKarta/index.html?map=" + mapName + "&trail=" + JSON.stringify storage.trail
 	r = info().join BR
 	t = ("#{key} #{x} #{y} #{littera} #{lat} #{lon}" for key,[x,y,littera,lat, lon] of storage.controls).join BR
-	content = link + BR+BR + r + BR+BR + t + BR+BR + dump.get()
-	# if currentControl
-	# 	littera = storage.controls[currentControl][2]
-	# 	sendMail "#{mapName} #{currentControl} #{littera}", content
-	# else
-	sendMail "#{mapName}", content
-
-Array.prototype.clear = -> @length = 0
-assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
+	sendMail "#{mapName}", content + link + BR+BR + r + BR+BR + t + BR+BR + dump.get()
 
 findKey = ->
 	for key in 'DEFGHIJKLMNOPQRSTUVWXYZ'
@@ -716,7 +704,7 @@ touchMoved = (event) ->
 
 touchEnded = (event) ->
 	event.preventDefault()
-	if released then return 
+	if released then return
 	released = true
 	if state == 0 then initSpeaker()
 	if state == 2 then dialogues.clear()
