@@ -1,4 +1,4 @@
-VERSION = 190
+VERSION = 191
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -26,6 +26,8 @@ params = null
 voices = null
 measure = {}
 surplus = 0
+
+start = new Date()
 
 state = 0 # 0=uninitialized 1=normal 2=info
 
@@ -683,7 +685,7 @@ showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
 
 touchStarted = (event) ->
 	console.log 'touchStarted',released,state
-	dump.store "touchStarted #{new Date()} #{JSON.stringify touches}"
+	dump.store "touchStarted #{(new Date())-start} #{JSON.stringify touches}"
 	event.preventDefault()
 	if not released then return 
 	released = false
@@ -693,7 +695,7 @@ touchStarted = (event) ->
 
 touchMoved = (event) ->
 	console.log 'touchMoved',released,state
-	dump.store "touchMoved #{new Date()} #{JSON.stringify touches}"
+	dump.store "touchMoved #{(new Date())-start} #{JSON.stringify touches}"
 	event.preventDefault()
 	if dialogues.length == 0 and state == 1
 		cx += (startX - mouseX)/SCALE
@@ -704,7 +706,7 @@ touchMoved = (event) ->
 
 touchEnded = (event) ->
 	console.log 'touchEnded',released,state
-	dump.store "touchEnded #{new Date()} #{JSON.stringify touches}"
+	dump.store "touchEnded #{(new Date())-start} #{JSON.stringify touches}"
 	event.preventDefault()
 	if released then return
 	released = true
