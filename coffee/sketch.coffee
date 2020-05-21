@@ -1,4 +1,4 @@
-VERSION = 185
+VERSION = 186
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -602,13 +602,17 @@ menu1 = -> # Main Menu
 	dialogue.add 'Center', ->
 		[cx,cy] = position
 		dialogues.clear()
-	dialogue.add 'Out', -> if SCALE > data.scale then SCALE /= 1.5
+	dialogue.add 'Out', ->
+		if SCALE > data.scale then SCALE /= 1.5
+		dialogues.clear()
 	dialogue.add 'Take...', -> menu4()
 	dialogue.add 'More...', -> menu6()
 	dialogue.add 'Setup...', -> menu2()
 	dialogue.add 'Aim', -> aim()
 	dialogue.add 'Save', -> savePosition()
-	dialogue.add 'In', -> SCALE *= 1.5
+	dialogue.add 'In', -> 
+		SCALE *= 1.5
+		dialogues.clear()
 	dialogue.clock ' ',true
 	dialogue.textSize *= 1.5
 
