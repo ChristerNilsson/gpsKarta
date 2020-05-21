@@ -1,4 +1,4 @@
-VERSION = 191
+VERSION = 192
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -685,9 +685,9 @@ showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
 
 touchStarted = (event) ->
 	console.log 'touchStarted',released,state
-	dump.store "touchStarted #{(new Date())-start} #{JSON.stringify touches}"
 	event.preventDefault()
 	if not released then return 
+	dump.store "touchStarted #{(new Date())-start} #{JSON.stringify touches}"
 	released = false
 	startX = mouseX
 	startY = mouseY
@@ -706,9 +706,9 @@ touchMoved = (event) ->
 
 touchEnded = (event) ->
 	console.log 'touchEnded',released,state
-	dump.store "touchEnded #{(new Date())-start} #{JSON.stringify touches}"
 	event.preventDefault()
 	if released then return
+	dump.store "touchEnded #{(new Date())-start} #{JSON.stringify touches}"
 	released = true
 	if state == 0 then initSpeaker()
 	if state == 2 then dialogues.clear()
