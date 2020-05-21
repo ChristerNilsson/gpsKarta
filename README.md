@@ -76,6 +76,11 @@ Reference points are stored under the names A,B and C. They are used for mapping
 * 2. Listen to distance indicating sounds (coins and explosions)
 * 3. Look at the map on the screen and the five circles.
 
+## Pan Speed
+As my Android has a very slow update rate (4Hz), I had to invent a new way of panning.
+I'm using adjustable speed. Starting in the middle gives the slowest, but most accurate, movement.
+The corners of the screen has approx the double normal speed. This feature can be disabled.
+
 ## Future Development
 
 * Låt localStorage lagras i molnet vid wifikontakt (typ Google Photo)
