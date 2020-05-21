@@ -1,4 +1,4 @@
-VERSION = 186
+VERSION = 187
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -390,12 +390,12 @@ setup = ->
 
 	menuButton = new MenuButton width-160
 
-	addEventListener 'touchstart', (evt) ->
-		touches = evt.changedTouches
-		touch = touches[touches.length-1]
-		mx = touch.pageX
-		my = touch.pageY
-		myMousePressed mx,my
+	# addEventListener 'touchstart', (evt) ->
+	# 	touches = evt.changedTouches
+	# 	touch = touches[touches.length-1]
+	# 	mx = touch.pageX
+	# 	my = touch.pageY
+	# 	myMousePressed mx,my
 
 info = () ->
 	[
