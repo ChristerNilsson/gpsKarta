@@ -1,4 +1,4 @@
-VERSION = 195
+VERSION = 196
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -44,7 +44,7 @@ startY = 0
 menuButton = null
 
 crossHair = null
-lastTouchEnded = null # to prevent double bounce in menus
+lastTouchEnded = new Date() # to prevent double bounce in menus
 
 fraction = (x) -> x - int x 
 Array.prototype.clear = -> @length = 0
