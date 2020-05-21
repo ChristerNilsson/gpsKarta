@@ -1,4 +1,4 @@
-VERSION = 199
+VERSION = 200
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -46,7 +46,7 @@ fraction = (x) -> x - int x
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
 
-general = {COINS: true, DISTANCE: true, TRAIL: true, SECTOR: 10}
+general = {COINS: true, DISTANCE: true, TRAIL: true, SECTOR: 10, PANSPEED : true}
 loadGeneral = -> if localStorage.gpsKarta then general = _.extend general, JSON.parse localStorage.gpsKarta
 saveGeneral = -> localStorage.gpsKarta = JSON.stringify general
 
@@ -402,6 +402,7 @@ info = () ->
 		"Version: #{VERSION}"
 		"TrailPoints: #{storage.trail.length}"
 		"GpsPoints: #{gpsCount}"
+		"PanSpeed: #{general.PANSPEED}"
 		"Sector: #{general.SECTOR}"
 		"Hear Coins: #{general.COINS}"
 		"Hear Distance: #{general.DISTANCE}"
@@ -625,6 +626,10 @@ menu1 = -> # Main Menu
 
 menu2 = -> # Setup
 	dialogue = new Dialogue()
+	dialogue.add 'PanSpeed', -> 
+		general.PANSPEED = not general.PANSPEED
+		saveGeneral()
+		dialogues.clear()
 	dialogue.add 'Coins', -> 
 		general.COINS = not general.COINS
 		saveGeneral()
@@ -707,7 +712,8 @@ touchStarted = (event) ->
 	#console.log 'touchStarted',released,state
 	event.preventDefault()
 	if not released then return 
-	speed = 2 * dist(mouseX,mouseY,width/2,height/2) / dist(0,0,width/2,height/2)
+	speed = 1
+	if general.PANSPEED then speed = 2 * dist(mouseX,mouseY,width/2,height/2) / dist(0,0,width/2,height/2)
 	dump.store "touchStarted #{(new Date())-start} #{JSON.stringify touches}"
 	released = false
 	startX = mouseX
