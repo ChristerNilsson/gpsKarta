@@ -1,4 +1,4 @@
-VERSION = 182
+VERSION = 183
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -686,6 +686,7 @@ update = (littera) ->
 showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
 
 touchStarted = (event) ->
+	console.log 'touchStarted',released,state
 	event.preventDefault()
 	if not released then return 
 	released = false
@@ -694,6 +695,7 @@ touchStarted = (event) ->
 	false
 
 touchMoved = (event) ->
+	console.log 'touchMoved',released,state
 	event.preventDefault()
 	if dialogues.length == 0 and state == 1
 		cx += (startX - mouseX)/SCALE
@@ -703,6 +705,7 @@ touchMoved = (event) ->
 	false
 
 touchEnded = (event) ->
+	console.log 'touchEnded',released,state
 	event.preventDefault()
 	if released then return
 	released = true
@@ -711,12 +714,16 @@ touchEnded = (event) ->
 	if state in [0,2]
 		state = 1
 		return false
+	#console.log 'ADAM',mouseX,mouseY
 	if menuButton.inside mouseX,mouseY
+		#console.log 'BERTIL'
 		menuButton.click()
 		return false
 	if dialogues.length > 0
+		#console.log 'CESAR'
 		dialogue = _.last dialogues
-		if not dialogue.execute mouseX,mouseY then dialogues.pop()
+		#if not dialogue.execute mouseX,mouseY then dialogues.pop()
+		dialogue.execute mouseX,mouseY # then dialogues.pop()
 	false
 
 keyPressed = -> # Används för att avläsa ABC bitmapskoordinater
