@@ -1,4 +1,4 @@
-VERSION = 193
+VERSION = 194
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -12,7 +12,7 @@ TRAIL = true
 SECTOR = 10 # Bearing resolution in degrees
 
 DIGITS = 'zero one two three four five six seven eight niner'.split ' '
-BR = if platform == 'Win32' then "\n" else '<br>'
+BR = if platform in ['Win32','iPad'] then "\n" else '<br>'
 
 # http://www.bvsok.se/Kartor/Skolkartor/
 # Högupplösta orienteringskartor: https://www.omaps.net
