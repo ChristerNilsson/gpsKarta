@@ -1,4 +1,4 @@
-VERSION = 201
+VERSION = 202
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -406,8 +406,8 @@ info = () ->
 		"Version: #{VERSION}"
 		"TrailPoints: #{storage.trail.length}"
 		"GpsPoints: #{gpsCount}"
-		"Position: #{lat} #{lon}"
-		"Distance: #{distbc} meter"
+		"Position: #{messages[4]}"
+		"Distance: #{messages[2]}"
 		"PanSpeed: #{general.PANSPEED}"
 		"Sector: #{general.SECTOR}"
 		"Hear Coins: #{general.COINS}"
