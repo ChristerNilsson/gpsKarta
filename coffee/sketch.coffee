@@ -22,6 +22,7 @@ measure = {}
 surplus = 0
 pois = null
 speed = 1
+distbc = 0
 
 start = new Date()
 
@@ -83,8 +84,8 @@ class Storage
 		for key,control of @controls
 			[z,z,z,qLat,qLon] = control
 			c = LatLon qLat,qLon
-			distbc = b.distanceTo(c) 
-			if distbc < data.radius and key not in "ABC" then delete @controls[key]
+			dbc = b.distanceTo(c) 
+			if dbc < data.radius and key not in "ABC" then delete @controls[key]
 		@save()
 
 storage = null
@@ -396,12 +397,17 @@ setup = ->
 	menuButton = new MenuButton width-160
 
 info = () ->
+	[x,y] = position
+	[lon,lat] = b2w.convert x,y
+
 	[
 		"Platform: #{platform}"
 		"Map: #{mapName}"
 		"Version: #{VERSION}"
 		"TrailPoints: #{storage.trail.length}"
 		"GpsPoints: #{gpsCount}"
+		"Position: #{lat} #{lon}"
+		"Distance: #{distbc} meter"
 		"PanSpeed: #{general.PANSPEED}"
 		"Sector: #{general.SECTOR}"
 		"Hear Coins: #{general.COINS}"
