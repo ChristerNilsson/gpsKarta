@@ -486,18 +486,21 @@ drawControls = ->
 		point x-cx, y-cy
 
 drawControl = ->
-	if crossHair and gpsLat != 0 and gpsLon != 0
-		[trgLon,trgLat] = b2w.convert crossHair[0],crossHair[1]
-		latLon2 = LatLon trgLat,trgLon
-		latLon1 = LatLon gpsLat,gpsLon
-		bearing = latLon1.bearingTo latLon2
-		messages[0] = ""
-		messages[1] = "#{int bearing}º"
-		messages[2] = "#{round(latLon1.distanceTo latLon2)} m"
-	else 
+	if gpsLat == 0 or gpsLon == 0
 		messages[0] = ""
 		messages[1] = ""
 		messages[2] = ""
+		return
+	if crossHair
+		[trgLon,trgLat] = b2w.convert crossHair[0],crossHair[1]
+	else
+		[trgLon,trgLat] = b2w.convert cx,cy
+	latLon2 = LatLon trgLat,trgLon
+	latLon1 = LatLon gpsLat,gpsLon
+	bearing = latLon1.bearingTo latLon2
+	messages[0] = ""
+	messages[1] = "#{int bearing}º"
+	messages[2] = "#{round(latLon1.distanceTo latLon2)} m"
 
 drawRuler = ->
 	[w1,w0] = getMeters width, SCALE
