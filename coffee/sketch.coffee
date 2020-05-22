@@ -583,6 +583,7 @@ executeMail = ->
 	r = info().join BR
 	t = ("#{key} #{x} #{y} #{littera} #{lat} #{lon}" for key,[x,y,littera,lat, lon] of storage.controls).join BR
 	sendMail "#{mapName}", link + BR+BR + r + BR+BR + t + BR+BR + dump.get()
+	storage.clear()
 
 findKey = ->
 	for key in 'DEFGHIJKLMNOPQRSTUVWXYZ'
