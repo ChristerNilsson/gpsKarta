@@ -1,4 +1,4 @@
-VERSION = 207
+VERSION = 208
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -552,9 +552,9 @@ draw = ->
 		return
 
 	if state == 1
-		# push()
-		# translate width/2, height/2
-		# scale SCALE
+		push()
+		translate width/2, height/2
+		scale SCALE
 		# image img, -cx,-cy
 		# drawTrail()
 		# drawTrack()
@@ -562,11 +562,11 @@ draw = ->
 		# drawControl()
 		# if crossHair then drawCrossHair crossHair[0]-cx, crossHair[1]-cy # detached
 		# drawPois()
-		# pop()
+		pop()
 		# if not crossHair then drawCrossHair width/2,height/2 # attached
-		# fc 0
-		# sc 1,1,0
-		# sw 3
+		fc 0
+		sc 1,1,0
+		sw 3
 		margin = 25
 		for message,i in messages
 			textAlign [LEFT,CENTER,RIGHT][i%3], [TOP,BOTTOM][i//3]
