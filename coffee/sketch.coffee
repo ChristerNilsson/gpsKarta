@@ -1,4 +1,4 @@
-VERSION = 209
+VERSION = 210
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -557,8 +557,8 @@ draw = ->
 		scale SCALE
 
 		image img, -cx,-cy
-		drawTrail()
-		drawTrack()
+		#drawTrail()
+		#drawTrack()
 
 		# if data.drawControls then drawControls()
 		# drawControl()
