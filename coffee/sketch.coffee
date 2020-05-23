@@ -1,4 +1,4 @@
-VERSION = 206
+VERSION = 207
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -552,31 +552,31 @@ draw = ->
 		return
 
 	if state == 1
-		push()
-		translate width/2, height/2
-		scale SCALE
-		image img, -cx,-cy
-		drawTrail()
-		drawTrack()
-		if data.drawControls then drawControls()
-		drawControl()
-		if crossHair then drawCrossHair crossHair[0]-cx, crossHair[1]-cy # detached
-		drawPois()
-		pop()
-		if not crossHair then drawCrossHair width/2,height/2 # attached
-		messages[3] = round frameRate()
-		fc 0
-		sc 1,1,0
-		sw 3
+		# push()
+		# translate width/2, height/2
+		# scale SCALE
+		# image img, -cx,-cy
+		# drawTrail()
+		# drawTrack()
+		# if data.drawControls then drawControls()
+		# drawControl()
+		# if crossHair then drawCrossHair crossHair[0]-cx, crossHair[1]-cy # detached
+		# drawPois()
+		# pop()
+		# if not crossHair then drawCrossHair width/2,height/2 # attached
+		# fc 0
+		# sc 1,1,0
+		# sw 3
 		margin = 25
 		for message,i in messages
 			textAlign [LEFT,CENTER,RIGHT][i%3], [TOP,BOTTOM][i//3]
 			textSize [100,50][i//3]
 			text message, [margin,width/2,width-margin][i%3], [margin,height][i//3] 
-		drawRuler()
+		# drawRuler()
 
-		showDialogue()
-		menuButton.draw()
+		# showDialogue()
+		# menuButton.draw()
+		messages[3] = round frameRate()
 		return
 
 	if state == 2
