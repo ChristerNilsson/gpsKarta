@@ -1,4 +1,4 @@
-VERSION = 205
+VERSION = 206
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -415,6 +415,8 @@ info = () ->
 		"See Trail: #{general.TRAIL}"
 		"Scale: #{SCALE}"
 		"Dump: #{dump.data.length}"
+		"frameRate: #{round frameRate()}"
+
 	]
 
 drawCrossHair = (x,y) ->
@@ -562,7 +564,7 @@ draw = ->
 		drawPois()
 		pop()
 		if not crossHair then drawCrossHair width/2,height/2 # attached
-
+		messages[3] = round frameRate()
 		fc 0
 		sc 1,1,0
 		sw 3
