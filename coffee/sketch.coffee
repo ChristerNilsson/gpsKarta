@@ -1,4 +1,4 @@
-VERSION = 203
+VERSION = 204
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
@@ -383,7 +383,7 @@ setup = ->
 
 	storage = new Storage mapName
 	storage.trail = []
-	if params.trail then storage.trail = JSON.parse params.trail
+	if params.trail then storage.trail = decodeAll params.trail
 
 	# myTest() Do not execute! Very dependent on .json file.
 
