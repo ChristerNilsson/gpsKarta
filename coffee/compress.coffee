@@ -2,12 +2,12 @@ QUARTILES = '._-~'
 LETTERS = '*abcdefghijklmnopqrstuvwxyz01234ABCDEFGHIJKLMNOPQRSTUVWXYZ56789+'
 
 # Det skickas bara positiva tal.
-# Kvadranter väljs med fyra specialtecken 
-#     tecken
-# 0 . +x +y
-# 1 _ -x +y
-# 2 - +x -y
-# 3 ~ -x -y
+# Kvadrant väljs med ett av fyra specialtecken 
+#      tecken
+# 0 . +dx +dy
+# 1 _ -dx +dy
+# 2 - +dx -dy
+# 3 ~ -dx -dy
 
 # Punkter på axlarna kan tillhöra två grupper, pga nollan.
 
@@ -18,15 +18,16 @@ LETTERS = '*abcdefghijklmnopqrstuvwxyz01234ABCDEFGHIJKLMNOPQRSTUVWXYZ56789+'
 # [1017,1388] dx=1 dy=5
 # Kodas: 1017,1373|_JI.J
 
-# 0 1 2 3 4 5 6 7
-# * a b c d e f g  0
-# h i j k l m n o  1
-# p q r s t u v w  2
-# x y z 0 1 2 3 4  3
-# A B C D E F G H  4
-# I J K L M N O P  5
-# Q R S T U V W X  6
-# Y Z 5 6 7 8 9 +  7
+# dy
+# 0  * a b c d e f g
+# 1  h i j k l m n o
+# 2  p q r s t u v w
+# 3  x y z 0 1 2 3 4
+# 4  A B C D E F G H
+# 5  I J K L M N O P
+# 6  Q R S T U V W X
+# 7  Y Z 5 6 7 8 9 +
+#    0 1 2 3 4 5 6 7 dx
 
 assert 1&3, 1
 assert 2&3, 2
@@ -96,8 +97,8 @@ decodeAll = (s) ->
 			q = QUARTILES.indexOf ch
 		else
 			[dx,dy] = decode ch
-			if q%2 == 1 then dx = -dx
-			if q>=2 then dy = -dy
+			if q % 2 == 1 then dx = -dx
+			if q >= 2 then dy = -dy
 			x += dx
 			y += dy
 			result.push [x,y]

@@ -1,4 +1,4 @@
-VERSION = 213
+VERSION = 214
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -401,23 +401,29 @@ info = () ->
 	[x,y] = position
 	[lon,lat] = b2w.convert x,y
 
+	if crossHair
+		[trgLon,trgLat] = b2w.convert crossHair[0],crossHair[1]
+	else
+		[trgLon,trgLat] = b2w.convert cx,cy
+
 	[
-		"Platform: #{platform}"
 		"Map: #{mapName}"
-		"Version: #{VERSION}"
+		"Program Version: #{VERSION}"
+		"GpsPosition: #{messages[4]}"
+		"  GpsPoints: #{gpsCount}"
+		"Target: #{trgLat} #{trgLon}"
+		"  Bearing: #{messages[1]}"
+		"  Distance: #{messages[2]}"
+		"Setup"
+		"  PanSpeed: #{general.PANSPEED}"
+		"  Sector: #{general.SECTOR}"
+		"  Hear Coins: #{general.COINS}"
+		"  Hear Distance: #{general.DISTANCE}"
+		"  See Trail: #{general.TRAIL}"
 		"TrailPoints: #{storage.trail.length}"
-		"GpsPoints: #{gpsCount}"
-		"Position: #{messages[4]}"
-		"Distance: #{messages[2]}"
-		"PanSpeed: #{general.PANSPEED}"
-		"Sector: #{general.SECTOR}"
-		"Hear Coins: #{general.COINS}"
-		"Hear Distance: #{general.DISTANCE}"
-		"See Trail: #{general.TRAIL}"
 		"Scale: #{SCALE}"
 		"Dump: #{dump.data.length}"
-		"frameRate: #{round frameRate()}"
-
+		"Platform: #{platform}"
 	]
 
 drawCrossHair = (x,y) ->
@@ -579,7 +585,7 @@ draw = ->
 
 		showDialogue()
 		menuButton.draw()
-		messages[3] = round frameRate()
+		#messages[3] = round frameRate()
 		return
 
 	if state == 2
