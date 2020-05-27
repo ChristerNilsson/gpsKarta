@@ -1,4 +1,4 @@
-VERSION = 214
+VERSION = 215
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -310,7 +310,7 @@ updateTrail = (pLat, pLon, x,y)->
 	b = LatLon qLat, qLon # last
 	dist = a.distanceTo b # meters
 	if dist > 5 + surplus
-		dump.store "updateTrail #{dist}"
+		dump.store "updateTrail #{dist} #{x} #{y} #{surplus}"
 		storage.trail.push position
 		surplus += 5 - dist
 
@@ -458,7 +458,7 @@ drawTrack = ->
 drawTrail = ->
 	if not general.TRAIL then return
 	fc 1,1,0
-	sw 1
+	sw 1/SCALE
 	sc 0
 	for [x,y] in storage.trail
 		circle x-cx, y-cy, 2
