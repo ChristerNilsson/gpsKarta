@@ -20,7 +20,7 @@ mapName = "" # t ex skarpnäck
 params = null
 voices = null
 measure = {}
-surplus = 0
+#surplus = 0
 pois = null
 speed = 1
 distbc = 0
@@ -309,10 +309,10 @@ updateTrail = (pLat, pLon, x,y)->
 	a = LatLon pLat, pLon # newest
 	b = LatLon qLat, qLon # last
 	dist = a.distanceTo b # meters
-	if dist > 5 + surplus
-		dump.store "updateTrail #{dist} #{x} #{y} #{surplus}"
+	if dist > 5 #+ surplus
+		dump.store "updateTrail #{dist} #{x} #{y}"
 		storage.trail.push position
-		surplus += 5 - dist
+		#surplus += 5 - dist
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
 window.speechSynthesis.onvoiceschanged = -> voices = window.speechSynthesis.getVoices()
@@ -457,11 +457,17 @@ drawTrack = ->
 
 drawTrail = ->
 	if not general.TRAIL then return
-	fc 1,1,0
+	textSize 20/SCALE
 	sw 1/SCALE
-	sc 0
 	for [x,y] in storage.trail
+		fc 1,1,0
+		sc 0
 		circle x-cx, y-cy, 2
+		if SCALE > 10
+			fc 0
+			sc()
+			text x,x-cx, y-cy-1
+			text y,x-cx, y-cy+1
 
 drawControls = ->
 	sw 2
