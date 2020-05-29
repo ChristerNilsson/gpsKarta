@@ -1,4 +1,4 @@
-VERSION = 215
+VERSION = 216
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -605,11 +605,11 @@ setTarget = ->
 	dialogues.clear()
 
 executeMail = ->
-	xxx = storage.trail
-	link = "https://christernilsson.github.io/gpsKarta/index.html?map=" + mapName + "&trail=" + encodeAll xxx
+	pairs = ("[#{x},#{y}]" for [x,y] in storage.trail).join ',' + BR
+	link = "https://christernilsson.github.io/gpsKarta/index.html?map=" + mapName + "&trail=" + encodeAll storage.trail
 	r = info().join BR
 	t = ("#{key} #{x} #{y} #{littera} #{lat} #{lon}" for key,[x,y,littera,lat, lon] of storage.controls).join BR
-	sendMail "#{mapName}", link + BR+BR + r + BR+BR + t + BR+BR + dump.get() + xxx
+	sendMail "#{mapName}", link + BR+BR + r + BR+BR + t + BR+BR + dump.get() + pairs
 	storage.clear()
 
 findKey = ->
