@@ -2,7 +2,7 @@ QUARTILES = '._-~'
 LETTERS = '*abcdefghijklmnopqrstuvwxyz01234ABCDEFGHIJKLMNOPQRSTUVWXYZ56789+'
 
 # Det skickas bara positiva tal.
-# Kvadrant väljs med ett av fyra specialtecken 
+# Kvadrant väljs med ett av fyra specialtecken
 #      tecken
 # 0 . +dx +dy
 # 1 _ -dx +dy

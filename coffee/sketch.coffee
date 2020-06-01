@@ -459,8 +459,13 @@ drawTrail = ->
 	if not general.TRAIL then return
 	textSize 20/SCALE
 	sw 1/SCALE
+	[x0,y0] = storage.trail[0]
 	for [x,y] in storage.trail
-		fc 1,1,0
+		index = 0
+		if x < x0 then index += 1
+		if y > y0 then index += 2
+		fill '#0ff #0f0 #f00 #ff0'.split(' ')[index]
+		[x0,y0] = [x,y]
 		sc 0
 		circle x-cx, y-cy, 2
 		if SCALE > 10

@@ -49,6 +49,7 @@ class Converter # bmp <=> wgs
 conv = new Converter [],[],6
 assert [2], conv.gauss [[4]], [8]
 assert [6,4], conv.gauss [[1, 1], [2, 1]], [10, 16]
+assert [9.4,5.300000000000001], conv.gauss [[1, 2], [3, -4]], [20, 7]
 assert [1,2,3], conv.gauss [[1, 1, 1], [2, 1, 2], [1, 2, 3]], [6, 10, 14]
 
 bmp = [338,1491, 4299,1948, 2963,5596] # x1,y1, x2,y2, x3,y3
