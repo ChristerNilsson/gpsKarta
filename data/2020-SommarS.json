@@ -1,8 +1,9 @@
 {
 	"map" : "2020-SommarS.jpg",
 	"mail" : "janchrister.nilsson@gmail.com",
-	"ABC" : [],
+	"ABC" : [59.279163, 18.149312, 59.269493, 18.168740, 59.265122, 18.153895],
 	"drawControls": true,
-	"radius" : 40,
-	"scale" : 2.0,
-	"controls": {"A":[541,1375],"B":[814,705],"C":[1250,1330]}}
+	"radius" : 60,
+	"scale" : 0.5,
+	"controls": {"A":[1868,488],"B":[3234,1692],"C":[2257,2312]}
+}
