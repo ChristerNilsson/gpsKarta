@@ -4,5 +4,5 @@
 	"ABC" : [],
 	"drawControls": true,
 	"radius" : 40,
-	"scale" : 1,
+	"scale" : 0.5,
 	"controls": {"A":[541,1375],"B":[814,705],"C":[1250,1330]}}
