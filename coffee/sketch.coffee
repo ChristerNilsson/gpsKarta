@@ -145,7 +145,7 @@ say = (m) ->
 
 preload = ->
 	params = getParameters()
-	mapName = params.map || "2020-SommarN"
+	mapName = params.map || "2020-SommarS"
 	if params.debug then dump.active = params.debug == '1'
 	loadJSON "data/#{mapName}.json", (json) ->
 		data = json
