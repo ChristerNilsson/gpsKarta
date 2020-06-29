@@ -1,0 +1,9 @@
+{
+	"map" : "Erstavik.PNG",
+	"mail" : "janchrister.nilsson@gmail.com",
+	"ABC" :	[59.278581, 18.225649, 59.267667, 18.287175, 59.287284, 18.285724], 
+	"drawControls": true,
+	"radius" : 30,
+	"scale" : 1,
+	"controls": {"A":[174,471],"B":[1752,1019],"C":[1715,35]}}
+	
