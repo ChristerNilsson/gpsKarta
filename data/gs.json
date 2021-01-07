@@ -1,0 +1,8 @@
+{
+	"map" : "gs.jpg",
+	"mail" : "janchrister.nilsson@gmail.com",
+	"ABC" : [62.126397, 12.291984, 62.070348, 12.310921, 62.117518, 12.398999],
+	"drawControls": true,
+	"radius" : 40,
+	"scale" : 1,
+	"controls": {"A":[1513,91],"B":[2132,3650],"C":[4684,610]}}

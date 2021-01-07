@@ -82,6 +82,9 @@ As my Android has a very slow update rate (4Hz), I had to invent a new way of pa
 I'm using adjustable speed. Starting in the middle gives a factor of 0.2, starting in a corner, 2.0
 This feature can be disabled with PanSpeed.
 
+## Make Chrome run even when Android turned off
+https://support.google.com/pixelphone/thread/6068458?hl=en
+
 ## Future Development
 
 * Låt localStorage lagras i molnet vid wifikontakt (typ Google Photo)
