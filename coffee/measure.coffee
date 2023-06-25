@@ -8,7 +8,7 @@ points = []
 
 #############################
 R = 44
-preload = -> img = loadImage 'data/gs.jpg'
+preload = -> img = loadImage 'data/2023-SommarS.jpg'
 #############################
 
 setup = ->

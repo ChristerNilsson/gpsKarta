@@ -6,7 +6,7 @@
 * [Naturpasset](https://www.facebook.com/Naturpasset.Nackareservatet)
 * [Compass](https://en.wikipedia.org/wiki/Compass)
 
-Buy the paper map [here](http://www.skogsluffarna.se/Arrangemang/Naturpasset)
+Buy the paper map [here](https://www.skogsluffarna.se/borja-orientera/naturpasset)
 
 ## Functionality
 
@@ -96,3 +96,19 @@ https://support.google.com/pixelphone/thread/6068458?hl=en
 
 * Har ej lyckats ställa in rätt röst på iOS. getVoices? Allt annat tycks fungera. Röst 0 är obegriplig. 
   * Borde vara 10 på iOS, 5 på Android.
+
+## Kalibrering av ny karta
+
+* Scanna in kartan (Brother Control Center 4)
+* Vrid rätt kartan genom att rotera 90 grader noll till två gånger
+* Spara till t ex C:\github\gpsKarta\data/2023-SommarN.jpg
+* Bestäm tre punkter A,B och C, typ rätvinklig triangel, så stor som möjligt
+	* Punkterna kan t ex vara hus, vägskäl eller liknande
+		* https://www.openstreetmap.org
+	* Alternativ:
+		* gps-koordinater (Google Maps ger WGS  59.269498,   18.168742 (Klisätravägen/Bergstigen))
+		* gps-koordinater (Min Karta ger WGS84, 59°16'10.2"N 18°10'7.4"E, Omvandlas för hand)
+		* https://minkarta.lantmateriet.se
+		* https://coordinates-converter.com/en/decimal/59.300661,18.125752?karte=OpenStreetMap
+	* bitmapskoordinater (measure.js i index.html)
+* Skapa till t ex C:\github\gpsKarta\data/2023-SommarN.json

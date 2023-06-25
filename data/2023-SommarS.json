@@ -1,0 +1,17 @@
+{
+	"map" : "2023-SommarS.jpg",
+	"mail" : "janchrister.nilsson@gmail.com",
+	"ABC" : [59.28181, 18.13276, 59.27939, 18.16627, 59.26799, 18.17072],
+	"drawControls": true,
+	"radius" : 60,
+	"scale" : 0.5,
+	"controls": {"A":[1501,77],"B":[6053,509],"C":[6776,3470]}
+}
+
+
+
+
+
+
+
+
