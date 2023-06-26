@@ -1,4 +1,4 @@
-VERSION = 217 
+VERSION = 218
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -7,7 +7,8 @@ LIMIT = 20 # meter. Under this value is no bearing given.
 platform = window.navigator.platform # Win32|iPad|Linux
 
 DIGITS = 'zero one two three four five six seven eight niner'.split ' '
-BR = if platform in ['Win32','iPad'] then "\n" else '<br>'
+#BR = if platform in ['Win32','iPad'] then "\n" else '<br>'
+BR = "\n"
 
 # http://www.bvsok.se/Kartor/Skolkartor/
 # Högupplösta orienteringskartor: https://www.omaps.net
@@ -145,7 +146,7 @@ say = (m) ->
 
 preload = ->
 	params = getParameters()
-	mapName = params.map || "2020-SommarS"
+	mapName = params.map || "2023-SommarS"
 	if params.debug then dump.active = params.debug == '1'
 	loadJSON "data/#{mapName}.json", (json) ->
 		data = json
