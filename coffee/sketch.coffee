@@ -150,6 +150,7 @@ preload = ->
 	if params.debug then dump.active = params.debug == '1'
 	loadJSON "data/#{mapName}.json", (json) ->
 		data = json
+		console.log 'adam',data
 		for key,control of data.controls
 			control.push ""
 			control.push 0
@@ -460,6 +461,7 @@ drawTrail = ->
 	if not general.TRAIL then return
 	textSize 20/SCALE
 	sw 1/SCALE
+	if storage.trail.length < 1 then return
 	[x0,y0] = storage.trail[0]
 	for [x,y] in storage.trail
 		index = 0
@@ -563,7 +565,7 @@ draw = ->
 		textSize 100
 		textAlign CENTER,CENTER
 		x = width/2
-		y = height/2
+		y = height/2 
 		text mapName, x,y-100
 		text 'Version: '+VERSION, x,y
 		if dump.active then text 'debug',x,y+100
