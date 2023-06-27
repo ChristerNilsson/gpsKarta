@@ -1,4 +1,4 @@
-VERSION = 223
+VERSION = 225
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -15,6 +15,9 @@ LIMIT = 20 # meter. Under this value is no bearing given.
 # https://omaps.blob.core.windows.net/map-excerpts/1fdc587ffdea489dbd69e29b10b48395.jpeg Nackareservatet utan kontroller.
 
 #DISTLIST = [0,2,4,6,8,10,12,14,16,18,20,30,40,50,60,70,80,90,100, 120,140,160,180,200,250,300,350,400,450,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000]
+
+#lastStartX = 0
+#lastStartY = 0
 
 released = true
 mapName = "" # t ex skarpnäck
@@ -119,6 +122,8 @@ draw = ->
 		return
 
 	if state == 1
+		#lastStartX = startX
+		#lastStartY = startY
 		push()
 		translate width/2, height/2
 		scale SCALE
@@ -126,13 +131,16 @@ draw = ->
 		pop()
 
 touchStarted = (event) ->
-	lastTouchStarted = new Date()
+	#lastTouchStarted = new Date()
 	event.preventDefault()
 	if not released then return
 	speed = 1
 	released = false
 	startX = mouseX
 	startY = mouseY
+	#lastStartX = startX
+	#lastStartY = startY
+
 	false
 
 touchMoved = (event) ->
@@ -140,16 +148,23 @@ touchMoved = (event) ->
 	if state == 1
 		cx += speed * (startX - mouseX)/SCALE
 		cy += speed * (startY - mouseY)/SCALE
+		#lastStartX = startX
+		#lastStartY = startY
 		startX = mouseX
 		startY = mouseY
 	false
 
 touchEnded = (event) ->
 	event.preventDefault()
+
 	# if (new Date()) - lastTouchEnded < 500
 	# 	lastTouchEnded = new Date()
 	# 	return # to prevent double bounce
 	if released then return
+
+	#lastStartX = startX
+	#lastStartY = startY
+
 	released = true
 	if state in [0,2]
 		state = 1
