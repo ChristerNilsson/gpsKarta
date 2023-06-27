@@ -1,4 +1,4 @@
-VERSION = 228
+VERSION = 230
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -22,7 +22,7 @@ params = null
 voices = null
 measure = {}
 #surplus = 0
-pois = null
+#pois = null
 speed = 1
 distbc = 0
 
@@ -77,7 +77,7 @@ distanceSaid = '' # förhindrar upprepning
 
 preload = ->
 	params = getParameters()
-	mapName = params.map || "2020-SommarS"
+	mapName = params.map || "2023-SommarS"
 	# if params.debug then dump.active = params.debug == '1'
 	loadJSON "data/#{mapName}.json", (json) ->
 		data = json
@@ -87,7 +87,7 @@ preload = ->
 			control.push 0
 			control.push 0
 		img = loadImage "data/" + data.map
-	loadJSON "data/poi.json", (json) -> pois = json
+	#loadJSON "data/poi.json", (json) -> pois = json
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
 window.speechSynthesis.onvoiceschanged = -> voices = window.speechSynthesis.getVoices()
