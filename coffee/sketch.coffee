@@ -1,4 +1,4 @@
-VERSION = 221
+VERSION = 222
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -279,10 +279,9 @@ decreaseQueue = ->
 
 locationUpdate = (p) ->
 
-	p.coords.latitude = 59.2681
-	p.coords.longitude = 18.14458
-
-	console.log "locationUpdate",p.coords
+	# p.coords.latitude = 59.2681
+	# p.coords.longitude = 18.14458
+	# console.log "locationUpdate",p.coords
 
 	pLat = myRound p.coords.latitude,6
 	pLon = myRound p.coords.longitude,6
