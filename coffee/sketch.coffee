@@ -1,4 +1,4 @@
-VERSION = 220
+VERSION = 221
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -216,6 +216,7 @@ increaseQueue = (p) ->
 firstInfo = ->
 	[x,y] = crossHair
 	[lon,lat] = b2w.convert x,y
+	console.log "firstInfo #{[x,y,lon,lat]}"
 
 	b = LatLon gpsLat, gpsLon
 	c = LatLon lat, lon 
@@ -277,6 +278,12 @@ decreaseQueue = ->
 		say msg.replace ':',' and '
 
 locationUpdate = (p) ->
+
+	p.coords.latitude = 59.2681
+	p.coords.longitude = 18.14458
+
+	console.log "locationUpdate",p.coords
+
 	pLat = myRound p.coords.latitude,6
 	pLon = myRound p.coords.longitude,6
 	if storage.trail.length == 0
@@ -291,6 +298,7 @@ uppdatera = (pLat, pLon) ->
 	dump.store ""
 	dump.store "LU #{pLat} #{pLon}"
 	[x,y] = w2b.convert pLon,pLat
+	console.log "uppdatera",pLon,pLat,x,y
 	updateTrack pLat, pLon, x,y
 	updateTrail pLat, pLon, x,y
 
@@ -382,7 +390,9 @@ setup = ->
 	wgs = [abc[1],abc[0],abc[3],abc[2],abc[5],abc[4]] # lat lon <=> lon lat
 
 	b2w = new Converter bmp,wgs,6
+	#console.log "b2w",b2w
 	w2b = new Converter wgs,bmp,0
+	#console.log "w2b",w2bb2ww2b
 
 	storage = new Storage mapName
 	storage.trail = []
@@ -770,6 +780,7 @@ touchMoved = (event) ->
 touchEnded = (event) ->
 	#console.log 'touchEnded',released,state
 	event.preventDefault()
+	console.log 'touchEnded',cx,cy
 	if (new Date()) - lastTouchEnded < 500
 		lastTouchEnded = new Date()
 		return # to prevent double bounce

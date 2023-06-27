@@ -77,3 +77,28 @@ w2b = new Converter wgs,bmp,0
 assert [bmp[0], bmp[1]], w2b.convert wgs[0],wgs[1]
 assert [bmp[2], bmp[3]], w2b.convert wgs[2],wgs[3]
 assert [bmp[4], bmp[5]], w2b.convert wgs[4],wgs[5]
+
+# 2023-S
+
+bmp = [1502,75, 3324,3945, 6777,3470]
+# T-korsning N Byälvsvägen
+# 4-vägskorsning norr om Trädgårdshuset (röd på OpenStreetMap)
+# Älta strandväg/Lövängsvägen
+
+wgs = [18.13277,59.28181, 18.145,59.2668, 18.17072,59.26799]
+
+b2w = new Converter bmp,wgs,6
+assert [wgs[0], wgs[1]], b2w.convert bmp[0],bmp[1]
+assert [wgs[2], wgs[3]], b2w.convert bmp[2],bmp[3]
+assert [wgs[4], wgs[5]], b2w.convert bmp[4],bmp[5]
+
+w2b = new Converter wgs,bmp,0
+assert [bmp[0], bmp[1]], w2b.convert wgs[0],wgs[1]
+assert [bmp[2], bmp[3]], w2b.convert wgs[2],wgs[3]
+assert [bmp[4], bmp[5]], w2b.convert wgs[4],wgs[5]
+
+# # 4-vägskorsning norr om Trädgårdshuset (vit på OpenStreetMap)
+assert [18.144625, 59.268136], b2w.convert 3258,3596
+assert [3258,3596], w2b.convert 18.144625, 59.268136
+
+console.log "All tests passed"
