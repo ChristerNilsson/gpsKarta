@@ -1,4 +1,4 @@
-VERSION = 221
+VERSION = 222
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -34,13 +34,8 @@ data = null
 
 img = null
 
-# b2w = null
-# w2b = null
-
 startX = 0
 startY = 0
-
-menuButton = null
 
 crossHair = null
 lastTouchEnded = new Date() # to prevent double bounce in menus
@@ -101,8 +96,6 @@ setup = ->
 	canvas = createCanvas innerWidth-0.0, innerHeight #-0.5
 	canvas.position 0,0 # hides text field used for clipboard copy.
 
-	# loadGeneral()
-
 	angleMode DEGREES
 	SCALE = data.scale
 
@@ -110,9 +103,6 @@ setup = ->
 	bmp = [dcs.A[0], dcs.A[1], dcs.B[0], dcs.B[1], dcs.C[0], dcs.C[1]]
 	abc = data.ABC
 	wgs = [abc[1],abc[0],abc[3],abc[2],abc[5],abc[4]] # lat lon <=> lon lat
-
-	# b2w = new Converter bmp,wgs,6
-	# w2b = new Converter wgs,bmp,0
 
 	[cx,cy] = [img.width/2,img.height/2]
 
@@ -125,7 +115,6 @@ draw = ->
 		y = height/2 
 		text mapName, x,y-100
 		text 'Version: '+VERSION, x,y
-		# if dump.active then text 'debug',x,y+100
 		text "Click to continue!", x,y+200
 		return
 
@@ -145,21 +134,6 @@ draw = ->
 			textSize [100,50][i//3]
 			text message, [margin,width/2,width-margin][i%3], [margin,height][i//3] 
 		return
-
-
-# SetSector = (sector) ->
-# 	general.SECTOR = sector
-# 	saveGeneral()
-# 	dialogues.clear()
-
-# update = (littera) ->
-# 	key = findKey()
-# 	[x,y] = crossHair
-# 	[lon,lat] = b2w.convert x,y
-# 	storage.controls[key] = [x,y,littera,lat,lon]
-# 	storage.save()
-# 	crossHair = null
-# 	dialogues.clear()
 
 touchStarted = (event) ->
 	lastTouchStarted = new Date()
@@ -187,16 +161,7 @@ touchEnded = (event) ->
 		return # to prevent double bounce
 	if released then return
 	released = true
-	# if state == 0 then initSpeaker()
-	if state == 2 then dialogues.clear()
 	if state in [0,2]
 		state = 1
 		return false
-	if menuButton.inside mouseX,mouseY
-		#console.log 'BERTIL'
-		menuButton.click()
-		return false
-	if dialogues.length > 0
-		dialogue = _.last dialogues
-		dialogue.execute mouseX,mouseY # then dialogues.pop()
 	false
