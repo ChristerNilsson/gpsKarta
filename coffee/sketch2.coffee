@@ -1,4 +1,4 @@
-VERSION = 226
+VERSION = 227
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -138,11 +138,11 @@ touchStarted = (event) ->
 
 touchMoved = (event) ->
 	event.preventDefault()
-	# if state == 1
-	# 	cx += speed * (startX - mouseX)/SCALE
-	# 	cy += speed * (startY - mouseY)/SCALE
-	# 	startX = mouseX
-	# 	startY = mouseY
+	if state == 1
+		cx += speed * (startX - mouseX)/SCALE
+		cy += speed * (startY - mouseY)/SCALE
+		startX = mouseX
+		startY = mouseY
 	false
 
 touchEnded = (event) ->
@@ -153,10 +153,10 @@ touchEnded = (event) ->
 	# 	return # to prevent double bounce
 	if released then return
 
-	cx += speed * (startX - mouseX)/SCALE
-	cy += speed * (startY - mouseY)/SCALE
-	startX = mouseX
-	startY = mouseY
+	# cx += speed * (startX - mouseX)/SCALE
+	# cy += speed * (startY - mouseY)/SCALE
+	# startX = mouseX
+	# startY = mouseY
 
 
 	released = true
