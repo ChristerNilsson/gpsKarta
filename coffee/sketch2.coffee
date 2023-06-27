@@ -1,20 +1,20 @@
-VERSION = 222
+VERSION = 223
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
 
-platform = window.navigator.platform # Win32|iPad|Linux
+# platform = window.navigator.platform # Win32|iPad|Linux
 
-DIGITS = 'zero one two three four five six seven eight niner'.split ' '
+# DIGITS = 'zero one two three four five six seven eight niner'.split ' '
 #BR = if platform in ['Win32','iPad'] then "\n" else '<br>'
-BR = "\n"
+#BR = "\n"
 
 # http://www.bvsok.se/Kartor/Skolkartor/
 # Högupplösta orienteringskartor: https://www.omaps.net
 # https://omaps.blob.core.windows.net/map-excerpts/1fdc587ffdea489dbd69e29b10b48395.jpeg Nackareservatet utan kontroller.
 
-DISTLIST = [0,2,4,6,8,10,12,14,16,18,20,30,40,50,60,70,80,90,100, 120,140,160,180,200,250,300,350,400,450,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000]
+#DISTLIST = [0,2,4,6,8,10,12,14,16,18,20,30,40,50,60,70,80,90,100, 120,140,160,180,200,250,300,350,400,450,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000]
 
 released = true
 mapName = "" # t ex skarpnäck
@@ -45,8 +45,8 @@ Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
 
 general = {COINS: true, DISTANCE: true, TRAIL: true, SECTOR: 10, PANSPEED : true}
-loadGeneral = -> if localStorage.gpsKarta then general = _.extend general, JSON.parse localStorage.gpsKarta
-saveGeneral = -> localStorage.gpsKarta = JSON.stringify general
+#loadGeneral = -> if localStorage.gpsKarta then general = _.extend general, JSON.parse localStorage.gpsKarta
+#saveGeneral = -> localStorage.gpsKarta = JSON.stringify general
 
 storage = null
 
@@ -60,9 +60,9 @@ track = [] # five latest GPS positions (bitmap coordinates)
 
 speaker = null
 
-soundUp = null
-soundDown = null
-soundQueue = 0 # integer neg=minskat avstånd pos=ökat avstånd
+#soundUp = null
+#soundDown = null
+#soundQueue = 0 # integer neg=minskat avstånd pos=ökat avstånd
 
 messages = ['','','','','','']
 gpsCount = 0
@@ -122,18 +122,8 @@ draw = ->
 		push()
 		translate width/2, height/2
 		scale SCALE
-
 		image img, -cx,-cy
 		pop()
-		fc 0
-		sc 1,1,0
-		sw 3
-		margin = 25
-		for message,i in messages
-			textAlign [LEFT,CENTER,RIGHT][i%3], [TOP,BOTTOM][i//3]
-			textSize [100,50][i//3]
-			text message, [margin,width/2,width-margin][i%3], [margin,height][i//3] 
-		return
 
 touchStarted = (event) ->
 	lastTouchStarted = new Date()
@@ -147,7 +137,7 @@ touchStarted = (event) ->
 
 touchMoved = (event) ->
 	event.preventDefault()
-	if dialogues.length == 0 and state == 1
+	if state == 1
 		cx += speed * (startX - mouseX)/SCALE
 		cy += speed * (startY - mouseY)/SCALE
 		startX = mouseX
@@ -156,9 +146,9 @@ touchMoved = (event) ->
 
 touchEnded = (event) ->
 	event.preventDefault()
-	if (new Date()) - lastTouchEnded < 500
-		lastTouchEnded = new Date()
-		return # to prevent double bounce
+	# if (new Date()) - lastTouchEnded < 500
+	# 	lastTouchEnded = new Date()
+	# 	return # to prevent double bounce
 	if released then return
 	released = true
 	if state in [0,2]
