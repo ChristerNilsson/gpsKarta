@@ -3,12 +3,6 @@ VERSION = 236
 released = true
 mapName = "" # t ex skarpnäck
 params = null
-# voices = null
-#measure = {}
-#surplus = 0
-#pois = null
-#speed = 1
-#distbc = 0
 
 start = new Date()
 
@@ -21,25 +15,10 @@ img = null
 startX = 0
 startY = 0
 
-#crossHair = null
-#lastTouchEnded = new Date() # to prevent double bounce in menus
-
-fraction = (x) -> x - int x 
 Array.prototype.clear = -> @length = 0
-assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
-
-# general = {COINS: true, DISTANCE: true, TRAIL: true, SECTOR: 10, PANSPEED : true}
-#loadGeneral = -> if localStorage.gpsKarta then general = _.extend general, JSON.parse localStorage.gpsKarta
-#saveGeneral = -> localStorage.gpsKarta = JSON.stringify general
-
-# storage = null
 
 [cx,cy] = [0,0] # center (image coordinates)
 SCALE = 1
-
-# gps = null
-# position = null # gps position [x,y] # [lon,lat,alt,hhmmss]
-#track = [] # five latest GPS positions (bitmap coordinates)
 
 messages = ['','','','','','']
 
@@ -57,7 +36,6 @@ preload = ->
 		img = loadImage "data/" + data.map
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
-# window.speechSynthesis.onvoiceschanged = -> voices = window.speechSynthesis.getVoices()
 
 setup = ->
 	canvas = createCanvas innerWidth-0.0, innerHeight #-0.5
