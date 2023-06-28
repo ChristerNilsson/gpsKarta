@@ -1,30 +1,14 @@
-VERSION = 234
-
-DELAY = 100 # ms, delay between sounds
-DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
-LIMIT = 20 # meter. Under this value is no bearing given.
-
-# platform = window.navigator.platform # Win32|iPad|Linux
-
-# DIGITS = 'zero one two three four five six seven eight niner'.split ' '
-#BR = if platform in ['Win32','iPad'] then "\n" else '<br>'
-#BR = "\n"
-
-# http://www.bvsok.se/Kartor/Skolkartor/
-# Högupplösta orienteringskartor: https://www.omaps.net
-# https://omaps.blob.core.windows.net/map-excerpts/1fdc587ffdea489dbd69e29b10b48395.jpeg Nackareservatet utan kontroller.
-
-#DISTLIST = [0,2,4,6,8,10,12,14,16,18,20,30,40,50,60,70,80,90,100, 120,140,160,180,200,250,300,350,400,450,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000]
+VERSION = 235
 
 released = true
 mapName = "" # t ex skarpnäck
 params = null
-voices = null
-measure = {}
+# voices = null
+#measure = {}
 #surplus = 0
 #pois = null
-speed = 1
-distbc = 0
+#speed = 1
+#distbc = 0
 
 start = new Date()
 
@@ -73,7 +57,7 @@ preload = ->
 		img = loadImage "data/" + data.map
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
-window.speechSynthesis.onvoiceschanged = -> voices = window.speechSynthesis.getVoices()
+# window.speechSynthesis.onvoiceschanged = -> voices = window.speechSynthesis.getVoices()
 
 setup = ->
 	canvas = createCanvas innerWidth-0.0, innerHeight #-0.5
@@ -106,7 +90,7 @@ draw = ->
 touchStarted = (event) ->
 	event.preventDefault()
 	if not released then return
-	speed = 1
+	#speed = 1
 	released = false
 	startX = mouseX
 	startY = mouseY
@@ -115,8 +99,8 @@ touchStarted = (event) ->
 touchMoved = (event) ->
 	event.preventDefault()
 	if state == 1
-		cx += speed * (startX - mouseX)/SCALE
-		cy += speed * (startY - mouseY)/SCALE
+		cx += (startX - mouseX)/SCALE
+		cy += (startY - mouseY)/SCALE
 		startX = mouseX
 		startY = mouseY
 	false
