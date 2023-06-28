@@ -1,4 +1,4 @@
-VERSION = 222
+VERSION = 223
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -218,8 +218,8 @@ firstInfo = ->
 	[lon,lat] = b2w.convert x,y
 	console.log "firstInfo #{[x,y,lon,lat]}"
 
-	b = LatLon gpsLat, gpsLon
-	c = LatLon lat, lon 
+	b = LatLon gpsLat, gpsLon # senaste position
+	c = LatLon lat, lon # target
 
 	distb = round b.distanceTo c
 	distance = round (distb)/DIST
@@ -294,10 +294,13 @@ locationUpdate = (p) ->
 	uppdatera pLat, pLon
 
 uppdatera = (pLat, pLon) ->
-	dump.store ""
-	dump.store "LU #{pLat} #{pLon}"
+	# dump.store ""
+	# dump.store "LU #{pLat} #{pLon}"
 	[x,y] = w2b.convert pLon,pLat
-	console.log "uppdatera",pLon,pLat,x,y
+	dump.store "uppdatera #{pLon} #{pLat} #{x} #{y}"
+	# console.log msg
+	# dump.store msg
+
 	updateTrack pLat, pLon, x,y
 	updateTrail pLat, pLon, x,y
 
@@ -643,7 +646,7 @@ savePosition = ->
 	dialogues.clear()
 
 aim = ->
-	if crossHair == null 
+	if crossHair == null
 		crossHair = [cx,cy]
 		setTarget()
 	else
@@ -663,7 +666,7 @@ menu1 = -> # Main Menu
 	dialogue.add 'Setup...', -> menu2()
 	dialogue.add 'Aim', -> aim()
 	dialogue.add 'Save', -> savePosition()
-	dialogue.add 'In', -> 
+	dialogue.add 'In', ->
 		SCALE *= 1.5
 		dialogues.clear()
 	dialogue.clock ' ',true
@@ -671,19 +674,19 @@ menu1 = -> # Main Menu
 
 menu2 = -> # Setup
 	dialogue = new Dialogue()
-	dialogue.add 'PanSpeed', -> 
+	dialogue.add 'PanSpeed', ->
 		general.PANSPEED = not general.PANSPEED
 		saveGeneral()
 		dialogues.clear()
-	dialogue.add 'Coins', -> 
+	dialogue.add 'Coins', ->
 		general.COINS = not general.COINS
 		saveGeneral()
 		dialogues.clear()
-	dialogue.add 'Distance', -> 
+	dialogue.add 'Distance', ->
 		general.DISTANCE = not general.DISTANCE
 		saveGeneral()
 		dialogues.clear()
-	dialogue.add 'Trail', -> 
+	dialogue.add 'Trail', ->
 		general.TRAIL = not general.TRAIL
 		saveGeneral()
 		dialogues.clear()
@@ -729,7 +732,7 @@ menu6 = -> # More
 	dialogue.add 'Clear', ->
 		storage.clear()
 		dialogues.clear()
-	dialogue.add 'Info...', -> 
+	dialogue.add 'Info...', ->
 		state = 2
 		dialogues.clear()
 	dialogue.clock()
@@ -754,9 +757,8 @@ showDialogue = -> if dialogues.length > 0 then (_.last dialogues).show()
 
 touchStarted = (event) ->
 	lastTouchStarted = new Date()
-	#console.log 'touchStarted',released,state
 	event.preventDefault()
-	if not released then return 
+	if not released then return
 	speed = 1
 	if general.PANSPEED then speed = 0.1 + 0.9 * dist(mouseX,mouseY,width/2,height/2) / dist(0,0,width/2,height/2)
 	dump.store "touchStarted #{(new Date())-start} #{JSON.stringify touches}"
@@ -766,7 +768,6 @@ touchStarted = (event) ->
 	false
 
 touchMoved = (event) ->
-	#console.log 'touchMoved',released,state
 	dump.store "touchMoved #{(new Date())-start} #{JSON.stringify touches}"
 	event.preventDefault()
 	if dialogues.length == 0 and state == 1
@@ -791,13 +792,10 @@ touchEnded = (event) ->
 	if state in [0,2]
 		state = 1
 		return false
-	#console.log 'ADAM',mouseX,mouseY
 	if menuButton.inside mouseX,mouseY
-		#console.log 'BERTIL'
 		menuButton.click()
 		return false
 	if dialogues.length > 0
-		#console.log 'CESAR'
 		dialogue = _.last dialogues
 		#if not dialogue.execute mouseX,mouseY then dialogues.pop()
 		dialogue.execute mouseX,mouseY # then dialogues.pop()
