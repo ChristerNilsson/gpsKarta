@@ -1,4 +1,4 @@
-VERSION = 227
+VERSION = 228
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -590,7 +590,7 @@ draw = ->
 		translate width/2, height/2
 		scale SCALE
 
-		image img, -cx,-cy
+		image img, round(-cx), round(-cy)
 		drawTrail()
 		drawTrack()
 
