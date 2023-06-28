@@ -1,4 +1,4 @@
-VERSION = 228
+VERSION = 229
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -661,7 +661,8 @@ menu1 = -> # Main Menu
 		dump.store 'Center #{cx} #{cy} #{position.coord.} #{}'
 		dialogues.clear()
 	dialogue.add 'Out', ->
-		if SCALE > data.scale then SCALE /= 1.5
+		#if SCALE > data.scale then SCALE /= 1.5
+		SCALE /= 1.5
 		dialogues.clear()
 	dialogue.add 'Take...', -> menu4()
 	dialogue.add 'More...', -> menu6()
