@@ -1,4 +1,4 @@
-VERSION = 230
+VERSION = 232
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -58,22 +58,7 @@ TRACKED = 5 # circles shows the user position
 position = null # gps position [x,y] # [lon,lat,alt,hhmmss]
 track = [] # five latest GPS positions (bitmap coordinates)
 
-speaker = null
-
-#soundUp = null
-#soundDown = null
-#soundQueue = 0 # integer neg=minskat avstånd pos=ökat avstånd
-
 messages = ['','','','','','']
-gpsCount = 0
-
-[gpsLat,gpsLon] = [0,0] # avgör om muntlig information ska ges
-
-timeout = null
-
-voiceQueue = []
-bearingSaid = '' # förhindrar upprepning
-distanceSaid = '' # förhindrar upprepning
 
 preload = ->
 	params = getParameters()
@@ -122,11 +107,10 @@ draw = ->
 		push()
 		translate width/2, height/2
 		scale SCALE
-		image img, -cx,-cy
+		image img, round(-cx),round(-cy)
 		pop()
 
 touchStarted = (event) ->
-	#lastTouchStarted = new Date()
 	event.preventDefault()
 	if not released then return
 	speed = 1
@@ -147,18 +131,7 @@ touchMoved = (event) ->
 
 touchEnded = (event) ->
 	event.preventDefault()
-
-	# if (new Date()) - lastTouchEnded < 500
-	# 	lastTouchEnded = new Date()
-	# 	return # to prevent double bounce
 	if released then return
-
-	# cx += speed * (startX - mouseX)/SCALE
-	# cy += speed * (startY - mouseY)/SCALE
-	# startX = mouseX
-	# startY = mouseY
-
-
 	released = true
 	if state in [0,2]
 		state = 1
