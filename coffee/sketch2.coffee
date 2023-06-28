@@ -1,8 +1,7 @@
-VERSION = 236
+VERSION = 237
 
 released = true
 mapName = "" # t ex skarpnäck
-params = null
 
 start = new Date()
 
@@ -15,27 +14,18 @@ img = null
 startX = 0
 startY = 0
 
-Array.prototype.clear = -> @length = 0
-
 [cx,cy] = [0,0] # center (image coordinates)
 SCALE = 1
 
-messages = ['','','','','','']
-
 preload = ->
-	params = getParameters()
 	mapName = "2020-SommarS"
-	# if params.debug then dump.active = params.debug == '1'
 	loadJSON "data/#{mapName}.json", (json) ->
 		data = json
-		console.log 'adam',data
 		for key,control of data.controls
 			control.push ""
 			control.push 0
 			control.push 0
 		img = loadImage "data/" + data.map
-
-locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
 
 setup = ->
 	canvas = createCanvas innerWidth-0.0, innerHeight #-0.5
@@ -61,7 +51,6 @@ draw = ->
 		push()
 		translate width/2, height/2
 		scale SCALE
-		console.log round(-cx),round(-cy) 
 		image img, round(-cx),round(-cy)
 		pop()
 
