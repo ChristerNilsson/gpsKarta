@@ -1,4 +1,4 @@
-VERSION = 232
+VERSION = 234
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -37,32 +37,31 @@ img = null
 startX = 0
 startY = 0
 
-crossHair = null
-lastTouchEnded = new Date() # to prevent double bounce in menus
+#crossHair = null
+#lastTouchEnded = new Date() # to prevent double bounce in menus
 
 fraction = (x) -> x - int x 
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
 
-general = {COINS: true, DISTANCE: true, TRAIL: true, SECTOR: 10, PANSPEED : true}
+# general = {COINS: true, DISTANCE: true, TRAIL: true, SECTOR: 10, PANSPEED : true}
 #loadGeneral = -> if localStorage.gpsKarta then general = _.extend general, JSON.parse localStorage.gpsKarta
 #saveGeneral = -> localStorage.gpsKarta = JSON.stringify general
 
-storage = null
+# storage = null
 
 [cx,cy] = [0,0] # center (image coordinates)
 SCALE = 1
 
-gps = null
-TRACKED = 5 # circles shows the user position
-position = null # gps position [x,y] # [lon,lat,alt,hhmmss]
-track = [] # five latest GPS positions (bitmap coordinates)
+# gps = null
+# position = null # gps position [x,y] # [lon,lat,alt,hhmmss]
+#track = [] # five latest GPS positions (bitmap coordinates)
 
 messages = ['','','','','','']
 
 preload = ->
 	params = getParameters()
-	mapName = params.map || "2023-SommarS"
+	mapName = "2023-SommarS"
 	# if params.debug then dump.active = params.debug == '1'
 	loadJSON "data/#{mapName}.json", (json) ->
 		data = json
@@ -72,7 +71,6 @@ preload = ->
 			control.push 0
 			control.push 0
 		img = loadImage "data/" + data.map
-	#loadJSON "data/poi.json", (json) -> pois = json
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
 window.speechSynthesis.onvoiceschanged = -> voices = window.speechSynthesis.getVoices()
@@ -81,13 +79,7 @@ setup = ->
 	canvas = createCanvas innerWidth-0.0, innerHeight #-0.5
 	canvas.position 0,0 # hides text field used for clipboard copy.
 
-	angleMode DEGREES
 	SCALE = data.scale
-
-	dcs = data.controls
-	bmp = [dcs.A[0], dcs.A[1], dcs.B[0], dcs.B[1], dcs.C[0], dcs.C[1]]
-	abc = data.ABC
-	wgs = [abc[1],abc[0],abc[3],abc[2],abc[5],abc[4]] # lat lon <=> lon lat
 
 	[cx,cy] = [img.width/2,img.height/2]
 
@@ -107,6 +99,7 @@ draw = ->
 		push()
 		translate width/2, height/2
 		scale SCALE
+		console.log round(-cx),round(-cy) 
 		image img, round(-cx),round(-cy)
 		pop()
 
@@ -117,7 +110,6 @@ touchStarted = (event) ->
 	released = false
 	startX = mouseX
 	startY = mouseY
-
 	false
 
 touchMoved = (event) ->
