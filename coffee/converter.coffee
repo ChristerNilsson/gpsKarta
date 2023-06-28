@@ -98,7 +98,11 @@ assert [bmp[2], bmp[3]], w2b.convert wgs[2],wgs[3]
 assert [bmp[4], bmp[5]], w2b.convert wgs[4],wgs[5]
 
 # # 4-vägskorsning norr om Trädgårdshuset (vit på OpenStreetMap)
-assert [18.144625, 59.268136], b2w.convert 3258,3596
-assert [3258,3596], w2b.convert 18.144625, 59.268136
+#assert [18.144625, 59.268136], b2w.convert 3258,3596
+#assert [3258,3596], w2b.convert 18.144625, 59.268136
+
+# Home
+assert [1685,4443], w2b.convert 18.132703, 59.265201
+assert [18.132703, 59.265201], b2w.convert 1685,4443
 
 console.log "All tests passed"

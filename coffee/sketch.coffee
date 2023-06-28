@@ -1,4 +1,4 @@
-VERSION = 225
+VERSION = 226
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -309,7 +309,7 @@ updateTrack = (pLat, pLon, x,y) -> # senaste fem positionerna
 	if track.length > TRACKED then track.shift()
 	t = _.last track
 	dump.store "T #{t[0]} #{t[1]}"
-	messages[4] = pLat + ' ' + pLon
+	messages[TRACKED-1] = pLat + ' ' + pLon
 
 updateTrail = (pLat, pLon, x,y)->
 	position = [x,y]
@@ -658,6 +658,7 @@ menu1 = -> # Main Menu
 	dialogue = new Dialogue()
 	dialogue.add 'Center', ->
 		[cx,cy] = position
+		dump.store 'Center #{cx} #{cy} #{position.coord.} #{}'
 		dialogues.clear()
 	dialogue.add 'Out', ->
 		if SCALE > data.scale then SCALE /= 1.5
