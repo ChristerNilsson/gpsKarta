@@ -1,4 +1,4 @@
-VERSION = 235
+VERSION = 236
 
 released = true
 mapName = "" # t ex skarpnäck
@@ -45,7 +45,7 @@ messages = ['','','','','','']
 
 preload = ->
 	params = getParameters()
-	mapName = "2023-SommarS"
+	mapName = "2020-SommarS"
 	# if params.debug then dump.active = params.debug == '1'
 	loadJSON "data/#{mapName}.json", (json) ->
 		data = json
