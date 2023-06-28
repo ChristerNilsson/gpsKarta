@@ -112,3 +112,11 @@ https://support.google.com/pixelphone/thread/6068458?hl=en
 		* https://coordinates-converter.com/en/decimal/59.300661,18.125752?karte=OpenStreetMap
 	* bitmapskoordinater (measure.js i index.html)
 * Skapa till t ex C:\github\gpsKarta\data/2023-SommarN.json
+
+# Problem med 2023-SommarS.jpg på iPad.
+
+Den vägrar visa bilden. Antar att det har med storleken eller dpi att göra.
+Den innehåller 2x2 så många pixlar.
+
+* 2020-SommarS 2.6 MB 300 dpi OK
+* 2023-SommarS 8.7 MB 600 dpi NIX!
