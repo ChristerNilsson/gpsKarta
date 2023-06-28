@@ -1,4 +1,4 @@
-VERSION = 239
+VERSION = 240
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -146,7 +146,7 @@ say = (m) ->
 
 preload = ->
 	params = getParameters()
-	mapName = params.map || "2023-SommarS"
+	mapName = params.map || "2023-SommarN"
 	if params.debug then dump.active = params.debug == '1'
 	loadJSON "data/#{mapName}.json", (json) ->
 		data = json
