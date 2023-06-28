@@ -1,4 +1,4 @@
-VERSION = 237
+VERSION = 238
 
 released = true
 mapName = "" # t ex skarpnäck
@@ -18,7 +18,7 @@ startY = 0
 SCALE = 1
 
 preload = ->
-	mapName = "2020-SommarS"
+	mapName = "2023-SommarS"
 	loadJSON "data/#{mapName}.json", (json) ->
 		data = json
 		for key,control of data.controls
