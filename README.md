@@ -115,8 +115,10 @@ https://support.google.com/pixelphone/thread/6068458?hl=en
 
 # Problem med 2023-SommarS.jpg på iPad.
 
-Den vägrar visa bilden. Antar att det har med storleken eller dpi att göra.
-Den innehåller 2x2 så många pixlar.
+Den vägrar visa bilden. Jag reducerade från 600 dpi till 300. Det löste problemet.
+Osäker på om storleken eller dpi orsakar felet.
 
-* 2020-SommarS 2.6 MB 300 dpi OK
-* 2023-SommarS 8.7 MB 600 dpi NIX!
+# SCALE måste vara 0.5 i .json-filen
+
+Om man sätter t ex 1.0, visas inte current location på rätt plats.
+Ändrar man SCALE, måste även pixelmåtten (controls i filen) uppdateras.
