@@ -1,4 +1,4 @@
-VERSION = 238
+VERSION = 241
 
 released = true
 mapName = "" # t ex skarpnäck
@@ -36,6 +36,7 @@ setup = ->
 	[cx,cy] = [img.width/2,img.height/2]
 
 draw = ->
+
 	bg 0,1,0
 	if state == 0 
 		textSize 100
@@ -48,11 +49,13 @@ draw = ->
 		return
 
 	if state == 1
+		start = new Date()
 		push()
 		translate width/2, height/2
 		scale SCALE
 		image img, round(-cx),round(-cy)
 		pop()
+		console.log new Date() - start
 
 touchStarted = (event) ->
 	event.preventDefault()

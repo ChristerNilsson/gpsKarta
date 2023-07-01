@@ -55,12 +55,16 @@ assert [1,2,3], conv.gauss [[1, 1, 1], [2, 1, 2], [1, 2, 3]], [6, 10, 14]
 bmp = [338,1491, 4299,1948, 2963,5596] # x1,y1, x2,y2, x3,y3
 wgs = [18.150709,59.285624, 18.179902,59.283048, 18.168739,59.269496] # lng1,lat1, lng2,lat2, lng3,lat3
 
+facit = [0.0000074100584451286486,-3.4626149049038394e-7, 18.148720676127866, -2.1274398616518889e-7,-0.0000037928251001973044, 59.29135100969171]
 b2w = new Converter bmp,wgs,6
+assert facit, b2w.arr
 assert [wgs[0], wgs[1]], b2w.convert bmp[0],bmp[1]
 assert [wgs[2], wgs[3]], b2w.convert bmp[2],bmp[3]
 assert [wgs[4], wgs[5]], b2w.convert bmp[4],bmp[5]
 
+facit = [134598.91024311556, -12288.048630737865, -1714223.0207242696, -7549.809954954736, -262966.46040959837, 15728656.099952022]
 w2b = new Converter wgs,bmp,0
+assert facit, w2b.arr
 assert [bmp[0], bmp[1]], w2b.convert wgs[0],wgs[1]
 assert [bmp[2], bmp[3]], w2b.convert wgs[2],wgs[3]
 assert [bmp[4], bmp[5]], w2b.convert wgs[4],wgs[5]
