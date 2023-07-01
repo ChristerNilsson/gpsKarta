@@ -1,4 +1,4 @@
-VERSION = 242
+VERSION = 243
 
 released = true
 mapName = "" # t ex skarpnäck
@@ -58,10 +58,11 @@ draw = ->
 		image img, round(-cx),round(-cy)
 		pop()
 		textSize 20
-		messages.push new Date() - start
-		if messages.length > 50 then messages.shift()
+		messages.push round frameRate()
+		#if messages.length > 50 then messages.shift()
 		for i in range messages.length
-			text messages[i] ,20,20*i
+			if i < messages.length - 50 then continue
+			text messages[i], 50,20 + 20*(i % 50)
 
 touchStarted = (event) ->
 	event.preventDefault()
