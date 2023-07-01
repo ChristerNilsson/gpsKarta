@@ -1,4 +1,4 @@
-VERSION = 241
+VERSION = 242
 
 released = true
 mapName = "" # t ex skarpnäck
@@ -13,6 +13,8 @@ img = null
 
 startX = 0
 startY = 0
+
+messages = []
 
 [cx,cy] = [0,0] # center (image coordinates)
 SCALE = 1
@@ -55,7 +57,11 @@ draw = ->
 		scale SCALE
 		image img, round(-cx),round(-cy)
 		pop()
-		console.log new Date() - start
+		textSize 20
+		messages.push new Date() - start
+		if messages.length > 50 then messages.shift()
+		for i in range messages.length
+			text messages[i] ,20,20*i
 
 touchStarted = (event) ->
 	event.preventDefault()
