@@ -1,4 +1,4 @@
-VERSION = 253
+VERSION = 254
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -155,7 +155,7 @@ say = (m) ->
 	speechSynthesis.speak speaker
 
 preload = ->
-	voices = window.speechSynthesis.getVoices()
+	# voices = window.speechSynthesis.getVoices()
 	params = getParameters()
 	mapName = params.map || "2023-SommarN"
 	if params.debug then dump.active = params.debug == '1'
@@ -338,7 +338,9 @@ updateTrail = (pLat, pLon, x,y)->
 		#surplus += 5 - dist
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
-window.speechSynthesis.onvoiceschanged = -> voices = window.speechSynthesis.getVoices()
+window.speechSynthesis.onvoiceschanged = -> 
+	voices = window.speechSynthesis.getVoices()
+	initSpeaker()
 
 initSpeaker = ->
 	#dump.store "initSpeaker in #{index}"
