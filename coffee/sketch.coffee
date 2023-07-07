@@ -1,4 +1,4 @@
-VERSION = 240
+VERSION = 250
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -349,6 +349,7 @@ initSpeaker = ->
 	speaker.pitch = 0
 	speaker.text = '' 
 	speaker.lang = 'en-GB'
+	dump.store "voices #{voices.length}"
 	if voices and index <= voices.length-1 then speaker.voice = voices[index]
 
 	soundUp = loadSound 'soundUp.wav'
@@ -422,7 +423,10 @@ setup = ->
 	menuButton = new MenuButton width-160
 
 info = () ->
-	[x,y] = position
+	if position
+		[x,y] = position
+	else
+		[x,y] = [cx,cy]
 	[lon,lat] = b2w.convert x,y
 
 	if crossHair

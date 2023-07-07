@@ -61,6 +61,8 @@ assert [7,6], decode 'X'
 
 encodeAll = (pairs) ->
 	q = 0
+	if not pairs then return ""
+	if pairs.length == 0 then return ""
 	[x,y] = pairs[0]
 	result = "#{x},#{y}|" 
 	for i in range 1,pairs.length
