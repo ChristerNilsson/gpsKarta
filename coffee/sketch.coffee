@@ -1,4 +1,4 @@
-VERSION = 252
+VERSION = 253
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -155,6 +155,7 @@ say = (m) ->
 	speechSynthesis.speak speaker
 
 preload = ->
+	voices = window.speechSynthesis.getVoices()
 	params = getParameters()
 	mapName = params.map || "2023-SommarN"
 	if params.debug then dump.active = params.debug == '1'
