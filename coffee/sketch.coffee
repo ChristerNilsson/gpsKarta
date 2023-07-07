@@ -1,4 +1,4 @@
-VERSION = 250
+VERSION = 251
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -341,6 +341,7 @@ window.speechSynthesis.onvoiceschanged = -> voices = window.speechSynthesis.getV
 
 initSpeaker = ->
 	#dump.store "initSpeaker in #{index}"
+	document.title = voices.length
 	index = int getParameters().speaker || 5
 	speaker = new SpeechSynthesisUtterance()
 	speaker.voiceURI = "native"
@@ -349,7 +350,7 @@ initSpeaker = ->
 	speaker.pitch = 0
 	speaker.text = '' 
 	speaker.lang = 'en-GB'
-	dump.store "voices #{voices.length}"
+	#dump.store "voices #{voices.length}"
 	if voices and index <= voices.length-1 then speaker.voice = voices[index]
 
 	soundUp = loadSound 'soundUp.wav'
