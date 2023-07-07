@@ -131,6 +131,16 @@ voiceQueue = []
 bearingSaid = '' # förhindrar upprepning
 distanceSaid = '' # förhindrar upprepning
 
+p1 = new LatLon 52.205, 0.119
+p2 = new LatLon 48.857, 2.351
+assert 404279.1639886792, p1.distanceTo p2  #  m
+p1 = new LatLon 59.0, 18.0
+p2 = new LatLon 59.0, 18.00001
+assert 0.5726962096664346, p1.distanceTo p2  #  m
+p2 = new LatLon 59.00001, 18.0
+assert 1.1119492665983002, p1.distanceTo p2  #  m
+# fem decimaler blir bra 
+
 sendMail = (subject,body) ->
 	mail.href = "mailto:" + data.mail + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body) # encodeURI 
 	console.log mail.href
@@ -234,8 +244,8 @@ firstInfo = ->
 	
 	if distance < 10 then soundQueue = distance else soundQueue = 1 # ett antal DIST
 
-playSound = ->
-	if not general.COINS then return 
+playSound = -> # spelar Down eller Up (Coin eller Explosion)
+	if not general.COINS then return
 	if soundQueue == 0 then return
 	dump.store "playSound #{soundQueue}"
 	if soundQueue < 0 and soundDown != null
