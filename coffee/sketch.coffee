@@ -1,4 +1,4 @@
-VERSION = 256
+VERSION = 257
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -339,15 +339,15 @@ initSounds = ->
 
 	bearingSounds = {}
 	for bearing in BEARINGLIST.split ' '
-		console.log "sounds/bearing/#{bearing}.mp3"
-		sound = loadSound "sounds/bearing/#{bearing}.mp3"
+		console.log "sounds/bearing/male/#{bearing}.mp3"
+		sound = loadSound "sounds/bearing/male/#{bearing}.mp3"
 		sound.setVolume 0.1
 		bearingSounds[bearing] = sound
 
 	distanceSounds = {}
 	for distance in DISTLIST.split ' '
-		console.log "sounds/distance/#{distance}.mp3"
-		sound = loadSound "sounds/distance/#{distance}.mp3"
+		console.log "sounds/distance/female/#{distance}.mp3"
+		sound = loadSound "sounds/distance/female/#{distance}.mp3"
 		sound.setVolume 0.1
 		distanceSounds[distance] = sound
 
