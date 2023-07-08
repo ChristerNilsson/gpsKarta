@@ -1,4 +1,4 @@
-VERSION = 255
+VERSION = 256
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -14,7 +14,8 @@ BR = "\n"
 # Högupplösta orienteringskartor: https://www.omaps.net
 # https://omaps.blob.core.windows.net/map-excerpts/1fdc587ffdea489dbd69e29b10b48395.jpeg Nackareservatet utan kontroller.
 
-DISTLIST = [0,2,4,6,8,10,12,14,16,18,20,30,40,50,60,70,80,90,100, 120,140,160,180,200,250,300,350,400,450,500,600,700,800,900,1000,2000,3000,4000,5000,6000,7000,8000,9000,10000]
+BEARINGLIST ='01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36'
+DISTLIST = '2 4 6 8 10 12 14 16 18 20 30 40 50 60 70 80 90 100 120 140 160 180 200 300 400 500 600 700 800 900 1000 1200 1400 1600 1800 2000 3000 4000 5000 6000 7000 8000 9000 10000'
 
 released = true
 mapName = "" # t ex skarpnäck
@@ -44,6 +45,10 @@ menuButton = null
 
 crossHair = null
 lastTouchEnded = new Date() # to prevent double bounce in menus
+
+distanceSounds = {}
+bearingSounds = {}
+
 
 fraction = (x) -> x - int x 
 Array.prototype.clear = -> @length = 0
@@ -146,28 +151,17 @@ sendMail = (subject,body) ->
 	console.log mail.href
 	mail.click()
 
-say = (m) ->
-	if speaker == null then return
-	speechSynthesis.cancel()
-	speaker.text = m
+sayBear = (m) -> # m är en bäring i BEARINGLIST
+	console.log "sayBear #{m}"
 	dump.store ""
-	dump.store "say #{m} #{JSON.stringify voiceQueue}"
-	speechSynthesis.speak speaker
+	dump.store "sayBearing #{m} #{JSON.stringify voiceQueue}"
+	bearingSounds[m].play()
 
-preload = ->
-	# voices = window.speechSynthesis.getVoices()
-	params = getParameters()
-	mapName = params.map || "2023-SommarN"
-	if params.debug then dump.active = params.debug == '1'
-	loadJSON "data/#{mapName}.json", (json) ->
-		data = json
-		console.log 'adam',data
-		for key,control of data.controls
-			control.push ""
-			control.push 0
-			control.push 0
-		img = loadImage "data/" + data.map
-	loadJSON "data/poi.json", (json) -> pois = json
+sayDist = (m) -> # m är en distans i DISTLIST
+	console.log "sayDist #{m}"
+	dump.store ""
+	dump.store "sayDistance #{m} #{JSON.stringify voiceQueue}"
+	distanceSounds[m].play()
 
 sayDistance = (a,b) -> # a is newer (meter)
 	# if a border is crossed, produce speech
@@ -175,7 +169,7 @@ sayDistance = (a,b) -> # a is newer (meter)
 	a = round a
 	b = round b
 	if b == -1 then return a
-	for d in DISTLIST
+	for d in DISTLIST.split ' '
 		if a == d and b != d then return d
 		if (a-d) * (b-d) < 0 then return d
 	""
@@ -260,33 +254,35 @@ decreaseQueue = ->
 	if voiceQueue.length == 0 then return
 	msg = voiceQueue.shift()
 	arr = msg.split ' '
+	console.log "decreaseQueue #{msg}"
 
 	if arr[0] == 'both'
-		result = ""
+		#result = ""
 		msg = arr[1] + ' ' + arr[2] # skippa ordet. t ex 'bäring etta tvåa'
 		if bearingSaid != arr[1] + ' ' + arr[2]
 			bearingSaid = arr[1] + ' ' + arr[2]
-			result += arr[1] + ' ' + arr[2]
+			result = arr[1] + arr[2]
+			sayBear result
 		if distanceSaid != arr[3]
 			distanceSaid = arr[3]
-			result += '. ' + arr[3]
-		if result != "" then say result
+			#result += '. ' + arr[3]
+		if result != "" then sayDist arr[3]
 	else if arr[0] == 'bearing'
-		msg = arr[1] + ' ' + arr[2] # skippa ordet. t ex 'bäring etta tvåa'
-		if bearingSaid != msg then say msg
+		msg = arr[1] # skippa ordet. t ex 'bäring 12'
+		if bearingSaid != msg then sayBear msg
 		bearingSaid = msg
 	else if arr[0] == 'distance' and (general.DISTANCE or arr[1] < LIMIT)
 		msg = arr[1]                # skippa ordet. t ex 'distans 30'
-		if distanceSaid != msg then say msg
+		if distanceSaid != msg then sayDist msg
 		distanceSaid = msg
-	else if arr[0] == 'target'
-		bearingSaid = arr[2] + ' ' + arr[3]
-		distanceSaid = arr[4]
-		msg = "#{arr[0]} #{arr[1]}. bearing #{bearingSaid}. distance #{distanceSaid} meters"
-		# Example: 'target 11. bearing zero niner. distance 250 meters'
-		say msg
-	else if arr[0] == 'saved'
-		say msg.replace ':',' and '
+	# else if arr[0] == 'target'
+		# bearingSaid = arr[2] + ' ' + arr[3]
+		# distanceSaid = arr[4]
+		# msg = "#{arr[0]} #{arr[1]}. bearing #{bearingSaid}. distance #{distanceSaid} meters"
+		# # Example: 'target 11. bearing zero niner. distance 250 meters'
+		# say msg
+	# else if arr[0] == 'saved'
+		# say msg.replace ':',' and '
 
 locationUpdate = (p) ->
 
@@ -338,39 +334,28 @@ updateTrail = (pLat, pLon, x,y)->
 		#surplus += 5 - dist
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
-window.speechSynthesis.onvoiceschanged = -> 
-	voices = window.speechSynthesis.getVoices()
-	initSpeaker()
 
-initSpeaker = ->
-	#dump.store "initSpeaker in #{index}"
-	# if voices
-	# 	document.title = voices.length
-	# else
-	# 	document.title = 'no voices'
-	index = int getParameters().speaker || 5
-	speaker = new SpeechSynthesisUtterance()
-	speaker.voiceURI = "native"
-	speaker.volume = 1
-	speaker.rate = 1.0
-	speaker.pitch = 0
-	speaker.text = '' 
-	speaker.lang = 'en-GB'
-	#dump.store "voices #{voices.length}"
-	#if voices and index <= voices.length-1 then speaker.voice = voices[index]
+initSounds = ->
 
-	soundUp = loadSound 'soundUp.wav'
-	soundDown = loadSound 'soundDown.wav'
+	bearingSounds = {}
+	for bearing in BEARINGLIST.split ' '
+		console.log "sounds/bearing/#{bearing}.mp3"
+		sound = loadSound "sounds/bearing/#{bearing}.mp3"
+		sound.setVolume 0.1
+		bearingSounds[bearing] = sound
+
+	distanceSounds = {}
+	for distance in DISTLIST.split ' '
+		console.log "sounds/distance/#{distance}.mp3"
+		sound = loadSound "sounds/distance/#{distance}.mp3"
+		sound.setVolume 0.1
+		distanceSounds[distance] = sound
+
+	soundUp = loadSound 'sounds/soundUp.wav'
+	soundDown = loadSound 'sounds/soundDown.wav'
 	soundUp.setVolume 0.1
 	soundDown.setVolume 0.1
-	clearInterval timeout
-	timeout = setInterval playSound, DELAY
-	soundQueue = 0
 
-	dialogues.clear()
-	say "Welcome!"
-	track = []
-	dump.store "initSpeaker out"
 
 getMeters = (w,skala) ->
 	[lon0,lat0] = b2w.convert 0,height
@@ -384,18 +369,39 @@ getMeters = (w,skala) ->
 		if 10**fract > i then n = i
 	[round(distans), n * 10**int d]
 
-# myTest = ->
-# 	getMeters 1920,1 # Smäller här
-# 	getMeters 1920,1.5 # eller här. Android
-# 	getMeters 1920,1.5*1.5
-# 	getMeters 1920,1.5*1.5*1.5
-	# assert [1434,1000], getMeters 1920,1 # Smäller här
-	# assert [956,500], getMeters 1920,1.5 # eller här. Android
-	# assert [638,500], getMeters 1920,1.5*1.5
-	# assert [425,200], getMeters 1920,1.5*1.5*1.5
-	#console.log "Ready!"
+
+preload = ->
+
+	console.log "preload starts"
+
+	params = getParameters()
+	mapName = params.map || "2023-SommarN"
+	if params.debug then dump.active = params.debug == '1'
+	loadJSON "data/#{mapName}.json", (json) ->
+		data = json
+		console.log 'adam',data
+		for key,control of data.controls
+			control.push ""
+			control.push 0
+			control.push 0
+		img = loadImage "data/" + data.map
+	loadJSON "data/poi.json", (json) -> pois = json
+	console.log "preload done"
+
 
 setup = ->
+
+	console.log "setup starts"
+
+	initSounds()
+
+	clearInterval timeout
+	timeout = setInterval playSound, DELAY
+	soundQueue = 0
+
+	dialogues.clear()
+	track = []
+
 	canvas = createCanvas innerWidth-0.0, innerHeight #-0.5
 	canvas.position 0,0 # hides text field used for clipboard copy.
 
@@ -746,7 +752,19 @@ menu5 = (letters) -> # ABCDE
 
 menu6 = -> # More
 	dialogue = new Dialogue()
-	dialogue.add 'Init', -> initSpeaker()
+
+	# dialogue.add 'Init', -> initSounds()
+	dialogue.add 'Init', ->
+		voiceQueue.push 'bearing 13'
+		voiceQueue.push 'bearing 26'
+		voiceQueue.push 'distance 1800'
+		dialogues.clear()
+
+	dialogue.add 'Talk', ->
+		console.log 'talk'
+		decreaseQueue()
+		dialogues.clear()
+
 	dialogue.add 'Mail...', ->
 		executeMail()
 		dialogues.clear()
@@ -811,7 +829,7 @@ touchEnded = (event) ->
 	if released then return
 	dump.store "touchEnded #{(new Date())-start} #{JSON.stringify touches}"
 	released = true
-	if state == 0 then initSpeaker()
+	#if state == 0 then initSounds()
 	if state == 2 then dialogues.clear()
 	if state in [0,2]
 		state = 1
