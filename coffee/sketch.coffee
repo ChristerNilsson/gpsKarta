@@ -1,4 +1,4 @@
-VERSION = 260
+VERSION = 261
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -254,7 +254,7 @@ firstInfo = ->
 	dump.store "trg #{[lat,lon]}"
 	dump.store "voiceQueue #{voiceQueue}"
 	
-	if distance < 10 then soundQueue = distance else soundQueue = 1 # ett antal DIST
+	if distance < 10 then soundQueue = distance else soundQueue = 0 # ett antal DIST
 
 playSound = -> # spelar Down eller Up (Coin eller Explosion)
 	# if not general.COINS then return
@@ -262,10 +262,10 @@ playSound = -> # spelar Down eller Up (Coin eller Explosion)
 	dump.store "playSound #{soundQueue}"
 	if soundQueue < 0 and soundDown != null
 		soundQueue++
-		if soundQueue < 20 then soundDown.play()
+		if abs(soundQueue) < 20 then soundDown.play()
 	else if soundQueue > 0 and soundUp != null
 		soundQueue--
-		if soundQueue < 20 then soundUp.play()
+		if abs(soundQueue) < 20 then soundUp.play()
 
 decreaseQueue = ->
 	if voiceQueue.length == 0 then return
