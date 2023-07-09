@@ -1,4 +1,4 @@
-VERSION = 259
+VERSION = 260
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -55,7 +55,7 @@ fraction = (x) -> x - int x
 Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
 
-general = {COINS: true, DISTANCE: true, TRAIL: true, SECTOR: 10, PANSPEED : true}
+general = {DISTANCE: true, TRAIL: true, SECTOR: 10, PANSPEED : true} # COINS: true,
 loadGeneral = -> if localStorage.gpsKarta then general = _.extend general, JSON.parse localStorage.gpsKarta
 saveGeneral = -> localStorage.gpsKarta = JSON.stringify general
 
@@ -257,15 +257,15 @@ firstInfo = ->
 	if distance < 10 then soundQueue = distance else soundQueue = 1 # ett antal DIST
 
 playSound = -> # spelar Down eller Up (Coin eller Explosion)
-	if not general.COINS then return
+	# if not general.COINS then return
 	if soundQueue == 0 then return
 	dump.store "playSound #{soundQueue}"
 	if soundQueue < 0 and soundDown != null
 		soundQueue++
-		soundDown.play()
+		if soundQueue < 20 then soundDown.play()
 	else if soundQueue > 0 and soundUp != null
 		soundQueue--
-		soundUp.play()
+		if soundQueue < 20 then soundUp.play()
 
 decreaseQueue = ->
 	if voiceQueue.length == 0 then return
@@ -466,7 +466,7 @@ info = () ->
 		"Setup"
 		"  PanSpeed: #{general.PANSPEED}"
 		"  Sector: #{general.SECTOR}"
-		"  Hear Coins: #{general.COINS}"
+		# "  Hear Coins: #{general.COINS}"
 		"  Hear Distance: #{general.DISTANCE}"
 		"  See Trail: #{general.TRAIL}"
 		"TrailPoints: #{storage.trail.length}"
@@ -716,10 +716,10 @@ menu2 = -> # Setup
 		general.PANSPEED = not general.PANSPEED
 		saveGeneral()
 		dialogues.clear()
-	dialogue.add 'Coins', ->
-		general.COINS = not general.COINS
-		saveGeneral()
-		dialogues.clear()
+	# dialogue.add 'Coins', ->
+	# 	general.COINS = not general.COINS
+	# 	saveGeneral()
+	# 	dialogues.clear()
 	dialogue.add 'Distance', ->
 		general.DISTANCE = not general.DISTANCE
 		saveGeneral()
