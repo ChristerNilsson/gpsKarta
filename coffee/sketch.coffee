@@ -1,10 +1,10 @@
-VERSION = 258
+VERSION = 259
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
 LIMIT = 20 # meter. Under this value is no bearing given.
 
-platform = window.navigator.platform # Win32|iPad|Linux
+platform = window.navigator.platform # Win32|iPad|Linux|iPhone
 
 #DIGITS = 'zero one two three four five six seven eight niner'.split ' '
 DIGITS = '0 1 2 3 4 5 6 7 8 9'.split ' '
@@ -175,6 +175,7 @@ sayDistance = (a,b) -> # a is newer (meter)
 	b = round b
 	if b == -1 then return a
 	for d in DISTLIST.split ' '
+		d = parseInt d
 		if a == d and b != d then return d
 		if (a-d) * (b-d) < 0 then return d
 	""
@@ -212,13 +213,17 @@ increaseQueue = (p) ->
 	sBearing = if distac >= LIMIT then sayBearing bearingac,bearingbc else ""
 	sDistance = sayDistance distac,distbc
 
-	if sBearing != "" and sDistance != "" 
-		voiceQueue.push "bearing #{sBearing}"
-		voiceQueue.push "distance #{sDistance}"
-	else if sBearing != ""
-		voiceQueue.push "bearing #{sBearing}"
-	else if sDistance != ""
-		voiceQueue.push "distance #{sDistance}"
+	# if sBearing != "" and sDistance != "" 
+	# 	voiceQueue.push "bearing #{sBearing}"
+	# 	voiceQueue.push "distance #{sDistance}"
+	# else if sBearing != ""
+	# 	voiceQueue.push "bearing #{sBearing}"
+	# else if sDistance != ""
+	# 	voiceQueue.push "distance #{sDistance}"
+
+	if sBearing  != "" then voiceQueue.push "bearing #{sBearing}"
+	if sDistance != "" then voiceQueue.push "distance #{sDistance}"
+
 	console.log voiceQueue
 
 	if abs(distance) >= 0.5 # update only if DIST detected. Otherwise some beeps will be lost.
