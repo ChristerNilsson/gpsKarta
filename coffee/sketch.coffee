@@ -1,4 +1,4 @@
-VERSION = 262
+VERSION = 263
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -257,6 +257,7 @@ firstInfo = ->
 	if distance < LIMIT then soundQueue = distance else soundQueue = 0 # ett antal DIST
 
 playSound = -> # spelar Down eller Up (Coin eller Explosion)
+	return
 	# if not general.COINS then return
 	if soundQueue == 0 then return
 	dump.store "playSound #{soundQueue}"
