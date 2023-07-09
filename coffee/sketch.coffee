@@ -1,4 +1,4 @@
-VERSION = 257
+VERSION = 258
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -6,7 +6,8 @@ LIMIT = 20 # meter. Under this value is no bearing given.
 
 platform = window.navigator.platform # Win32|iPad|Linux
 
-DIGITS = 'zero one two three four five six seven eight niner'.split ' '
+#DIGITS = 'zero one two three four five six seven eight niner'.split ' '
+DIGITS = '0 1 2 3 4 5 6 7 8 9'.split ' '
 #BR = if platform in ['Win32','iPad'] then "\n" else '<br>'
 BR = "\n"
 
@@ -133,6 +134,10 @@ gpsCount = 0
 timeout = null
 
 voiceQueue = []
+# bearing 36
+# distance 1800
+# both 36 1800
+
 bearingSaid = '' # förhindrar upprepning
 distanceSaid = '' # förhindrar upprepning
 
@@ -184,7 +189,8 @@ sayBearing = (a0,b0) -> # a is newer (degrees)
 	if a == 0 then a = 36 # 01..36
 	tiotal = DIGITS[a // 10]
 	ental = DIGITS[a %% 10]
-	"#{tiotal} #{ental}"
+	"#{tiotal}#{ental}"
+	#console.log "sayBearing",res
 
 increaseQueue = (p) ->
 	dump.store "increaseQueue #{p.coords.latitude} #{p.coords.longitude}"
@@ -206,9 +212,14 @@ increaseQueue = (p) ->
 	sBearing = if distac >= LIMIT then sayBearing bearingac,bearingbc else ""
 	sDistance = sayDistance distac,distbc
 
-	if sBearing != "" and sDistance != "" then voiceQueue.push "both #{sBearing} #{sDistance}"
-	else if sBearing != "" then voiceQueue.push "bearing #{sBearing}"
-	else if sDistance != "" then voiceQueue.push "distance #{sDistance}"
+	if sBearing != "" and sDistance != "" 
+		voiceQueue.push "bearing #{sBearing}"
+		voiceQueue.push "distance #{sDistance}"
+	else if sBearing != ""
+		voiceQueue.push "bearing #{sBearing}"
+	else if sDistance != ""
+		voiceQueue.push "distance #{sDistance}"
+	console.log voiceQueue
 
 	if abs(distance) >= 0.5 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = myRound p.coords.latitude,6
@@ -230,7 +241,8 @@ firstInfo = ->
 	distance = round (distb)/DIST
 
 	bearingb = b.bearingTo c
-	voiceQueue.push "target #{key} #{sayBearing bearingb,-1} #{sayDistance distb,-1}"
+	voiceQueue.push "bearing #{sayBearing bearingb,-1}"
+	voiceQueue.push "distance #{sayDistance distb,-1}"
 	dump.store ""
 	dump.store "target #{crossHair}"
 	dump.store "gps #{[gpsLat,gpsLon]}"
@@ -256,33 +268,24 @@ decreaseQueue = ->
 	arr = msg.split ' '
 	console.log "decreaseQueue #{msg}"
 
-	if arr[0] == 'both'
-		#result = ""
-		msg = arr[1] + ' ' + arr[2] # skippa ordet. t ex 'bäring etta tvåa'
-		if bearingSaid != arr[1] + ' ' + arr[2]
-			bearingSaid = arr[1] + ' ' + arr[2]
-			result = arr[1] + arr[2]
-			sayBear result
-		if distanceSaid != arr[3]
-			distanceSaid = arr[3]
-			#result += '. ' + arr[3]
-		if result != "" then sayDist arr[3]
-	else if arr[0] == 'bearing'
-		msg = arr[1] # skippa ordet. t ex 'bäring 12'
-		if bearingSaid != msg then sayBear msg
-		bearingSaid = msg
+	# if arr[0] == 'both'
+	# 	bearing = arr[1]
+	# 	distance = arr[2]
+	# 	if bearingSaid != bearing
+	# 		bearingSaid = bearing
+	# 		result = bearing
+	# 		sayBear result
+	# 	if distanceSaid != distance
+	# 		distanceSaid = distance
+	# 	if distance != "" then sayDist distance
+	if arr[0] == 'bearing'
+		bearing = arr[1]
+		if bearingSaid != bearing then sayBear bearing
+		bearingSaid = bearing
 	else if arr[0] == 'distance' and (general.DISTANCE or arr[1] < LIMIT)
-		msg = arr[1]                # skippa ordet. t ex 'distans 30'
-		if distanceSaid != msg then sayDist msg
-		distanceSaid = msg
-	# else if arr[0] == 'target'
-		# bearingSaid = arr[2] + ' ' + arr[3]
-		# distanceSaid = arr[4]
-		# msg = "#{arr[0]} #{arr[1]}. bearing #{bearingSaid}. distance #{distanceSaid} meters"
-		# # Example: 'target 11. bearing zero niner. distance 250 meters'
-		# say msg
-	# else if arr[0] == 'saved'
-		# say msg.replace ':',' and '
+		distance = arr[1]
+		if distanceSaid != distance then sayDist distance
+		distanceSaid = distance
 
 locationUpdate = (p) ->
 
@@ -375,7 +378,7 @@ preload = ->
 	console.log "preload starts"
 
 	params = getParameters()
-	mapName = params.map || "2023-SommarN"
+	mapName = params.map || "2023-SommarS"
 	if params.debug then dump.active = params.debug == '1'
 	loadJSON "data/#{mapName}.json", (json) ->
 		data = json
@@ -844,9 +847,17 @@ touchEnded = (event) ->
 	false
 
 keyPressed = -> # Används för att avläsa ABC bitmapskoordinater
+
 	if key == ' '
 		x = round cx + (mouseX - width/2) / SCALE  	# image koordinater
 		y = round cy + (mouseY - height/2) / SCALE
+
+		# [lon,lat] = b2w.convert x,y
+		# p = {coords:{longitude:lon,latitude:lat}}
+		# console.log 'keyPressed',x,y,p
+		# increaseQueue p # meters
+		#decreaseQueue()
+
 		letter = "ABC"[_.size measure]
 		measure[letter] = [x,y]
 		if letter == 'C' then console.log '"controls": ' + JSON.stringify measure
