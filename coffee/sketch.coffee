@@ -1,8 +1,8 @@
-VERSION = 261
+VERSION = 262
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
-LIMIT = 20 # meter. Under this value is no bearing given.
+LIMIT = 20 # meter. Under this value is no bearing or coins/explosions given.
 
 platform = window.navigator.platform # Win32|iPad|Linux|iPhone
 
@@ -230,8 +230,8 @@ increaseQueue = (p) ->
 		gpsLat = myRound p.coords.latitude,6
 		gpsLon = myRound p.coords.longitude,6
 
-	if distance < -10 then soundQueue = -10
-	else if distance > 10 then soundQueue = 10
+	if distance < -LIMIT then soundQueue = -LIMIT
+	else if distance > LIMIT then soundQueue = LIMIT
 	else soundQueue = round distance
 
 firstInfo = ->
@@ -254,7 +254,7 @@ firstInfo = ->
 	dump.store "trg #{[lat,lon]}"
 	dump.store "voiceQueue #{voiceQueue}"
 	
-	if distance < 10 then soundQueue = distance else soundQueue = 0 # ett antal DIST
+	if distance < LIMIT then soundQueue = distance else soundQueue = 0 # ett antal DIST
 
 playSound = -> # spelar Down eller Up (Coin eller Explosion)
 	# if not general.COINS then return
@@ -262,10 +262,10 @@ playSound = -> # spelar Down eller Up (Coin eller Explosion)
 	dump.store "playSound #{soundQueue}"
 	if soundQueue < 0 and soundDown != null
 		soundQueue++
-		if abs(soundQueue) < 20 then soundDown.play()
+		if abs(soundQueue) < LIMIT then soundDown.play()
 	else if soundQueue > 0 and soundUp != null
 		soundQueue--
-		if abs(soundQueue) < 20 then soundUp.play()
+		if abs(soundQueue) < LIMIT then soundUp.play()
 
 decreaseQueue = ->
 	if voiceQueue.length == 0 then return
