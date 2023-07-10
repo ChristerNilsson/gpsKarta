@@ -1,12 +1,11 @@
-VERSION = 264
+VERSION = 266
 
-DELAY = 100 # ms, delay between sounds
+# DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
-LIMIT = 20 # meter. Under this value is no bearing or coins/explosions given.
+LIMIT = 20 # meter. Under this value is no bearing given
 
 platform = window.navigator.platform # Win32|iPad|Linux|iPhone
 
-#DIGITS = 'zero one two three four five six seven eight niner'.split ' '
 DIGITS = '0 1 2 3 4 5 6 7 8 9'.split ' '
 #BR = if platform in ['Win32','iPad'] then "\n" else '<br>'
 BR = "\n"
@@ -122,9 +121,9 @@ track = [] # five latest GPS positions (bitmap coordinates)
 
 speaker = null
 
-soundUp = null
-soundDown = null
-soundQueue = 0 # integer neg=minskat avstånd pos=ökat avstånd
+#soundUp = null
+#soundDown = null
+#soundQueue = 0 # integer neg=minskat avstånd pos=ökat avstånd
 
 messages = ['','','','','','']
 gpsCount = 0
@@ -134,9 +133,6 @@ gpsCount = 0
 timeout = null
 
 voiceQueue = []
-# bearing 36
-# distance 1800
-# both 36 1800
 
 bearingSaid = '' # förhindrar upprepning
 distanceSaid = '' # förhindrar upprepning
@@ -169,7 +165,7 @@ sayDist = (m) -> # m är en distans i DISTLIST
 	distanceSounds[m].play()
 
 sayDistance = (a,b) -> # a is newer (meter)
-	# if a border is crossed, produce speech
+	# if a border is crossed, produce a distance
 	dump.store "D #{myRound a,1} #{myRound b,1}"
 	a = round a
 	b = round b
@@ -189,7 +185,6 @@ sayBearing = (a0,b0) -> # a is newer (degrees)
 	a = round a / 10 
 	if a == 0 then a = 36 # 01..36
 	str(DIGITS[a // 10]) + str(DIGITS[a %% 10])
-	#console.log "sayBearing",res
 
 increaseQueue = (p) ->
 	dump.store "increaseQueue #{p.coords.latitude} #{p.coords.longitude}"
@@ -211,14 +206,6 @@ increaseQueue = (p) ->
 	sBearing = if distac >= LIMIT then sayBearing bearingac,bearingbc else ""
 	sDistance = sayDistance distac,distbc
 
-	# if sBearing != "" and sDistance != "" 
-	# 	voiceQueue.push "bearing #{sBearing}"
-	# 	voiceQueue.push "distance #{sDistance}"
-	# else if sBearing != ""
-	# 	voiceQueue.push "bearing #{sBearing}"
-	# else if sDistance != ""
-	# 	voiceQueue.push "distance #{sDistance}"
-
 	if sBearing  != "" then voiceQueue.push "bearing #{sBearing}"
 	if sDistance != "" then voiceQueue.push "distance #{sDistance}"
 
@@ -228,9 +215,9 @@ increaseQueue = (p) ->
 		gpsLat = myRound p.coords.latitude,6
 		gpsLon = myRound p.coords.longitude,6
 
-	if distance < -LIMIT then soundQueue = -LIMIT
-	else if distance > LIMIT then soundQueue = LIMIT
-	else soundQueue = round distance
+	# if distance < -LIMIT then soundQueue = -LIMIT
+	# else if distance > LIMIT then soundQueue = LIMIT
+	# else soundQueue = round distance
 
 firstInfo = ->
 	[x,y] = crossHair
@@ -252,19 +239,19 @@ firstInfo = ->
 	dump.store "trg #{[lat,lon]}"
 	dump.store "voiceQueue #{voiceQueue}"
 	
-	if distance < LIMIT then soundQueue = distance else soundQueue = 0 # ett antal DIST
+	# if distance < LIMIT then soundQueue = distance else soundQueue = 0 # ett antal DIST
 
-playSound = -> # spelar Down eller Up (Coin eller Explosion)
-	return
-	# if not general.COINS then return
-	if soundQueue == 0 then return
-	dump.store "playSound #{soundQueue}"
-	if soundQueue < 0 and soundDown != null
-		soundQueue++
-		if abs(soundQueue) < LIMIT then soundDown.play()
-	else if soundQueue > 0 and soundUp != null
-		soundQueue--
-		if abs(soundQueue) < LIMIT then soundUp.play()
+# playSound = -> # spelar Down eller Up (Coin eller Explosion)
+# 	return
+# 	# if not general.COINS then return
+# 	if soundQueue == 0 then return
+# 	dump.store "playSound #{soundQueue}"
+# 	if soundQueue < 0 and soundDown != null
+# 		soundQueue++
+# 		if abs(soundQueue) < LIMIT then soundDown.play()
+# 	else if soundQueue > 0 and soundUp != null
+# 		soundQueue--
+# 		if abs(soundQueue) < LIMIT then soundUp.play()
 
 decreaseQueue = ->
 	if voiceQueue.length == 0 then return
@@ -349,7 +336,7 @@ initSounds = ->
 		sound = loadSound "sounds/bearing/male/#{bearing}.mp3"
 		if sound
 			console.log "sounds/bearing/male/#{bearing}.mp3"
-		#sound.setVolume 0.1
+		sound.setVolume 0.1
 		bearingSounds[bearing] = sound
 
 	distanceSounds = {}
@@ -357,11 +344,11 @@ initSounds = ->
 		sound = loadSound "sounds/distance/female/#{distance}.mp3"
 		if sound
 			console.log "sounds/distance/female/#{distance}.mp3"
-		#sound.setVolume 0.1
+		sound.setVolume 0.1
 		distanceSounds[distance] = sound
 
-	soundUp = loadSound 'sounds/soundUp.wav'
-	soundDown = loadSound 'sounds/soundDown.wav'
+	# soundUp = loadSound 'sounds/soundUp.wav'
+	# soundDown = loadSound 'sounds/soundDown.wav'
 	# soundUp.setVolume 0.1
 	# soundDown.setVolume 0.1
 
@@ -406,9 +393,9 @@ setup = ->
 	console.log bearingSounds
 	#soundUp.play()
 
-	clearInterval timeout
-	timeout = setInterval playSound, DELAY
-	soundQueue = 0
+	# clearInterval timeout
+	# timeout = setInterval playSound, DELAY
+	# soundQueue = 0
 
 	dialogues.clear()
 	track = []
@@ -658,7 +645,7 @@ draw = ->
 		return
 
 setTarget = ->
-	soundQueue = 0
+	# soundQueue = 0
 	firstInfo()
 	storage.save()
 	dialogues.clear()
