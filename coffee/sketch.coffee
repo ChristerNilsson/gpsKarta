@@ -1,4 +1,4 @@
-VERSION = 263
+VERSION = 264
 
 DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -188,9 +188,7 @@ sayBearing = (a0,b0) -> # a is newer (degrees)
 	if a == b and b0 != -1 then return "" # samma sektor
 	a = round a / 10 
 	if a == 0 then a = 36 # 01..36
-	tiotal = DIGITS[a // 10]
-	ental = DIGITS[a %% 10]
-	"#{tiotal}#{ental}"
+	str(DIGITS[a // 10]) + str(DIGITS[a %% 10])
 	#console.log "sayBearing",res
 
 increaseQueue = (p) ->
@@ -348,23 +346,24 @@ initSounds = ->
 
 	bearingSounds = {}
 	for bearing in BEARINGLIST.split ' '
-		console.log "sounds/bearing/male/#{bearing}.mp3"
 		sound = loadSound "sounds/bearing/male/#{bearing}.mp3"
-		sound.setVolume 0.1
+		if sound
+			console.log "sounds/bearing/male/#{bearing}.mp3"
+		#sound.setVolume 0.1
 		bearingSounds[bearing] = sound
 
 	distanceSounds = {}
 	for distance in DISTLIST.split ' '
-		console.log "sounds/distance/female/#{distance}.mp3"
 		sound = loadSound "sounds/distance/female/#{distance}.mp3"
-		sound.setVolume 0.1
+		if sound
+			console.log "sounds/distance/female/#{distance}.mp3"
+		#sound.setVolume 0.1
 		distanceSounds[distance] = sound
 
 	soundUp = loadSound 'sounds/soundUp.wav'
 	soundDown = loadSound 'sounds/soundDown.wav'
-	soundUp.setVolume 0.1
-	soundDown.setVolume 0.1
-
+	# soundUp.setVolume 0.1
+	# soundDown.setVolume 0.1
 
 getMeters = (w,skala) ->
 	[lon0,lat0] = b2w.convert 0,height
@@ -381,28 +380,31 @@ getMeters = (w,skala) ->
 
 preload = ->
 
-	console.log "preload starts"
+	# console.log "preload starts"
+	initSounds()
 
 	params = getParameters()
 	mapName = params.map || "2023-SommarS"
 	if params.debug then dump.active = params.debug == '1'
+	loadJSON "data/poi.json", (json) -> pois = json
 	loadJSON "data/#{mapName}.json", (json) ->
 		data = json
-		console.log 'adam',data
 		for key,control of data.controls
 			control.push ""
 			control.push 0
 			control.push 0
 		img = loadImage "data/" + data.map
-	loadJSON "data/poi.json", (json) -> pois = json
-	console.log "preload done"
+	# console.log "preload done"
 
 
 setup = ->
 
 	console.log "setup starts"
 
-	initSounds()
+	#initSounds()
+
+	console.log bearingSounds
+	#soundUp.play()
 
 	clearInterval timeout
 	timeout = setInterval playSound, DELAY
