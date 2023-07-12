@@ -1,4 +1,4 @@
-VERSION = 266
+VERSION = 1915
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -227,18 +227,20 @@ firstInfo = ->
 	b = LatLon gpsLat, gpsLon # senaste position
 	c = LatLon lat, lon # target
 
-	distb = round b.distanceTo c
-	distance = round (distb)/DIST
+	increaseQueue {coords: {latitude:lat, longitude:lon}}
 
-	bearingb = b.bearingTo c
-	voiceQueue.push "bearing #{sayBearing bearingb,-1}"
-	voiceQueue.push "distance #{sayDistance distb,-1}"
-	dump.store ""
-	dump.store "target #{crossHair}"
-	dump.store "gps #{[gpsLat,gpsLon]}"
-	dump.store "trg #{[lat,lon]}"
-	dump.store "voiceQueue #{voiceQueue}"
-	
+	# distb = round b.distanceTo c
+	# distance = round (distb)/DIST
+
+	# bearingb = b.bearingTo c
+	# voiceQueue.push "bearing #{sayBearing bearingb,-1}"
+	# voiceQueue.push "distance #{sayDistance distb,-1}"
+	# dump.store ""
+	# dump.store "target #{crossHair}"
+	# dump.store "gps #{[gpsLat,gpsLon]}"
+	# dump.store "trg #{[lat,lon]}"
+	# dump.store "voiceQueue #{voiceQueue}"
+	####
 	# if distance < LIMIT then soundQueue = distance else soundQueue = 0 # ett antal DIST
 
 # playSound = -> # spelar Down eller Up (Coin eller Explosion)
