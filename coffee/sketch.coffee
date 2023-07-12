@@ -1,4 +1,4 @@
-VERSION = 1915
+VERSION = 1930
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -222,7 +222,7 @@ increaseQueue = (p) ->
 firstInfo = ->
 	[x,y] = crossHair
 	[lon,lat] = b2w.convert x,y
-	console.log "firstInfo #{[x,y,lon,lat]}"
+	dump.store "firstInfo #{{x,y,lon,lat,gpsLat,gpsLon}}"
 
 	b = LatLon gpsLat, gpsLon # senaste position
 	c = LatLon lat, lon # target
@@ -494,7 +494,7 @@ drawTrack = ->
 	sw 2/SCALE
 	sc 0
 	for [x,y],i in track
-		dump.store "drawTrack #{i} #{track.length} #{x} #{y} #{cx} #{cy} #{x-cx} #{y-cy}"
+		#dump.store "drawTrack #{i} #{track.length} #{x} #{y} #{cx} #{cy} #{x-cx} #{y-cy}"
 		circle x-cx, y-cy, 5 * (track.length-i)
 
 drawTrail = ->
