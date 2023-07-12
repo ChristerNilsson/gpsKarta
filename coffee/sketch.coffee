@@ -293,16 +293,14 @@ initSounds = ->
 	bearingSounds = {}
 	for bearing in BEARINGLIST.split ' '
 		sound = loadSound "sounds/bearing/male/#{bearing}.mp3"
-		if sound
-			console.log "sounds/bearing/male/#{bearing}.mp3"
+		if sound then console.log "sounds/bearing/male/#{bearing}.mp3"
 		sound.setVolume 0.1
 		bearingSounds[bearing] = sound
 
 	distanceSounds = {}
 	for distance in DISTLIST.split ' '
 		sound = loadSound "sounds/distance/female/#{distance}.mp3"
-		if sound
-			console.log "sounds/distance/female/#{distance}.mp3"
+		if sound then console.log "sounds/distance/female/#{distance}.mp3"
 		sound.setVolume 0.1
 		distanceSounds[distance] = sound
 
