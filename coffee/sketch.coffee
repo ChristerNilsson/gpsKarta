@@ -1,4 +1,4 @@
-VERSION = 1942
+VERSION = 266
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
