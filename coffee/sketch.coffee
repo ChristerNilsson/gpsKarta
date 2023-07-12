@@ -1,4 +1,4 @@
-VERSION = 266
+VERSION = 267
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -121,10 +121,6 @@ track = [] # five latest GPS positions (bitmap coordinates)
 
 speaker = null
 
-#soundUp = null
-#soundDown = null
-#soundQueue = 0 # integer neg=minskat avstånd pos=ökat avstånd
-
 messages = ['','','','','','']
 gpsCount = 0
 
@@ -215,10 +211,6 @@ increaseQueue = (p) ->
 		gpsLat = myRound p.coords.latitude,6
 		gpsLon = myRound p.coords.longitude,6
 
-	# if distance < -LIMIT then soundQueue = -LIMIT
-	# else if distance > LIMIT then soundQueue = LIMIT
-	# else soundQueue = round distance
-
 firstInfo = ->
 	[x,y] = crossHair
 	[lon,lat] = b2w.convert x,y
@@ -241,34 +233,11 @@ firstInfo = ->
 	
 	# if distance < LIMIT then soundQueue = distance else soundQueue = 0 # ett antal DIST
 
-# playSound = -> # spelar Down eller Up (Coin eller Explosion)
-# 	return
-# 	# if not general.COINS then return
-# 	if soundQueue == 0 then return
-# 	dump.store "playSound #{soundQueue}"
-# 	if soundQueue < 0 and soundDown != null
-# 		soundQueue++
-# 		if abs(soundQueue) < LIMIT then soundDown.play()
-# 	else if soundQueue > 0 and soundUp != null
-# 		soundQueue--
-# 		if abs(soundQueue) < LIMIT then soundUp.play()
-
 decreaseQueue = ->
 	if voiceQueue.length == 0 then return
 	msg = voiceQueue.shift()
 	arr = msg.split ' '
 	console.log "decreaseQueue #{msg}"
-
-	# if arr[0] == 'both'
-	# 	bearing = arr[1]
-	# 	distance = arr[2]
-	# 	if bearingSaid != bearing
-	# 		bearingSaid = bearing
-	# 		result = bearing
-	# 		sayBear result
-	# 	if distanceSaid != distance
-	# 		distanceSaid = distance
-	# 	if distance != "" then sayDist distance
 	if arr[0] == 'bearing'
 		bearing = arr[1]
 		if bearingSaid != bearing then sayBear bearing
@@ -279,11 +248,6 @@ decreaseQueue = ->
 		distanceSaid = distance
 
 locationUpdate = (p) ->
-
-	# p.coords.latitude = 59.2681
-	# p.coords.longitude = 18.14458
-	# console.log "locationUpdate",p.coords
-
 	pLat = myRound p.coords.latitude,6
 	pLon = myRound p.coords.longitude,6
 	if storage.trail.length == 0
@@ -295,13 +259,8 @@ locationUpdate = (p) ->
 	uppdatera pLat, pLon
 
 uppdatera = (pLat, pLon) ->
-	# dump.store ""
-	# dump.store "LU #{pLat} #{pLon}"
 	[x,y] = w2b.convert pLon,pLat
 	dump.store "uppdatera #{pLon} #{pLat} #{x} #{y}"
-	# console.log msg
-	# dump.store msg
-
 	updateTrack pLat, pLon, x,y
 	updateTrail pLat, pLon, x,y
 
@@ -347,11 +306,6 @@ initSounds = ->
 		sound.setVolume 0.1
 		distanceSounds[distance] = sound
 
-	# soundUp = loadSound 'sounds/soundUp.wav'
-	# soundDown = loadSound 'sounds/soundDown.wav'
-	# soundUp.setVolume 0.1
-	# soundDown.setVolume 0.1
-
 getMeters = (w,skala) ->
 	[lon0,lat0] = b2w.convert 0,height
 	[lon1,lat1] = b2w.convert w,height
@@ -367,7 +321,6 @@ getMeters = (w,skala) ->
 
 preload = ->
 
-	# console.log "preload starts"
 	initSounds()
 
 	params = getParameters()
@@ -381,26 +334,17 @@ preload = ->
 			control.push 0
 			control.push 0
 		img = loadImage "data/" + data.map
-	# console.log "preload done"
 
 
 setup = ->
 
 	console.log "setup starts"
-
-	#initSounds()
-
-	console.log bearingSounds
-	#soundUp.play()
-
-	# clearInterval timeout
-	# timeout = setInterval playSound, DELAY
-	# soundQueue = 0
+#	console.log bearingSounds
 
 	dialogues.clear()
 	track = []
 
-	canvas = createCanvas innerWidth-0.0, innerHeight #-0.5
+	canvas = createCanvas innerWidth, innerHeight
 	canvas.position 0,0 # hides text field used for clipboard copy.
 
 	loadGeneral()
@@ -414,15 +358,11 @@ setup = ->
 	wgs = [abc[1],abc[0],abc[3],abc[2],abc[5],abc[4]] # lat lon <=> lon lat
 
 	b2w = new Converter bmp,wgs,6
-	#console.log "b2w",b2w
 	w2b = new Converter wgs,bmp,0
-	#console.log "w2b",w2bb2ww2b
 
 	storage = new Storage mapName
 	storage.trail = []
 	if params.trail then storage.trail = decodeAll params.trail
-
-	# myTest() Do not execute! Very dependent on .json file.
 
 	[cx,cy] = [img.width/2,img.height/2]
 
@@ -456,7 +396,6 @@ info = () ->
 		"Setup"
 		"  PanSpeed: #{general.PANSPEED}"
 		"  Sector: #{general.SECTOR}"
-		# "  Hear Coins: #{general.COINS}"
 		"  Hear Distance: #{general.DISTANCE}"
 		"  See Trail: #{general.TRAIL}"
 		"TrailPoints: #{storage.trail.length}"
@@ -645,7 +584,6 @@ draw = ->
 		return
 
 setTarget = ->
-	# soundQueue = 0
 	firstInfo()
 	storage.save()
 	dialogues.clear()
@@ -706,10 +644,6 @@ menu2 = -> # Setup
 		general.PANSPEED = not general.PANSPEED
 		saveGeneral()
 		dialogues.clear()
-	# dialogue.add 'Coins', ->
-	# 	general.COINS = not general.COINS
-	# 	saveGeneral()
-	# 	dialogues.clear()
 	dialogue.add 'Distance', ->
 		general.DISTANCE = not general.DISTANCE
 		saveGeneral()
@@ -751,17 +685,13 @@ menu5 = (letters) -> # ABCDE
 menu6 = -> # More
 	dialogue = new Dialogue()
 
-	# dialogue.add 'Init', -> initSounds()
-	dialogue.add 'Init', ->
-		voiceQueue.push 'bearing 13'
-		voiceQueue.push 'bearing 26'
-		voiceQueue.push 'distance 1800'
-		dialogues.clear()
+	# dialogue.add 'Init', ->
+	# 	dialogues.clear()
 
-	dialogue.add 'Talk', ->
-		console.log 'talk'
-		decreaseQueue()
-		dialogues.clear()
+	# dialogue.add 'Talk', ->
+	# 	console.log 'talk'
+	# 	decreaseQueue()
+	# 	dialogues.clear()
 
 	dialogue.add 'Mail...', ->
 		executeMail()
