@@ -1,4 +1,4 @@
-VERSION = 269
+VERSION = 270
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -246,9 +246,9 @@ decreaseQueue = ->
 		bearingSaid = bearing
 	else if arr[0] == 'distance'
 		errors.push general.DISTANCE
-		errors.push arr[1]
 		if general.DISTANCE or arr[1] < LIMIT
 			distance = arr[1]
+			errors.push "#{distanceSaid} #{distance}" 
 			if distanceSaid != distance then sayDist distance
 			distanceSaid = distance
 
