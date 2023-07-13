@@ -1,4 +1,4 @@
-VERSION = 273
+VERSION = 275
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -184,7 +184,7 @@ sayBearing = (a0,b0) -> # a is newer (degrees)
 	str(DIGITS[a // 10]) + str(DIGITS[a %% 10])
 
 increaseQueue = (p) ->
-	errors.push "increaseQueue #{p.coords.latitude} #{p.coords.longitude}"
+	# errors.push "increaseQueue #{round p.coords.latitude,6} #{round p.coords.longitude,6}"
 
 	if crossHair == null then return 
 
@@ -207,7 +207,7 @@ increaseQueue = (p) ->
 	if sDistance != "" then voiceQueue.push "distance #{sDistance}"
 
 	for voice in voiceQueue
-		errors.push voice
+		errors.push "vQ #{voice}"
 
 	if abs(distance) >= 0.5 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = myRound p.coords.latitude,6
