@@ -1,4 +1,4 @@
-VERSION = 271
+VERSION = 272
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -215,7 +215,8 @@ increaseQueue = (p) ->
 firstInfo = ->
 	[x,y] = crossHair
 	[lon,lat] = b2w.convert x,y
-	errors.push "firstInfo #{[x,y,lon,lat]}"
+	errors.push "firstInfo #{round(x)} #{round(y)}"
+	errors.push "#{lon} #{lat}"
 
 	# b = LatLon gpsLat, gpsLon # senaste position
 	# c = LatLon lat, lon # target
