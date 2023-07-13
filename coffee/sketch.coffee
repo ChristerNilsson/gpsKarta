@@ -1,4 +1,4 @@
-VERSION = 267
+VERSION = 268
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -122,6 +122,7 @@ track = [] # five latest GPS positions (bitmap coordinates)
 speaker = null
 
 messages = ['','','','','','']
+lastError = ""
 gpsCount = 0
 
 [gpsLat,gpsLon] = [0,0] # avgör om muntlig information ska ges
@@ -237,7 +238,8 @@ decreaseQueue = ->
 	if voiceQueue.length == 0 then return
 	msg = voiceQueue.shift()
 	arr = msg.split ' '
-	console.log "decreaseQueue #{msg}"
+	dump.store "decreaseQueue #{msg}"
+	lastError = "decreaseQueue #{msg}"
 	if arr[0] == 'bearing'
 		bearing = arr[1]
 		if bearingSaid != bearing then sayBear bearing
@@ -294,14 +296,14 @@ initSounds = ->
 	for bearing in BEARINGLIST.split ' '
 		sound = loadSound "sounds/bearing/male/#{bearing}.mp3"
 		if sound then console.log "sounds/bearing/male/#{bearing}.mp3"
-		sound.setVolume 0.1
+		sound.setVolume 0.5
 		bearingSounds[bearing] = sound
 
 	distanceSounds = {}
 	for distance in DISTLIST.split ' '
 		sound = loadSound "sounds/distance/female/#{distance}.mp3"
 		if sound then console.log "sounds/distance/female/#{distance}.mp3"
-		sound.setVolume 0.1
+		sound.setVolume 0.5
 		distanceSounds[distance] = sound
 
 getMeters = (w,skala) ->
@@ -575,6 +577,7 @@ draw = ->
 		showDialogue()
 		menuButton.draw()
 		#messages[3] = round frameRate()
+		text lastError,width/2,height/2
 		return
 
 	if state == 2
