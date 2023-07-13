@@ -1,4 +1,4 @@
-VERSION = 280
+VERSION = 281
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -163,7 +163,7 @@ sayDist = (m) -> # m är en distans i DISTLIST
 
 sayDistance = (a,b) -> # a is newer (meter)
 	# if a border is crossed, produce a distance
-	dump.store "D #{myRound a,1} #{myRound b,1}"
+	dump.store "D #{round a,1} #{round b,1}"
 	a = round a
 	b = round b
 	if b == -1 then return a
@@ -174,7 +174,7 @@ sayDistance = (a,b) -> # a is newer (meter)
 	""
 
 sayBearing = (a0,b0) -> # a is newer (degrees)
-	dump.store "B #{myRound a0,1} #{myRound b0,1}"
+	dump.store "B #{round a0,1} #{round b0,1}"
 	# if a sector limit is crossed, tell the new bearing
 	a = general.SECTOR * round(a0/general.SECTOR)
 	b = general.SECTOR * round(b0/general.SECTOR)
@@ -218,8 +218,8 @@ increaseQueue = (p) ->
 		errors.push "vQ #{voice}"
 
 	if abs(distance) >= 0.5 # update only if DIST detected. Otherwise some beeps will be lost.
-		gpsLat = myRound p.coords.latitude,6
-		gpsLon = myRound p.coords.longitude,6
+		gpsLat = round p.coords.latitude,6
+		gpsLon = round p.coords.longitude,6
 
 firstInfo = ->
 	[x,y] = crossHair
@@ -266,8 +266,8 @@ decreaseQueue = ->
 			distanceSaid = distance
 
 locationUpdate = (p) ->
-	pLat = myRound p.coords.latitude,6
-	pLon = myRound p.coords.longitude,6
+	pLat = round p.coords.latitude,6
+	pLon = round p.coords.longitude,6
 	if storage.trail.length == 0
 		gpsLat = pLat
 		gpsLon = pLon

@@ -1,11 +1,11 @@
-myRound = (x,dec=0) -> Math.round(x*10**dec)/10**dec
+# myRound = (x,dec=0) -> Math.round(x*10**dec)/10**dec
 
 class Converter # bmp <=> wgs
 	constructor : (inp,outp,@decimals) -> @arr = @solve inp,outp
 
 	convert : (x,y) ->
 		[a,b,c,d,e,f] = @arr
-		[myRound(a*x+b*y+c,@decimals), myRound(d*x+e*y+f,@decimals)]
+		[round(a*x+b*y+c,@decimals), round(d*x+e*y+f,@decimals)]
 
 	solve : (inp,outp) ->
 		[a,b,c,d,e,f] = inp
