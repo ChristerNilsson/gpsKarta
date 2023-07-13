@@ -1,4 +1,4 @@
-VERSION = 279
+VERSION = 280
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -353,6 +353,8 @@ preload = ->
 
 
 setup = ->
+
+	console.log "PI #{round Math.PI,6}"
 
 	console.log "setup starts"
 #	console.log bearingSounds
