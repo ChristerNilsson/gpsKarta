@@ -1,7 +1,7 @@
-VERSION = 270
+VERSION = 271
 
 # DELAY = 100 # ms, delay between sounds
-DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
+DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
 LIMIT = 20 # meter. Under this value is no bearing given
 
 platform = window.navigator.platform # Win32|iPad|Linux|iPhone
@@ -215,24 +215,26 @@ increaseQueue = (p) ->
 firstInfo = ->
 	[x,y] = crossHair
 	[lon,lat] = b2w.convert x,y
-	console.log "firstInfo #{[x,y,lon,lat]}"
+	errors.push "firstInfo #{[x,y,lon,lat]}"
 
-	b = LatLon gpsLat, gpsLon # senaste position
-	c = LatLon lat, lon # target
+	# b = LatLon gpsLat, gpsLon # senaste position
+	# c = LatLon lat, lon # target
 
-	distb = round b.distanceTo c
-	distance = round (distb)/DIST
+	# distb = round b.distanceTo c
+	# distance = round (distb)/DIST
 
-	bearingb = b.bearingTo c
-	voiceQueue.push "bearing #{sayBearing bearingb,-1}"
-	voiceQueue.push "distance #{sayDistance distb,-1}"
+	# bearingb = b.bearingTo c
+	# voiceQueue.push "bearing #{sayBearing bearingb,-1}"
+	# voiceQueue.push "distance #{sayDistance distb,-1}"
+	increaseQueue {coords: {latitude:gpsLat, longitude:gpsLon}}
+
 	dump.store ""
 	dump.store "target #{crossHair}"
 	dump.store "gps #{[gpsLat,gpsLon]}"
 	dump.store "trg #{[lat,lon]}"
 	dump.store "voiceQueue #{voiceQueue}"
-	
-	# if distance < LIMIT then soundQueue = distance else soundQueue = 0 # ett antal DIST
+
+	# if distance < LIMIT then soundQueue = distance else soundQueue = 0 ett antal DIST
 
 decreaseQueue = ->
 	if voiceQueue.length == 0 then return
