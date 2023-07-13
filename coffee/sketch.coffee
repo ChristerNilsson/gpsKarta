@@ -1,4 +1,4 @@
-VERSION = 281
+VERSION = 282
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -191,14 +191,13 @@ increaseQueue = (p) ->
 
 	[trgLon,trgLat] = b2w.convert crossHair[0],crossHair[1]
 	errors.push "incQB #{round trgLon,6} #{round trgLat,6}"
-
 	errors.push "incQC #{round p.coords.longitude,6} #{round p.coords.latitude,6}"
-	a = LatLon p.coords.latitude,p.coords.longitude # newest
-	b = LatLon gpsLat, gpsLon
-	c = LatLon trgLat, trgLon # target
 
+	a = LatLon p.coords.latitude, p.coords.longitude # newest
 	errors.push "a #{a}"
+	b = LatLon gpsLat, gpsLon
 	errors.push "b #{b}"
+	c = LatLon trgLat, trgLon # target
 	errors.push "c #{c}"
 
 	distac = a.distanceTo c # meters
@@ -634,7 +633,7 @@ savePosition = ->
 
 aim = ->
 	if crossHair == null
-		crossHair = [cx,cy]
+		crossHair = [round(cx),round(cy)]
 		setTarget()
 	else
 		crossHair = null
