@@ -1,4 +1,4 @@
-VERSION = 268
+VERSION = 269
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike
@@ -122,7 +122,7 @@ track = [] # five latest GPS positions (bitmap coordinates)
 speaker = null
 
 messages = ['','','','','','']
-lastError = ""
+errors = []
 gpsCount = 0
 
 [gpsLat,gpsLon] = [0,0] # avgör om muntlig information ska ges
@@ -239,15 +239,18 @@ decreaseQueue = ->
 	msg = voiceQueue.shift()
 	arr = msg.split ' '
 	dump.store "decreaseQueue #{msg}"
-	lastError = "decreaseQueue #{msg}"
+	errors.push "decreaseQueue #{msg}"
 	if arr[0] == 'bearing'
 		bearing = arr[1]
 		if bearingSaid != bearing then sayBear bearing
 		bearingSaid = bearing
-	else if arr[0] == 'distance' and (general.DISTANCE or arr[1] < LIMIT)
-		distance = arr[1]
-		if distanceSaid != distance then sayDist distance
-		distanceSaid = distance
+	else if arr[0] == 'distance'
+		errors.push general.DISTANCE
+		errors.push arr[1]
+		if general.DISTANCE or arr[1] < LIMIT
+			distance = arr[1]
+			if distanceSaid != distance then sayDist distance
+			distanceSaid = distance
 
 locationUpdate = (p) ->
 	pLat = myRound p.coords.latitude,6
@@ -577,7 +580,8 @@ draw = ->
 		showDialogue()
 		menuButton.draw()
 		#messages[3] = round frameRate()
-		text lastError,width/2,height/2
+		for i in range errors.length
+			text errors[i], width/2, 50 + 50*i
 		return
 
 	if state == 2
