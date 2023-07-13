@@ -1,4 +1,4 @@
-VERSION = 277
+VERSION = 278
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -592,8 +592,11 @@ draw = ->
 		showDialogue()
 		menuButton.draw()
 		#messages[3] = round frameRate()
+		push()
+		textAlign LEFT
 		for i in range errors.length
-			text errors[i], width/2, 50 + 50*i
+			text errors[i], 0, 50 + 50*i
+		pop()
 		return
 
 	if state == 2
