@@ -1,4 +1,4 @@
-VERSION = 284
+VERSION = 285
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -210,10 +210,10 @@ increaseQueue = (p) ->
 	bearingac = a.bearingTo c
 	bearingbc = b.bearingTo c
 	sBearing = if distac >= LIMIT then sayBearing bearingac,bearingbc else ""
-	sDistance = sayDistance distac,distbc
-
 	if sBearing  != "" then voiceQueue.push "bearing #{sBearing}"
-	if sDistance != "" then voiceQueue.push "distance #{sDistance}"
+
+	# sDistance = sayDistance distac,distbc
+	# if sDistance != "" then voiceQueue.push "distance #{sDistance}" Vi kan inte säga godtyckligt avstånd numera
 
 	for voice in voiceQueue
 		errors.push "vQ #{voice}"
@@ -238,7 +238,7 @@ firstInfo = ->
 
 	bearingb = b.bearingTo c
 	voiceQueue.push "bearing #{sayBearing bearingb,-1}"
-	# voiceQueue.push "distance #{sayDistance distb,-1}"
+	voiceQueue.push "distance #{sayDistance distb,-1}"
 
 	#increaseQueue {coords: {latitude:gpsLat, longitude:gpsLon}}
 
@@ -601,7 +601,7 @@ draw = ->
 		push()
 		textAlign LEFT
 		for i in range errors.length
-			text errors[i], 0, 50 + 50*i
+			text errors[i], 10, 50 + 50*i
 		pop()
 		return
 
