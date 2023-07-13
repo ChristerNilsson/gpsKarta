@@ -1,4 +1,4 @@
-VERSION = 283
+VERSION = 284
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -194,7 +194,7 @@ increaseQueue = (p) ->
 	errors.push "incQC #{round p.coords.longitude,6} #{round p.coords.latitude,6}"
 
 	a = LatLon p.coords.latitude, p.coords.longitude # newest
-	#errors.push "a #{a}"
+	#errors.push "a #{a}" VISAS EJ!
 	b = LatLon gpsLat, gpsLon
 	#errors.push "b #{b}"
 	c = LatLon trgLat, trgLon # target
@@ -225,20 +225,22 @@ increaseQueue = (p) ->
 firstInfo = ->
 	[x,y] = crossHair
 	[lon,lat] = b2w.convert x,y
+
 	errors.push "firstInfo #{round(x)} #{round(y)}"
 	errors.push "lon #{lon} lat #{lat}"
 	errors.push "gps #{gpsLon} #{gpsLat}"
 
-	# b = LatLon gpsLat, gpsLon # senaste position
-	# c = LatLon lat, lon # target
+	b = LatLon gpsLat, gpsLon # senaste position
+	c = LatLon lat, lon # target
 
-	# distb = round b.distanceTo c
-	# distance = round (distb)/DIST
+	distb = round b.distanceTo c
+	distance = round (distb)/DIST
 
-	# bearingb = b.bearingTo c
-	# voiceQueue.push "bearing #{sayBearing bearingb,-1}"
+	bearingb = b.bearingTo c
+	voiceQueue.push "bearing #{sayBearing bearingb,-1}"
 	# voiceQueue.push "distance #{sayDistance distb,-1}"
-	increaseQueue {coords: {latitude:gpsLat, longitude:gpsLon}}
+
+	#increaseQueue {coords: {latitude:gpsLat, longitude:gpsLon}}
 
 	dump.store ""
 	dump.store "target #{crossHair}"
