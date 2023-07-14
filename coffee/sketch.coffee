@@ -1,4 +1,4 @@
-PROG_VERSION = 292
+PROG_VERSION = 293
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -129,6 +129,8 @@ voiceQueue = []
 
 bearingSaid = '' # förhindrar upprepning
 distanceSaid = '' # förhindrar upprepning
+
+locationId = 0
 
 p1 = new LatLon 52.205, 0.119
 p2 = new LatLon 48.857, 2.351
@@ -265,6 +267,7 @@ decreaseQueue = ->
 			distanceSaid = distance
 
 locationUpdate = (p) ->
+	reason = 0
 	try
 		pLat = round p.coords.latitude,6
 		pLon = round p.coords.longitude,6
@@ -273,10 +276,13 @@ locationUpdate = (p) ->
 			gpsLon = pLon
 		messages[5] = gpsCount++
 		decreaseQueue()
+		reason = 1
 		increaseQueue p # meters
+		reason = 2
 		uppdatera pLat, pLon
+		reason = 3
 	catch error
-		errors.push "locationUpdate #{error}"
+		errors.push "locationUpdate #{error} #{reason}"
 
 uppdatera = (pLat, pLon) ->
 	[x,y] = w2b.convert pLon,pLat
@@ -391,12 +397,12 @@ setup = ->
 			maximumAge: 0,
 		}
 
-		id = navigator.geolocation.watchPosition locationUpdate, locationUpdateFail, options
+		locationId = navigator.geolocation.watchPosition locationUpdate, locationUpdateFail, options
 			# enableHighAccuracy: true
 			# maximumAge: 30000
 			# timeout: 27000
 
-		errors.push "watchPosition #{id}"
+		errors.push "watchPosition locationId = #{locationId}"
 
 		menuButton = new MenuButton width-160
 		#throw "myerror"
@@ -719,8 +725,10 @@ menu5 = (letters) -> # ABCDE
 menu6 = -> # More
 	dialogue = new Dialogue()
 
-	# dialogue.add 'Init', ->
-	# 	dialogues.clear()
+	dialogue.add 'Exit', ->
+		navigator.geolocation.clearWatch locationId
+		locationId = 0
+		dialogues.clear()
 
 	# dialogue.add 'Talk', ->
 	# 	console.log 'talk'
