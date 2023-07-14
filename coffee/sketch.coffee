@@ -1,4 +1,4 @@
-PROG_VERSION = 291
+PROG_VERSION = 292
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -305,7 +305,7 @@ updateTrail = (pLat, pLon, x,y)->
 		dump.store "updateTrail #{dist} #{x} #{y}"
 		storage.trail.push position
 
-locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
+locationUpdateFail = (error) ->	errors.push 'locationUpdateFail #{error.code}'
 
 initSounds = ->
 
