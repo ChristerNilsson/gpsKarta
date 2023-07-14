@@ -1,4 +1,4 @@
-PROG_VERSION = 294
+PROG_VERSION = 295
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -53,6 +53,27 @@ assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
 general = {DISTANCE: true, TRAIL: true, SECTOR: 10, PANSPEED : true} # COINS: true,
 #loadGeneral = -> if localStorage.gpsKarta then general = _.extend general, JSON.parse localStorage.gpsKarta
 #saveGeneral = -> localStorage.gpsKarta = JSON.stringify general
+
+class Bearing
+	# Håller reda på föregående talad bäring (i BEARINGLIST)
+	# Om avvikelsen > 7.5 grader, sätt ny riktbäring
+	constructor : (@oldBearing) -> # in range 0,360,10
+
+	update : (newBearing) => # 0..359
+
+		diff = abs newBearing - @oldBearing
+		if diff < 180 then diff += 360
+		if diff < 7.5 then return ""
+		a = newBearing
+		a = round a / 10
+		if a == 0 then a = 36 # 01..36
+		@oldBearing = a * 10
+		voiceQueue.push "bearing #{str(DIGITS[a // 10]) + str(DIGITS[a %% 10])}"
+
+	# sayBear : (m) -> # m är en bäring i BEARINGLIST
+	# 	bearingSounds[m].play()
+	# if sBearing  != "" then 
+
 
 class Storage
 	constructor : (@mapName) ->
@@ -127,7 +148,7 @@ timeout = null
 
 voiceQueue = []
 
-bearingSaid = '' # förhindrar upprepning
+bearing = null # förhindrar upprepning
 distanceSaid = '' # förhindrar upprepning
 
 locationId = 0
@@ -147,12 +168,6 @@ sendMail = (subject,body) ->
 	console.log mail.href
 	mail.click()
 
-sayBear = (m) -> # m är en bäring i BEARINGLIST
-	console.log "sayBear #{m}"
-	dump.store ""
-	dump.store "sayBearing #{m} #{JSON.stringify voiceQueue}"
-	bearingSounds[m].play()
-
 sayDist = (m) -> # m är en distans i DISTLIST
 	console.log "sayDist #{m}"
 	dump.store ""
@@ -171,47 +186,27 @@ sayDistance = (a,b) -> # a is newer (meter)
 		if (a-d) * (b-d) < 0 then return d
 	""
 
-sayBearing = (a0,b0) -> # a is newer (degrees)
-	dump.store "B #{round a0,1} #{round b0,1}"
-	# if a sector limit is crossed, tell the new bearing
-	a = general.SECTOR * round(a0/general.SECTOR)
-	b = general.SECTOR * round(b0/general.SECTOR)
-	if a == b and b0 != -1 then return "" # samma sektor
-	a = round a / 10 
-	if a == 0 then a = 36 # 01..36
-	str(DIGITS[a // 10]) + str(DIGITS[a %% 10])
 
 increaseQueue = (p) ->
-	# errors.push "increaseQueue #{round p.coords.latitude,6} #{round p.coords.longitude,6}"
 
 	if crossHair == null then return
-	#errors.push "incQA #{crossHair}"
 
 	[trgLon,trgLat] = b2w.convert crossHair[0],crossHair[1]
-	#errors.push "incQB #{round trgLon,6} #{round trgLat,6}"
-	#errors.push "incQC #{round p.coords.longitude,6} #{round p.coords.latitude,6}"
 
 	a = LatLon p.coords.latitude, p.coords.longitude # newest
-	#errors.push "a #{a}" VISAS EJ!
 	b = LatLon gpsLat, gpsLon
-	#errors.push "b #{b}"
 	c = LatLon trgLat, trgLon # target
-	#errors.push "c #{c}"
-
+	
 	distac = a.distanceTo c # meters
 	distbc = b.distanceTo c
 	distance = (distac - distbc)/DIST
-	#errors.push "distac #{distac}"
-	#errors.push "distbc #{distbc}"
-	#errors.push "distance #{distance}"
 
 	bearingac = a.bearingTo c
-	bearingbc = b.bearingTo c
-	sBearing = if distac >= LIMIT then sayBearing bearingac,bearingbc else ""
-	if sBearing  != "" then voiceQueue.push "bearing #{sBearing}"
+	#bearingbc = b.bearingTo c
+	if distac >= LIMIT then bearing.update bearingac # sayBearing bearingac,bearingbc else ""
 
-	# sDistance = sayDistance distac,distbc
-	# if sDistance != "" then voiceQueue.push "distance #{sDistance}" Vi kan inte säga godtyckligt avstånd numera
+	sDistance = sayDistance distac,distbc
+	if sDistance != "" then voiceQueue.push "distance #{sDistance}" # Vi kan inte säga godtyckligt avstånd numera
 
 	#for voice in voiceQueue
 	#	errors.push "vQ #{voice}"
@@ -254,10 +249,7 @@ decreaseQueue = ->
 	arr = msg.split ' '
 	dump.store "decreaseQueue #{msg}"
 	#errors.push "decreaseQueue #{msg}"
-	if arr[0] == 'bearing'
-		bearing = arr[1]
-		if bearingSaid != bearing then sayBear bearing
-		bearingSaid = bearing
+	if arr[0] == 'bearing' then sayBear arr[1]
 	else if arr[0] == 'distance'
 		#errors.push general.DISTANCE
 		if general.DISTANCE or arr[1] < LIMIT
@@ -316,11 +308,11 @@ locationUpdateFail = (error) ->	errors.push 'locationUpdateFail #{error.code}'
 initSounds = ->
 
 	bearingSounds = {}
-	for bearing in BEARINGLIST.split ' '
-		sound = loadSound "sounds/bearing/male/#{bearing}.mp3"
-		if sound then console.log "sounds/bearing/male/#{bearing}.mp3"
+	for b in BEARINGLIST.split ' '
+		sound = loadSound "sounds/bearing/male/#{b}.mp3"
+		if sound then console.log "sounds/bearing/male/#{b}.mp3"
 		sound.setVolume 0.5
-		bearingSounds[bearing] = sound
+		bearingSounds[b] = sound
 
 	distanceSounds = {}
 	for distance in DISTLIST.split ' '
@@ -362,6 +354,8 @@ preload = ->
 setup = ->
 
 	try
+
+		bearing = new Bearing 0
 
 		#console.log "PI #{round Math.PI,6}"
 		#console.log "setup starts"
@@ -533,9 +527,9 @@ drawControl = ->
 		[trgLon,trgLat] = b2w.convert cx,cy
 	latLon2 = LatLon trgLat,trgLon
 	latLon1 = LatLon gpsLat,gpsLon
-	bearing = latLon1.bearingTo latLon2
+	b = latLon1.bearingTo latLon2
 	messages[0] = ""
-	messages[1] = "#{int bearing}º"
+	messages[1] = "#{int b}º"
 	messages[2] = "#{round(latLon1.distanceTo latLon2)} m"
 
 drawRuler = ->
