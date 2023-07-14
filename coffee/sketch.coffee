@@ -1,4 +1,4 @@
-PROG_VERSION = 299
+PROG_VERSION = 300
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -51,8 +51,8 @@ Array.prototype.clear = -> @length = 0
 assert = (a, b, msg='Assert failure') -> chai.assert.deepEqual a, b, msg
 
 general = {DISTANCE: true, TRAIL: true, SECTOR: 10, PANSPEED : true} # COINS: true,
-#loadGeneral = -> if localStorage.gpsKarta then general = _.extend general, JSON.parse localStorage.gpsKarta
-#saveGeneral = -> localStorage.gpsKarta = JSON.stringify general
+loadGeneral = -> if localStorage.gpsKarta then general = _.extend general, JSON.parse localStorage.gpsKarta
+saveGeneral = -> localStorage.gpsKarta = JSON.stringify general
 
 class Bearing
 	# Håller reda på föregående talad bäring (i BEARINGLIST)
@@ -368,7 +368,7 @@ setup = ->
 		canvas = createCanvas innerWidth, innerHeight
 		canvas.position 0,0 # hides text field used for clipboard copy.
 
-		#loadGeneral()
+		loadGeneral()
 
 		angleMode DEGREES
 		SCALE = data.scale
@@ -431,7 +431,7 @@ info = () ->
 	]
 
 drawCrossHair = (x,y) ->
-	r = 0.9 * data.radius
+	r = 2 * 0.9 * data.radius
 	if crossHair
 		sw 1
 		sc 1,1,1,0.5
@@ -671,15 +671,15 @@ menu2 = -> # Setup
 	dialogue = new Dialogue()
 	dialogue.add 'PanSpeed', ->
 		general.PANSPEED = not general.PANSPEED
-		#saveGeneral()
+		saveGeneral()
 		dialogues.clear()
 	dialogue.add 'Distance', ->
 		general.DISTANCE = not general.DISTANCE
-		#saveGeneral()
+		saveGeneral()
 		dialogues.clear()
 	dialogue.add 'Trail', ->
 		general.TRAIL = not general.TRAIL
-		#saveGeneral()
+		saveGeneral()
 		dialogues.clear()
 	dialogue.add 'Sector...', -> menu3()
 	dialogue.clock()
@@ -741,7 +741,7 @@ menu6 = -> # More
 
 SetSector = (sector) ->
 	general.SECTOR = sector
-	#saveGeneral()
+	saveGeneral()
 	dialogues.clear()
 
 update = (littera) ->
