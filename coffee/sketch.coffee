@@ -1,4 +1,4 @@
-PROG_VERSION = 289
+PROG_VERSION = 290
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -265,15 +265,18 @@ decreaseQueue = ->
 			distanceSaid = distance
 
 locationUpdate = (p) ->
-	pLat = round p.coords.latitude,6
-	pLon = round p.coords.longitude,6
-	if storage.trail.length == 0
-		gpsLat = pLat
-		gpsLon = pLon
-	messages[5] = gpsCount++
-	decreaseQueue()
-	increaseQueue p # meters
-	uppdatera pLat, pLon
+	try
+		pLat = round p.coords.latitude,6
+		pLon = round p.coords.longitude,6
+		if storage.trail.length == 0
+			gpsLat = pLat
+			gpsLon = pLon
+		messages[5] = gpsCount++
+		decreaseQueue()
+		increaseQueue p # meters
+		uppdatera pLat, pLon
+	catch error
+		errors.push "locationUpdate #{error}"
 
 uppdatera = (pLat, pLon) ->
 	[x,y] = w2b.convert pLon,pLat
