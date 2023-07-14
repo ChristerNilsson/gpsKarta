@@ -1,4 +1,4 @@
-PROG_VERSION = 293
+PROG_VERSION = 294
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -391,21 +391,14 @@ setup = ->
 
 		[cx,cy] = [img.width/2,img.height/2]
 
-		options = {
-			enableHighAccuracy: false,
-			timeout: 5000,
-			maximumAge: 0,
-		}
+#		options = {enableHighAccuracy: false, maximumAge: 0,     timeout: 5000}
+		options = {enableHighAccuracy: true,  maximumAge: 30000, timeout: 27000}
 
 		locationId = navigator.geolocation.watchPosition locationUpdate, locationUpdateFail, options
-			# enableHighAccuracy: true
-			# maximumAge: 30000
-			# timeout: 27000
 
-		errors.push "watchPosition locationId = #{locationId}"
+		# errors.push "watchPosition locationId = #{locationId}"
 
 		menuButton = new MenuButton width-160
-		#throw "myerror"
 
 	catch error
 		errors.push "setup failed: #{error}"
