@@ -1,4 +1,4 @@
-PROG_VERSION = 288
+PROG_VERSION = 289
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -7,12 +7,9 @@ LIMIT = 20 # meter. Under this value is no bearing given
 platform = window.navigator.platform # Win32|iPad|Linux|iPhone
 
 DIGITS = '0 1 2 3 4 5 6 7 8 9'.split ' '
-#BR = if platform in ['Win32','iPad'] then "\n" else '<br>'
 BR = "\n"
 
-# http://www.bvsok.se/Kartor/Skolkartor/
 # Högupplösta orienteringskartor: https://www.omaps.net
-# https://omaps.blob.core.windows.net/map-excerpts/1fdc587ffdea489dbd69e29b10b48395.jpeg Nackareservatet utan kontroller.
 
 BEARINGLIST ='01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36'
 DISTLIST = '2 4 6 8 10 12 14 16 18 20 30 40 50 60 70 80 90 100 120 140 160 180 200 300 400 500 600 700 800 900 1000 1200 1400 1600 1800 2000 3000 4000 5000 6000 7000 8000 9000 10000'
@@ -22,7 +19,6 @@ mapName = "" # t ex skarpnäck
 params = null
 voices = null
 measure = {}
-#surplus = 0
 pois = null
 speed = 1
 distbc = 0
@@ -302,10 +298,9 @@ updateTrail = (pLat, pLon, x,y)->
 	a = LatLon pLat, pLon # newest
 	b = LatLon qLat, qLon # last
 	dist = a.distanceTo b # meters
-	if dist > 5 #+ surplus
+	if dist > 5
 		dump.store "updateTrail #{dist} #{x} #{y}"
 		storage.trail.push position
-		#surplus += 5 - dist
 
 locationUpdateFail = (error) ->	if error.code == error.PERMISSION_DENIED then messages = ['','','','','','Check location permissions']
 
@@ -357,42 +352,46 @@ preload = ->
 
 setup = ->
 
-	console.log "PI #{round Math.PI,6}"
+	try
 
-	console.log "setup starts"
-#	console.log bearingSounds
+		#console.log "PI #{round Math.PI,6}"
+		#console.log "setup starts"
 
-	dialogues.clear()
-	track = []
+		dialogues.clear()
+		track = []
 
-	canvas = createCanvas innerWidth, innerHeight
-	canvas.position 0,0 # hides text field used for clipboard copy.
+		canvas = createCanvas innerWidth, innerHeight
+		canvas.position 0,0 # hides text field used for clipboard copy.
 
-	#loadGeneral()
+		#loadGeneral()
 
-	angleMode DEGREES
-	SCALE = data.scale
+		angleMode DEGREES
+		SCALE = data.scale
 
-	dcs = data.controls
-	bmp = [dcs.A[0], dcs.A[1], dcs.B[0], dcs.B[1], dcs.C[0], dcs.C[1]]
-	abc = data.ABC
-	wgs = [abc[1],abc[0],abc[3],abc[2],abc[5],abc[4]] # lat lon <=> lon lat
+		dcs = data.controls
+		bmp = [dcs.A[0], dcs.A[1], dcs.B[0], dcs.B[1], dcs.C[0], dcs.C[1]]
+		abc = data.ABC
+		wgs = [abc[1],abc[0],abc[3],abc[2],abc[5],abc[4]] # lat lon <=> lon lat
 
-	b2w = new Converter bmp,wgs,6
-	w2b = new Converter wgs,bmp,0
+		b2w = new Converter bmp,wgs,6
+		w2b = new Converter wgs,bmp,0
 
-	storage = new Storage mapName
-	storage.trail = []
-	if params.trail then storage.trail = decodeAll params.trail
+		storage = new Storage mapName
+		storage.trail = []
+		if params.trail then storage.trail = decodeAll params.trail
 
-	[cx,cy] = [img.width/2,img.height/2]
+		[cx,cy] = [img.width/2,img.height/2]
 
-	navigator.geolocation.watchPosition locationUpdate, locationUpdateFail,
-		enableHighAccuracy: true
-		maximumAge: 30000
-		timeout: 27000
+		navigator.geolocation.watchPosition locationUpdate, locationUpdateFail,
+			enableHighAccuracy: true
+			maximumAge: 30000
+			timeout: 27000
 
-	menuButton = new MenuButton width-160
+		menuButton = new MenuButton width-160
+		#throw "myerror"
+
+	catch error
+		errors.push "setup failed: #{error}"
 
 info = () ->
 	if position
@@ -649,18 +648,16 @@ menu1 = -> # Main Menu
 		[cx,cy] = position
 		dump.store 'Center #{cx} #{cy} #{position.coord.} #{}'
 		dialogues.clear()
-	dialogue.add 'Out', ->
+	dialogue.add 'Out', -> SCALE /= 1.5
 		#if SCALE > data.scale then SCALE /= 1.5
-		SCALE /= 1.5
-		dialogues.clear()
+		#dialogues.clear()
 	dialogue.add 'Take...', -> menu4()
 	dialogue.add 'More...', -> menu6()
 	dialogue.add 'Setup...', -> menu2()
 	dialogue.add 'Aim', -> aim()
 	dialogue.add 'Save', -> savePosition()
-	dialogue.add 'In', ->
-		SCALE *= 1.5
-		dialogues.clear()
+	dialogue.add 'In', -> SCALE *= 1.5
+		#dialogues.clear()
 	dialogue.clock ' ',true
 	dialogue.textSize *= 1.5
 
