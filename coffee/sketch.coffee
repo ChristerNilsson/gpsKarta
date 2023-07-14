@@ -1,4 +1,4 @@
-PROG_VERSION = 296
+PROG_VERSION = 297
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -61,9 +61,10 @@ class Bearing
 
 	update : (newBearing) => # 0..359
 
-		diff = abs newBearing - @oldBearing
+		diff = newBearing - @oldBearing
+		if diff > 180 then diff -= 360
 		if diff < 180 then diff += 360
-		if diff < 7.5 then return ""
+		if 7.5 > abs diff then return ""
 		a = newBearing
 		a = round a / 10
 		if a == 0 then a = 36 # 01..36
