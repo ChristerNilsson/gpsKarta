@@ -1,4 +1,4 @@
-PROG_VERSION = 295
+PROG_VERSION = 296
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -56,7 +56,7 @@ general = {DISTANCE: true, TRAIL: true, SECTOR: 10, PANSPEED : true} # COINS: tr
 
 class Bearing
 	# Håller reda på föregående talad bäring (i BEARINGLIST)
-	# Om avvikelsen > 7.5 grader, sätt ny riktbäring
+	# Om avvikelsen > 7.5 grader, sätt ny riktbäring. Anger man 5, riskerar man att få 10,20,10,20 osv om man bara rör sig 10.5, 9.5, 10.5
 	constructor : (@oldBearing) -> # in range 0,360,10
 
 	update : (newBearing) => # 0..359
@@ -249,7 +249,7 @@ decreaseQueue = ->
 	arr = msg.split ' '
 	dump.store "decreaseQueue #{msg}"
 	#errors.push "decreaseQueue #{msg}"
-	if arr[0] == 'bearing' then sayBear arr[1]
+	if arr[0] == 'bearing' then bearingSounds[arr[1]].play() 
 	else if arr[0] == 'distance'
 		#errors.push general.DISTANCE
 		if general.DISTANCE or arr[1] < LIMIT
