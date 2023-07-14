@@ -1,4 +1,4 @@
-VERSION = 286
+PROG_VERSION = 287
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -408,7 +408,7 @@ info = () ->
 
 	[
 		"Map: #{mapName}"
-		"Program Version: #{VERSION}"
+		"Program Version: #{PROG_VERSION}"
 		"GpsPosition: #{messages[4]}"
 		"  GpsPoints: #{gpsCount}"
 		"Target: #{trgLat} #{trgLon}"
@@ -565,7 +565,7 @@ draw = ->
 		x = width/2
 		y = height/2 
 		text mapName, x,y-100
-		text 'Version: '+VERSION, x,y
+		text 'Version: '+PROG_VERSION, x,y
 		if dump.active then text 'debug',x,y+100
 		text "Click to continue!", x,y+200
 		return
