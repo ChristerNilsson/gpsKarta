@@ -1,4 +1,4 @@
-PROG_VERSION = 287
+PROG_VERSION = 288
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -187,11 +187,11 @@ increaseQueue = (p) ->
 	# errors.push "increaseQueue #{round p.coords.latitude,6} #{round p.coords.longitude,6}"
 
 	if crossHair == null then return
-	errors.push "incQA #{crossHair}"
+	#errors.push "incQA #{crossHair}"
 
 	[trgLon,trgLat] = b2w.convert crossHair[0],crossHair[1]
-	errors.push "incQB #{round trgLon,6} #{round trgLat,6}"
-	errors.push "incQC #{round p.coords.longitude,6} #{round p.coords.latitude,6}"
+	#errors.push "incQB #{round trgLon,6} #{round trgLat,6}"
+	#errors.push "incQC #{round p.coords.longitude,6} #{round p.coords.latitude,6}"
 
 	a = LatLon p.coords.latitude, p.coords.longitude # newest
 	#errors.push "a #{a}" VISAS EJ!
@@ -203,9 +203,9 @@ increaseQueue = (p) ->
 	distac = a.distanceTo c # meters
 	distbc = b.distanceTo c
 	distance = (distac - distbc)/DIST
-	errors.push "distac #{distac}"
-	errors.push "distbc #{distbc}"
-	errors.push "distance #{distance}"
+	#errors.push "distac #{distac}"
+	#errors.push "distbc #{distbc}"
+	#errors.push "distance #{distance}"
 
 	bearingac = a.bearingTo c
 	bearingbc = b.bearingTo c
@@ -215,8 +215,8 @@ increaseQueue = (p) ->
 	# sDistance = sayDistance distac,distbc
 	# if sDistance != "" then voiceQueue.push "distance #{sDistance}" Vi kan inte säga godtyckligt avstånd numera
 
-	for voice in voiceQueue
-		errors.push "vQ #{voice}"
+	#for voice in voiceQueue
+	#	errors.push "vQ #{voice}"
 
 	if abs(distance) >= 0.5 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = round p.coords.latitude,6
@@ -226,9 +226,9 @@ firstInfo = ->
 	[x,y] = crossHair
 	[lon,lat] = b2w.convert x,y
 
-	errors.push "firstInfo #{round(x)} #{round(y)}"
-	errors.push "lon #{lon} lat #{lat}"
-	errors.push "gps #{gpsLon} #{gpsLat}"
+	#errors.push "firstInfo #{round(x)} #{round(y)}"
+	#errors.push "lon #{lon} lat #{lat}"
+	#errors.push "gps #{gpsLon} #{gpsLat}"
 
 	b = LatLon gpsLat, gpsLon # senaste position
 	c = LatLon lat, lon # target
@@ -255,16 +255,16 @@ decreaseQueue = ->
 	msg = voiceQueue.shift()
 	arr = msg.split ' '
 	dump.store "decreaseQueue #{msg}"
-	errors.push "decreaseQueue #{msg}"
+	#errors.push "decreaseQueue #{msg}"
 	if arr[0] == 'bearing'
 		bearing = arr[1]
 		if bearingSaid != bearing then sayBear bearing
 		bearingSaid = bearing
 	else if arr[0] == 'distance'
-		errors.push general.DISTANCE
+		#errors.push general.DISTANCE
 		if general.DISTANCE or arr[1] < LIMIT
 			distance = arr[1]
-			errors.push "#{distanceSaid} #{distance}" 
+			#errors.push "#{distanceSaid} #{distance}" 
 			if distanceSaid != distance then sayDist distance
 			distanceSaid = distance
 
