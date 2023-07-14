@@ -1,4 +1,4 @@
-PROG_VERSION = 298
+PROG_VERSION = 299
 
 # DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
@@ -64,6 +64,7 @@ class Bearing
 		diff = newBearing - @oldBearing
 		if diff > 180 then diff -= 360
 		if diff < -180 then diff += 360
+		# nu gäller -180 <= diff <= 180
 		if 7.5 > abs diff then return ""
 		a = newBearing
 		a = round a / 10
@@ -713,10 +714,10 @@ menu5 = (letters) -> # ABCDE
 menu6 = -> # More
 	dialogue = new Dialogue()
 
-	dialogue.add 'Exit', ->
-		navigator.geolocation.clearWatch locationId
-		locationId = 0
-		dialogues.clear()
+	# dialogue.add 'Exit', ->
+	# 	navigator.geolocation.clearWatch locationId
+	# 	locationId = 0
+	# 	dialogues.clear()
 
 	# dialogue.add 'Talk', ->
 	# 	console.log 'talk'

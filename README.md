@@ -124,5 +124,11 @@ Om man sätter t ex 1.0, visas inte current location på rätt plats.
 Ändrar man SCALE, måste även pixelmåtten (controls i filen) uppdateras.
 
 # Efter Reload läses inga gps-koordinater in
-Utför Exit som avregistrerar locationhanteraren.  
-Om man glömt utföra Exit, måste man rensa History  
+Rensa History
+* ...
+* History
+* Clear Browsing Data
+* Clear Browsing Data
+* Clear Browsing Data
+* Done
+* Done
