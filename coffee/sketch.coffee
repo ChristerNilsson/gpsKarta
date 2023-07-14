@@ -1,6 +1,5 @@
-PROG_VERSION = 300
+PROG_VERSION = 301
 
-# DELAY = 100 # ms, delay between sounds
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
 LIMIT = 20 # meter. Under this value is no bearing given
 
@@ -60,11 +59,10 @@ class Bearing
 	constructor : (@oldBearing) -> # in range 0,360,10
 
 	update : (newBearing) => # 0..359
-
 		diff = newBearing - @oldBearing
 		if diff > 180 then diff -= 360
 		if diff < -180 then diff += 360
-		# nu gäller -180 <= diff <= 180
+		# nu gäller abs(diff) <= 180
 		if 7.5 > abs diff then return ""
 		a = newBearing
 		a = round a / 10
@@ -72,19 +70,15 @@ class Bearing
 		@oldBearing = a * 10
 		voiceQueue.push "bearing #{str(DIGITS[a // 10]) + str(DIGITS[a %% 10])}"
 
-	# sayBear : (m) -> # m är en bäring i BEARINGLIST
-	# 	bearingSounds[m].play()
-	# if sBearing  != "" then 
-
 
 class Storage
 	constructor : (@mapName) ->
 		key = 'gpsKarta' + @mapName
-		# if localStorage[key]
-		# 	try
-		# 		obj = JSON.parse localStorage[key]
-		# 		@controls = obj.controls
-		# 		@trail = obj.trail
+		if localStorage[key]
+			try
+				obj = JSON.parse localStorage[key]
+				@controls = obj.controls
+				@trail = obj.trail
 		@clear()
 
 	save : -> localStorage['gpsKarta' + @mapName] = JSON.stringify @
