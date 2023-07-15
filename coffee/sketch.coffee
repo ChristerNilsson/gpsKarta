@@ -425,7 +425,7 @@ info = () ->
 	]
 
 drawCrossHair = (x,y) ->
-	r = 2 * 0.9 * data.radius
+	r = 1.3 * data.radius
 	if crossHair
 		sw 1
 		sc 1,1,1,0.5
