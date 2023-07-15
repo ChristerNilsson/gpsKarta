@@ -1,4 +1,4 @@
-PROG_VERSION = 301
+PROG_VERSION = 302
 
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
 LIMIT = 20 # meter. Under this value is no bearing given
@@ -68,8 +68,7 @@ class Bearing
 		a = round a / 10
 		if a == 0 then a = 36 # 01..36
 		@oldBearing = a * 10
-		voiceQueue.push "bearing #{str(DIGITS[a // 10]) + str(DIGITS[a %% 10])}"
-
+		bearingQ.push str(DIGITS[a // 10]) + str(DIGITS[a %% 10])
 
 class Storage
 	constructor : (@mapName) ->
@@ -142,7 +141,8 @@ gpsCount = 0
 
 timeout = null
 
-voiceQueue = []
+bearingQ = []
+distanceQ = []
 
 bearing = null # förhindrar upprepning
 distanceSaid = '' # förhindrar upprepning
@@ -167,7 +167,7 @@ sendMail = (subject,body) ->
 sayDist = (m) -> # m är en distans i DISTLIST
 	console.log "sayDist #{m}"
 	dump.store ""
-	dump.store "sayDistance #{m} #{JSON.stringify voiceQueue}"
+	dump.store "sayDistance #{m} #{JSON.stringify distanceQ}"
 	distanceSounds[m].play()
 
 sayDistance = (a,b) -> # a is newer (meter)
@@ -202,10 +202,7 @@ increaseQueue = (p) ->
 	if distac >= LIMIT then bearing.update bearingac # sayBearing bearingac,bearingbc else ""
 
 	sDistance = sayDistance distac,distbc
-	if sDistance != "" then voiceQueue.push "distance #{sDistance}" # Vi kan inte säga godtyckligt avstånd numera
-
-	#for voice in voiceQueue
-	#	errors.push "vQ #{voice}"
+	if sDistance != "" then distanceQ.push sDistance # Vi kan inte säga godtyckligt avstånd numera
 
 	if abs(distance) >= 0.5 # update only if DIST detected. Otherwise some beeps will be lost.
 		gpsLat = round p.coords.latitude,6
@@ -226,8 +223,8 @@ firstInfo = ->
 	distance = round (distb)/DIST
 
 	bearingb = b.bearingTo c
-	voiceQueue.push "bearing #{sayBearing bearingb,-1}"
-	voiceQueue.push "distance #{sayDistance distb,-1}"
+	bearingQ.push bearing.update bearingb
+	distanceQ.push sayDistance distb,-1
 
 	#increaseQueue {coords: {latitude:gpsLat, longitude:gpsLon}}
 
@@ -235,24 +232,29 @@ firstInfo = ->
 	dump.store "target #{crossHair}"
 	dump.store "gps #{[gpsLat,gpsLon]}"
 	dump.store "trg #{[lat,lon]}"
-	dump.store "voiceQueue #{voiceQueue}"
+	dump.store "bearingQ #{bearingQ}"
+	dump.store "distanceQ #{distanceQ}"
 
 	# if distance < LIMIT then soundQueue = distance else soundQueue = 0 ett antal DIST
 
 decreaseQueue = ->
-	if voiceQueue.length == 0 then return
-	msg = voiceQueue.shift()
-	arr = msg.split ' '
-	dump.store "decreaseQueue #{msg}"
-	#errors.push "decreaseQueue #{msg}"
-	if arr[0] == 'bearing' then bearingSounds[arr[1]].play() 
-	else if arr[0] == 'distance'
-		#errors.push general.DISTANCE
-		if general.DISTANCE or arr[1] < LIMIT
-			distance = arr[1]
-			#errors.push "#{distanceSaid} #{distance}" 
-			if distanceSaid != distance then sayDist distance
-			distanceSaid = distance
+	if bearingQ.length == 0
+		if distanceQ.length == 0
+			return
+		else
+			msg = _.last distanceQ # latest
+			distanceQ.clear() # ignore the rest
+			#arr = msg.split ' '
+			if general.DISTANCE or msg < LIMIT
+				distance = msg
+				if distanceSaid != distance then sayDist distance
+				distanceSaid = distance
+	else 
+		queue = bearingQ
+		msg = _.last queue # latest
+		queue.clear() # ignore the rest
+		#arr = msg.split ' '
+		bearingSounds[msg].play()
 
 locationUpdate = (p) ->
 	reason = 0
@@ -631,7 +633,6 @@ savePosition = ->
 	key = findKey()
 	storage.controls[key] = [x,y,'',gpsLat,gpsLon]
 	storage.save()
-	voiceQueue.push "saved #{key}"
 	dialogues.clear()
 
 aim = ->
