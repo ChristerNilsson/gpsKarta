@@ -1,4 +1,4 @@
-PROG_VERSION = 302
+PROG_VERSION = 303
 
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
 LIMIT = 20 # meter. Under this value is no bearing given
@@ -68,7 +68,7 @@ class Bearing
 		a = round a / 10
 		if a == 0 then a = 36 # 01..36
 		@oldBearing = a * 10
-		bearingQ.push str(DIGITS[a // 10]) + str(DIGITS[a %% 10])
+		bearingQ.push str(DIGITS[a // 10]) + str(DIGITS[a %% 10]) # "01" .. "36"
 
 class Storage
 	constructor : (@mapName) ->
@@ -223,7 +223,7 @@ firstInfo = ->
 	distance = round (distb)/DIST
 
 	bearingb = b.bearingTo c
-	bearingQ.push bearing.update bearingb
+	bearing.update bearingb
 	distanceQ.push sayDistance distb,-1
 
 	#increaseQueue {coords: {latitude:gpsLat, longitude:gpsLon}}
@@ -252,6 +252,7 @@ decreaseQueue = ->
 	else 
 		queue = bearingQ
 		msg = _.last queue # latest
+		console.log 'msg',msg
 		queue.clear() # ignore the rest
 		#arr = msg.split ' '
 		bearingSounds[msg].play()
