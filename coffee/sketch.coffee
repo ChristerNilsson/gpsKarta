@@ -1,4 +1,4 @@
-PROG_VERSION = 304
+PROG_VERSION = 305
 
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
 LIMIT = 20 # meter. Under this value is no bearing given
@@ -10,8 +10,8 @@ BR = "\n"
 
 # Högupplösta orienteringskartor: https://www.omaps.net
 
-BEARINGLIST ='01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36'
-DISTLIST = '2 4 6 8 10 12 14 16 18 20 30 40 50 60 70 80 90 100 120 140 160 180 200 300 400 500 600 700 800 900 1000 1200 1400 1600 1800 2000 3000 4000 5000 6000 7000 8000 9000 10000'
+BEARINGLIST ='01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36'.split ' '
+DISTLIST = '2 4 6 8 10 12 14 16 18 20 30 40 50 60 70 80 90 100 120 140 160 180 200 300 400 500 600 700 800 900 1000 1200 1400 1600 1800 2000 3000 4000 5000 6000 7000 8000 9000 10000'.split ''
 
 released = true
 mapName = "" # t ex skarpnäck
@@ -176,7 +176,7 @@ sayDistance = (a,b) -> # a is newer (meter)
 	a = round a
 	b = round b
 	if b == -1 then return a
-	for d in DISTLIST.split ' '
+	for d in DISTLIST
 		d = parseInt d
 		if a == d and b != d then return d
 		if (a-d) * (b-d) < 0 then return d
@@ -306,14 +306,14 @@ locationUpdateFail = (error) ->	errors.push 'locationUpdateFail #{error.code}'
 initSounds = ->
 
 	bearingSounds = {}
-	for b in BEARINGLIST.split ' '
+	for b in BEARINGLIST
 		sound = loadSound "sounds/bearing/male/#{b}.mp3"
 		if sound then console.log "sounds/bearing/male/#{b}.mp3"
 		sound.setVolume 0.5
 		bearingSounds[b] = sound
 
 	distanceSounds = {}
-	for distance in DISTLIST.split ' '
+	for distance in DISTLIST
 		sound = loadSound "sounds/distance/female/#{distance}.mp3"
 		if sound then console.log "sounds/distance/female/#{distance}.mp3"
 		sound.setVolume 0.5
