@@ -1,4 +1,4 @@
-PROG_VERSION = 310
+PROG_VERSION = 311
 
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
 LIMIT = 20 # meter. Under this value is no bearing given
@@ -164,12 +164,20 @@ sendMail = (subject,body) ->
 	console.log mail.href
 	mail.click()
 
-sayDist = (m) -> # m är en distans i DISTLIST
-	console.log "sayDist #{m}"
+closestDistance = (m) =>
+	bestDist = 999999
+	bestValue = 0
+	for d in DISTLIST
+		if abs(m-d) < bestDist
+			bestDist = abs m-d
+			bestValue = d
+	bestValue
+
+sayDist = (m) -> # m är en distans, eventuellt i DISTLIST
 	dump.store ""
 	dump.store "sayDistance #{m} #{JSON.stringify distanceQ}"
-	if m in DISTLIST
-		distanceSounds[m].play()
+	m = closestDistance m
+	distanceSounds[m].play()
 
 sayDistance = (a,b) -> # a is newer (meter)
 	# if a border is crossed, produce a distance
