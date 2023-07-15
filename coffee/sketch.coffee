@@ -1,4 +1,4 @@
-PROG_VERSION = 306
+PROG_VERSION = 307
 
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
 LIMIT = 20 # meter. Under this value is no bearing given
@@ -238,10 +238,12 @@ firstInfo = ->
 	# if distance < LIMIT then soundQueue = distance else soundQueue = 0 ett antal DIST
 
 decreaseQueue = ->
+	console.log 'decreaseQueue',bearingQ,distanceQ
 	if bearingQ.length == 0
 		if distanceQ.length == 0
 			return
 		else
+			console.log 'distance',distanceQ
 			msg = _.last distanceQ # latest
 			distanceQ.clear() # ignore the rest
 			#arr = msg.split ' '
@@ -250,10 +252,12 @@ decreaseQueue = ->
 				if distanceSaid != distance then sayDist distance
 				distanceSaid = distance
 	else
+		console.log 'bearing',bearingQ
 		msg = _.last bearingQ # latest
 		error.push "bearing #{msg}"
 		bearingQ.clear() # ignore the rest
 		if msg in BEARINGLIST
+			errors.push "bearing #{msg}"
 			bearingSounds[msg].play()
 
 locationUpdate = (p) ->
@@ -272,7 +276,7 @@ locationUpdate = (p) ->
 		uppdatera pLat, pLon
 		reason = 3
 	catch error
-		errors.push "locationUpdate #{error} #{reason}"
+		errors.push "loc.Upd #{error} #{reason}"
 
 uppdatera = (pLat, pLon) ->
 	[x,y] = w2b.convert pLon,pLat
@@ -301,21 +305,19 @@ updateTrail = (pLat, pLon, x,y)->
 		dump.store "updateTrail #{dist} #{x} #{y}"
 		storage.trail.push position
 
-locationUpdateFail = (error) ->	errors.push 'locationUpdateFail #{error.code}'
+locationUpdateFail = (error) ->	errors.push "locationUpdateFail #{error.code}"
 
 initSounds = ->
 
 	bearingSounds = {}
 	for b in BEARINGLIST
 		sound = loadSound "sounds/bearing/male/#{b}.mp3"
-		if sound then console.log "sounds/bearing/male/#{b}.mp3"
 		sound.setVolume 0.5
 		bearingSounds[b] = sound
 
 	distanceSounds = {}
 	for distance in DISTLIST
 		sound = loadSound "sounds/distance/female/#{distance}.mp3"
-		if sound then console.log "sounds/distance/female/#{distance}.mp3"
 		sound.setVolume 0.5
 		distanceSounds[distance] = sound
 
