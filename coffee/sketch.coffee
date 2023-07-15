@@ -1,4 +1,4 @@
-PROG_VERSION = 311
+PROG_VERSION = 312
 
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
 LIMIT = 20 # meter. Under this value is no bearing given
@@ -258,13 +258,13 @@ decreaseQueue = ->
 			#arr = msg.split ' '
 			if general.DISTANCE or msg < LIMIT
 				distance = msg
-				errors.push "distance #{msg}"
+				#errors.push "distance #{msg}"
 				if distanceSaid != distance then sayDist distance
 				distanceSaid = distance
 	else
 		console.log 'bearing',bearingQ
 		msg = _.last bearingQ # latest
-		errors.push "bearing #{msg}"
+		#errors.push "bearing #{msg}"
 		bearingQ.clear() # ignore the rest
 		if msg in BEARINGLIST
 			bearingSounds[msg].play()
