@@ -1,4 +1,4 @@
-PROG_VERSION = 309
+PROG_VERSION = 310
 
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
 LIMIT = 20 # meter. Under this value is no bearing given
@@ -168,7 +168,8 @@ sayDist = (m) -> # m är en distans i DISTLIST
 	console.log "sayDist #{m}"
 	dump.store ""
 	dump.store "sayDistance #{m} #{JSON.stringify distanceQ}"
-	distanceSounds[m].play()
+	if m in DISTLIST
+		distanceSounds[m].play()
 
 sayDistance = (a,b) -> # a is newer (meter)
 	# if a border is crossed, produce a distance
@@ -249,6 +250,7 @@ decreaseQueue = ->
 			#arr = msg.split ' '
 			if general.DISTANCE or msg < LIMIT
 				distance = msg
+				errors.push "distance #{msg}"
 				if distanceSaid != distance then sayDist distance
 				distanceSaid = distance
 	else
@@ -257,7 +259,6 @@ decreaseQueue = ->
 		errors.push "bearing #{msg}"
 		bearingQ.clear() # ignore the rest
 		if msg in BEARINGLIST
-			errors.push "bearing #{msg}"
 			bearingSounds[msg].play()
 
 locationUpdate = (p) ->
@@ -604,7 +605,7 @@ draw = ->
 		#messages[3] = round frameRate()
 		push()
 		textAlign LEFT
-		textSize 15
+		textSize 25
 		for i in range errors.length
 			text errors[i], 10, 50 + 50*i
 		pop()
