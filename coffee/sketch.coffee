@@ -1,4 +1,4 @@
-PROG_VERSION = 307
+PROG_VERSION = 308
 
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
 LIMIT = 20 # meter. Under this value is no bearing given
@@ -276,7 +276,8 @@ locationUpdate = (p) ->
 		uppdatera pLat, pLon
 		reason = 3
 	catch error
-		errors.push "loc.Upd #{error} #{reason}"
+		errors.push error
+		errors.push reason
 
 uppdatera = (pLat, pLon) ->
 	[x,y] = w2b.convert pLon,pLat
