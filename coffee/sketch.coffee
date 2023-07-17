@@ -768,8 +768,9 @@ touchStarted = (event) ->
 	lastTouchStarted = new Date()
 	event.preventDefault()
 	if not released then return
-	speed = 1
-	if general.PANSPEED then speed = 0.1 + 0.9 * dist(mouseX,mouseY,width/2,height/2) / dist(0,0,width/2,height/2)
+	# Low speed in center - high in corners
+	amt = dist(mouseX,mouseY,width/2,height/2) / dist(0,0,width/2,height/2)
+	speed = if general.PANSPEED then lerp 0, 1, amt else 1
 	dump.store "touchStarted #{(new Date())-start} #{JSON.stringify touches}"
 	released = false
 	startX = mouseX
