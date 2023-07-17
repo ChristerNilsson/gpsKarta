@@ -1,4 +1,4 @@
-PROG_VERSION = 313
+PROG_VERSION = 316
 
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
 LIMIT = 20 # meter. Under this value is no bearing given
@@ -177,7 +177,9 @@ sayDist = (m) -> # m är en distans, eventuellt i DISTLIST
 	dump.store ""
 	dump.store "sayDistance #{m} #{JSON.stringify distanceQ}"
 	m = closestDistance m
+	console.log m,'started'
 	distanceSounds[m].play()
+	# distanceSounds[m].onended () => console.log m, "ended"
 
 sayDistance = (a,b) -> # a is newer (meter)
 	# if a border is crossed, produce a distance
@@ -330,6 +332,7 @@ initSounds = ->
 		sound = loadSound "sounds/distance/female/#{distance}.mp3"
 		sound.setVolume 0.5
 		distanceSounds[distance] = sound
+
 
 getMeters = (w,skala) ->
 	[lon0,lat0] = b2w.convert 0,height
