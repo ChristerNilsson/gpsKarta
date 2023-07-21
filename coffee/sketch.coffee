@@ -1,4 +1,4 @@
-PROG_VERSION = 317
+PROG_VERSION = 318
 
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
 LIMIT = 20 # meter. Under this value is no bearing given
@@ -20,7 +20,11 @@ params = null
 voices = null
 measure = {}
 pois = null
-speed = 1
+
+# speed = 1
+speedx = 1
+speedy = 1
+
 distbc = 0
 
 start = new Date()
@@ -772,9 +776,19 @@ touchStarted = (event) ->
 	lastTouchStarted = new Date()
 	event.preventDefault()
 	if not released then return
+
 	# Low speed in center - high in corners
-	amt = dist(mouseX,mouseY,width/2,height/2) / dist(0,0,width/2,height/2)
-	speed = if general.PANSPEED then lerp 0, 1, amt else 1
+	#dx = dist mouseX,mouseY,width/2,height/2
+	#dy = dist 0,0,width/2,height/2
+	#amt = dx / dy
+	#speed = if general.PANSPEED then lerp 0, 1, amt else 1
+
+	# separate speeds for x and y 
+	dx = abs (mouseX - width/2) / (width/2)
+	dy = abs (mouseY - height/2) / (height/2)
+	speedx = if general.PANSPEED then lerp 0, 1, dx else 1
+	speedy = if general.PANSPEED then lerp 0, 1, dy else 1
+
 	dump.store "touchStarted #{(new Date())-start} #{JSON.stringify touches}"
 	released = false
 	startX = mouseX
@@ -785,8 +799,8 @@ touchMoved = (event) ->
 	dump.store "touchMoved #{(new Date())-start} #{JSON.stringify touches}"
 	event.preventDefault()
 	if dialogues.length == 0 and state == 1
-		cx += speed * (startX - mouseX)/SCALE
-		cy += speed * (startY - mouseY)/SCALE
+		cx += speedx * (startX - mouseX)/SCALE
+		cy += speedy * (startY - mouseY)/SCALE
 		startX = mouseX
 		startY = mouseY
 	false
