@@ -1,5 +1,7 @@
 # gpsKarta
 
+[Try it!](https://christernilsson.github.io/gpsKarta/)
+
 ## Digital orienteering
 
 * [Orienteering](https://en.wikipedia.org/wiki/Orienteering)

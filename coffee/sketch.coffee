@@ -332,12 +332,14 @@ initSounds = ->
 	for b in BEARINGLIST
 		sound = loadSound "sounds/bearing/male/#{b}.mp3"
 		sound.setVolume 0.5
+		sound.pan 0
 		bearingSounds[b] = sound
 
 	distanceSounds = {}
 	for distance in DISTLIST
 		sound = loadSound "sounds/distance/female/#{distance}.mp3"
 		sound.setVolume 0.5
+		sound.pan 0
 		distanceSounds[distance] = sound
 
 
