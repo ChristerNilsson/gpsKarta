@@ -1,0 +1,9 @@
+{
+	"map" : "2025-Sommar.jpg",
+	"mail" : "janchrister.nilsson@gmail.com",
+	"ABC" : [59.30075, 18.125611,   59.297611, 18.172972, 59.268, 18.17075],
+	"drawControls": true,
+	"radius" : 60,
+	"scale" : 0.5,
+	"controls": {"A":[118,174],"B":[3324,440],"C":[3358,4340]}
+}

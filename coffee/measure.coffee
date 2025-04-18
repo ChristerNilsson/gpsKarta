@@ -8,7 +8,13 @@ points = []
 
 #############################
 R = 44
-preload = -> img = loadImage 'data/2023-SommarN.jpg'
+preload = -> 
+	try
+		# img = loadImage 'data/2023-SommarS.jpg'
+		img = loadImage 'data/2025-Sommar.jpg' 
+		console.log img.width,img.height
+	catch error
+		console.log 'Error',error
 #############################
 
 setup = ->

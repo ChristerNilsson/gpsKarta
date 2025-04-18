@@ -1,4 +1,6 @@
-PROG_VERSION = 319
+PROG_VERSION = 320
+
+#  https://coordinates-converter.com/en/decimal/59.300750,18.125611?karte=OpenStreetMap&zoom=8
 
 DIST = 1 # meter. Movement less than DIST makes no sound 1=walk. 5=bike 
 LIMIT = 20 # meter. Under this value is no bearing given
@@ -357,7 +359,7 @@ preload = ->
 	initSounds()
 
 	params = getParameters()
-	mapName = params.map || "2023-SommarS"
+	mapName = params.map || "2025-Sommar"
 	if params.debug then dump.active = params.debug == '1'
 	loadJSON "data/poi.json", (json) -> pois = json
 	loadJSON "data/#{mapName}.json", (json) ->
