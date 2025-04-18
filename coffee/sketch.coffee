@@ -1,4 +1,4 @@
-PROG_VERSION = 320
+PROG_VERSION = 321
 
 #  https://coordinates-converter.com/en/decimal/59.300750,18.125611?karte=OpenStreetMap&zoom=8
 
